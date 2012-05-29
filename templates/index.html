@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block heading %} Планы {% endblock %}
+{% block content %}
+    {% for section, items in sections %}
+        <h2>{{section}}</h2>
+        <ul>
+            {% for plan in items %}
+                <li>
+                    {% if plan.bigstone %}
+                        <span class="label label-important">big stone</span>
+                    {% endif %}
+                    {% if plan.state == 'done' %}
+                        <span class="label label-success">Done!</span>
+                    {% endif %}
+                    {{ plan.text|urlize }}
+                </li>
+            {% else %}
+                —
+            {% endfor %}
+        </ul>
+    {% endfor %}
+{% endblock %}
