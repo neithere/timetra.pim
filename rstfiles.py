@@ -81,6 +81,9 @@ def parse_task(line, src_ver, context=None, from_yesterday=False, fixed_time=Fal
     item['text'] = re.sub(r'#([A-Za-z][A-Za-z0-9_\-]+)',
                           r'<a href="#"><i class="icon-tasks"></i> \1</a>',
                           item['text'])
+    item['text'] = re.sub(r'%([A-Za-z][A-Za-z0-9_\-]+)',
+                          r'<a href="#"><i class="icon-briefcase"></i> \1</a>',
+                          item['text'])
     return item
 
 

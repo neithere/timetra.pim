@@ -24,12 +24,15 @@
         <thead>
             <tr>
                 <th>State</th>
+                {#
                 <th>Bonus</th>
+                #}
                 <th>Text</th>
-                <th>Time</th>
                 <th>Est.</th>
-                <th>YEST</th>
+                <th>DRAG</th>
+                {#
                 <th>FXTM</th>
+                #}
                 <th>WAIT</th>
             </tr>
         </thead>
@@ -38,19 +41,39 @@
                 <tr>
                     <td>
                         {% if plan.state == 'done' %}
-                            <span class="label label-success">Done!</span>
+                            {% if plan.from_yesterday %}
+                                <span class="label label-success">finally!</span>
+                            {% else %}
+                                <span class="label label-success">done</span>
+                            {% endif %}
+                        {% elif plan.waiting_for %}
+                            <span class="label label-info">waiting</span>
+                        {% elif plan.from_yesterday %}
+                            <span class="label label-warning">drag</span>
+                        {% elif plan.bigstone %}
+                            <span class="label label-warning">big stone</span>
+                        {% else %}
+                            <span class="label label-warning">to do</span>
                         {% endif %}
                     </td>
+                    {#
                     <td>
                         {% if plan.bigstone %}
                             <span class="label label-important">big stone</span>
                         {% endif %}
                     </td>
-                    <td>{{ plan.text|safe|urlize }}</td>
-                    <td>{{ plan.time }}</td>
+                    #}
+                    <td style="{% if plan.bigstone %}font-size: 1.2em;{% endif %}">
+                        {% if plan.time %}
+                            <span class="label label-info"><i class="icon-time icon-white"></i> {{ plan.time.strftime('%H:%M') }}</span>
+                        {% endif %}
+                        {{ plan.text|safe|urlize }}
+                    </td>
                     <td>{{ plan.estimate }}</td>
                     <td>{% if plan.from_yesterday %}<i class="icon-ok-sign"></i>{% else %}—{% endif %}</td>
+                    {#
                     <td>{% if plan.fixed_time %}<i class="icon-ok-sign"></i>{% else %}—{% endif %}</td>
+                    #}
                     <td>{% if plan.waiting_for %}<i class="icon-ok-sign"></i>{% else %}—{% endif %}</td>
                 </tr>
             {% endfor %}
