@@ -2,22 +2,58 @@
 
 {% block heading %} Планы {% endblock %}
 {% block content %}
-    {% for section, items in sections %}
-        <h2>{{section}}</h2>
-        <ul>
+
+    <ul class="pager">
+        <li> {# class="previous">#}
+            <a href="{{ url_for('day_view', year=prev.year, month=prev.month, day=prev.day) }}">&larr; {{ prev.strftime('%e %b') }}</a>
+        </li>
+        <li>{{ date.strftime('%e %b %Y') }}</li>
+        <li> {# class="next">#}
+            <a href="{{ url_for('day_view', year=next.year, month=next.month, day=next.day) }}">{{ next.strftime('%e %b') }} &rarr;</a>
+        </li>
+    </ul>
+
+    {% if not items %}
+    <div class="alert alert-block">
+        <h2 class="alert-heading">Нет данных</h2>
+        Попробуйте другой день.
+    </div>
+    {% endif %}
+
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <th>State</th>
+                <th>Bonus</th>
+                <th>Text</th>
+                <th>Time</th>
+                <th>Est.</th>
+                <th>YS</th>
+                <th>FT</th>
+                <th>WF</th>
+            </tr>
+        </thead>
+        <tbody>
             {% for plan in items %}
-                <li>
-                    {% if plan.bigstone %}
-                        <span class="label label-important">big stone</span>
-                    {% endif %}
-                    {% if plan.state == 'done' %}
-                        <span class="label label-success">Done!</span>
-                    {% endif %}
-                    {{ plan.text|safe|urlize }}
-                </li>
-            {% else %}
-                —
+                <tr>
+                    <td>
+                        {% if plan.state == 'done' %}
+                            <span class="label label-success">Done!</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if plan.bigstone %}
+                            <span class="label label-important">big stone</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ plan.text|safe|urlize }}</td>
+                    <td>{{ plan.time }}</td>
+                    <td>{{ plan.estimate }}</td>
+                    <td>{% if plan.from_yesterday %}<i class="icon-ok-sign"></i>{% else %}—{% endif %}</td>
+                    <td>{% if plan.fixed_time %}<i class="icon-ok-sign"></i>{% else %}—{% endif %}</td>
+                    <td>{% if plan.waiting_for %}<i class="icon-ok-sign"></i>{% else %}—{% endif %}</td>
+                </tr>
             {% endfor %}
-        </ul>
-    {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
