@@ -10,6 +10,28 @@ __all__ = ['get_day_plans']
 
 garbage = re.compile(r'^[\-=]+$')
 
+hashtag_to_css = {
+    '@': 'user',      # contact
+    '#': 'tasks',     # project
+    '%': 'briefcase', # asset
+}
+regex_to_css = []
+for hashtag, css_class in hashtag_to_css.items():
+    regex = re.compile(r'([^\w]){0}([A-Za-z][A-Za-z0-9_\-]+)'.format(hashtag))
+    template = r'\1<a href="#"><i class="icon-{0}"></i>&nbsp;\2</a>'.format(css_class)
+    regex_to_css.append((regex, template))
+
+
+def replace_hashtags(text):
+    contexts = 'pc', 'home', 'city'
+    text = re.sub(r'([^\w])@({0})'.format('|'.join(contexts)),
+                  r'\1<span class="label"><i class="icon-white icon-globe"></i>&nbsp;\2</span>',
+                  text)
+
+    for regex, template in regex_to_css:
+        text = re.sub(regex, template, text)
+    return text
+
 
 def parse_task(line, src_ver, context=None, from_yesterday=False, fixed_time=False,
                waiting_for=False):
@@ -71,19 +93,7 @@ def parse_task(line, src_ver, context=None, from_yesterday=False, fixed_time=Fal
         )
 
 
-    contexts = 'pc', 'home', 'city'
-    item['text'] = re.sub(r'@({0})'.format('|'.join(contexts)),
-                          r'<span class="label"><i class="icon-white icon-globe"></i> \1</span>',
-                          item['text'])
-    item['text'] = re.sub(r'@([A-Za-z][A-Za-z0-9_\-]+)',
-                          r'<a href="#"><i class="icon-user"></i> \1</a>',
-                          item['text'])
-    item['text'] = re.sub(r'#([A-Za-z][A-Za-z0-9_\-]+)',
-                          r'<a href="#"><i class="icon-tasks"></i> \1</a>',
-                          item['text'])
-    item['text'] = re.sub(r'%([A-Za-z][A-Za-z0-9_\-]+)',
-                          r'<a href="#"><i class="icon-briefcase"></i> \1</a>',
-                          item['text'])
+    item['text'] = replace_hashtags(item['text'])
     return item
 
 
