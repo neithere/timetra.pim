@@ -29,11 +29,11 @@
                 #}
                 <th>Text</th>
                 <th>Est.</th>
-                <th>DRAG</th>
                 {#
+                <th>DRAG</th>
                 <th>FXTM</th>
-                #}
                 <th>WAIT</th>
+                #}
             </tr>
         </thead>
         <tbody>
@@ -69,12 +69,12 @@
                         {% endif %}
                         {{ plan.text|safe|urlize }}
                     </td>
-                    <td>{{ plan.estimate }}</td>
-                    <td>{% if plan.from_yesterday %}<i class="icon-ok-sign"></i>{% else %}—{% endif %}</td>
+                    <td>{% if plan.estimate %}<span class="badge">{{ plan.estimate }}</span>{% endif %}</td>
                     {#
+                    <td>{% if plan.from_yesterday %}<i class="icon-ok-sign"></i>{% else %}—{% endif %}</td>
                     <td>{% if plan.fixed_time %}<i class="icon-ok-sign"></i>{% else %}—{% endif %}</td>
-                    #}
                     <td>{% if plan.waiting_for %}<i class="icon-ok-sign"></i>{% else %}—{% endif %}</td>
+                    #}
                 </tr>
             {% endfor %}
         </tbody>
