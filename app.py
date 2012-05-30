@@ -43,6 +43,10 @@ def extract_rst(date=None):
                     continue
                 elif line in data:
                     print 'OK', line
+                    # possible remainder from another section
+                    if prev:
+                        data[section].append(prev)
+                        prev = None
                     section = line
                 elif line.startswith(' '):
                     # prev item continued
