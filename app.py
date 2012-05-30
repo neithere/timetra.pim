@@ -65,6 +65,12 @@ def extract_rst(date=None):
                     if state:
                         item['text'] = item['text'][1:].strip()
                         item['state'] = state
+                    if ':doc:' in item['text']:
+                        html_root = app.config['SOURCE_HTML_ROOT']
+                        item['text'] = re.sub(r':doc:`(.+?)`',
+                                              r'<a href="file://{0}\1.html">\1</a>'.format(html_root),
+                                              item['text'])
+
                     prev = item
                 else:
                     print "Don't know how to treat line", line

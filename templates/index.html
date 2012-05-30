@@ -13,7 +13,7 @@
                     {% if plan.state == 'done' %}
                         <span class="label label-success">Done!</span>
                     {% endif %}
-                    {{ plan.text|urlize }}
+                    {{ plan.text|safe|urlize }}
                 </li>
             {% else %}
                 —
