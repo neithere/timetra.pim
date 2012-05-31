@@ -14,16 +14,16 @@
         <div class="navbar navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container">
-                    <a class="brand" href="/">Flow</a>
-
                     <ul class="nav">
-                        <li><a href="{{ url_for('day_view') }}">Планы</a></li>
-                        <li><a href="{{ url_for('project_index') }}">Проекты</a></li>
-                        <li><a href="{{ url_for('asset_index') }}">Имущество</a></li>
-                        <li><a href="{{ url_for('contact_index') }}">Люди</a></li>
-                        <li><a href="{{ url_for('reference_index') }}">Справка</a></li>
-                        <li><a href="{{ url_for('someday') }}">Someday/Maybe</a></li>
+                        {% for endpoint, label in config.NAV_ITEMS %}
+                            <li class="{% if request.url_rule.endpoint == endpoint %}active{% endif %}">
+                                <a href="{{ url_for(endpoint) }}">{{ label }}</a>
+                            </li>
+                        {% endfor %}
                     </ul>
+                    <div class="pull-right">
+                        <a class="brand" href="/">Flow</a>
+                    </div>
                 </div>
             </div>
         </div>

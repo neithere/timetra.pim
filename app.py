@@ -118,4 +118,12 @@ def hashtags_filter(s):
 
 if __name__ == "__main__":
     app.config.from_pyfile('conf.py')
+    app.config.NAV_ITEMS = (
+        ('day_view', u'Планы'),
+        ('project_index', u'Проекты'),
+        ('asset_index', u'Имущество'),
+        ('contact_index', u'Контакты'),
+        ('reference_index', u'Справка'),
+        ('someday', u'Когда-нибудь'),
+    )
     app.run(port=6061)
