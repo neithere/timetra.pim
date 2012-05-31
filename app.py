@@ -25,6 +25,20 @@ def day_view(year=None, month=None, day=None):
     return render_template('index.html', items=items, date=date, prev=prev, next=next)
 
 
+@app.route('/projects/')
+def project_index():
+    root = app.config['SOURCE_RST_ROOT']
+    items = rstfiles.get_projects(root)
+    return render_template('project_index.html', items=items)
+
+
+@app.route('/projects/<slug>/')
+def project_detail(slug):
+    root = app.config['SOURCE_RST_ROOT']
+    item = rstfiles.get_project(root, slug=slug)
+    return render_template('project_detail.html', item=item, slug=slug)
+
+
 if __name__ == "__main__":
     app.config.from_pyfile('conf.py')
     app.run(port=6061)

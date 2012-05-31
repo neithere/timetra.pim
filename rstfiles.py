@@ -4,6 +4,8 @@ import datetime
 import os
 import re
 
+import docutils.core
+
 
 __all__ = ['get_day_plans']
 
@@ -181,3 +183,24 @@ def get_day_plans(root_dir, date=None):
     else:
         src_ver = 2
     return extract_items(today_path, src_ver=src_ver)
+
+
+def get_projects(root_dir):
+    directory = os.path.join(root_dir, 'projects')
+    files = [f for f in os.listdir(directory) if f.endswith('.rst')]
+    names = (name for name, ext in (os.path.splitext(f) for f in files))
+    return names
+
+
+def get_project(root_dir, slug):
+    directory = os.path.join(root_dir, 'projects')
+    print directory
+    path = '{root}/{slug}.rst'.format(root=directory, slug=slug)
+    if not os.path.exists(path):
+        return
+    with codecs.open(path, encoding='utf-8') as f:
+        raw_document = f.read()
+        conf = dict(initial_header_level=2)
+        doc = docutils.core.publish_parts(raw_document, writer_name='html',
+                                          settings_overrides=conf)
+        return doc
