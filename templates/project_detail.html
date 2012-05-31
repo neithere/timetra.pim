@@ -1,7 +1,13 @@
 {% extends 'base.html' %}
 
+{% from "_helpers.html" import render_tasks %}
+
 {% block heading %} Проект {{ item.title }} {% endblock %}
 {% block content %}
+    {% if agenda %}
+        {{ render_tasks(agenda) }}
+    {% endif %}
+
     {% if item %}
         {{ item.body|hashtagify|safe }}
     {% else %}

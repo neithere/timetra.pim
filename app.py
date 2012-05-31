@@ -26,6 +26,14 @@ def day_view(year=None, month=None, day=None):
     return render_template('index.html', items=items, date=date, prev=prev, next=next)
 
 
+def get_agenda(pattern):
+    date = datetime.date.today()
+    root = app.config['SOURCE_RST_ROOT']
+    all_items = rstfiles.get_day_plans(root, date)
+    items = [item for item in all_items if pattern in item['text']]
+    return items
+
+
 @app.route('/assets/')
 def asset_index():
     root = app.config['SOURCE_RST_ROOT']
@@ -37,7 +45,8 @@ def asset_index():
 def asset_detail(slug):
     root = app.config['SOURCE_RST_ROOT']
     item = rstfiles.get_asset(root, slug=slug)
-    return render_template('asset_detail.html', item=item, slug=slug)
+    agenda = get_agenda('%'+slug)
+    return render_template('asset_detail.html', item=item, agenda=agenda)
 
 
 @app.route('/contacts/')
@@ -51,7 +60,8 @@ def contact_index():
 def contact_detail(slug):
     root = app.config['SOURCE_RST_ROOT']
     item = rstfiles.get_contact(root, slug=slug)
-    return render_template('contact_detail.html', item=item, slug=slug)
+    agenda = get_agenda('@'+slug)
+    return render_template('contact_detail.html', item=item, agenda=agenda)
 
 
 @app.route('/projects/')
@@ -65,7 +75,8 @@ def project_index():
 def project_detail(slug):
     root = app.config['SOURCE_RST_ROOT']
     item = rstfiles.get_project(root, slug=slug)
-    return render_template('project_detail.html', item=item, slug=slug)
+    agenda = get_agenda('#'+slug)
+    return render_template('project_detail.html', item=item, agenda=agenda)
 
 
 @app.route('/reference/')
@@ -79,7 +90,8 @@ def reference_index():
 def reference_detail(slug):
     root = app.config['SOURCE_RST_ROOT']
     item = rstfiles.get_reference(root, slug=slug)
-    return render_template('reference_detail.html', item=item, slug=slug)
+    agenda = get_agenda('?'+slug)
+    return render_template('reference_detail.html', item=item, agenda=agenda)
 
 
 @app.route('/someday/')
