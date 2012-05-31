@@ -10,15 +10,18 @@ __all__ = ['get_day_plans']
 
 garbage = re.compile(r'^[\-=]+$')
 
-hashtag_to_css = {
-    '@': 'user',      # contact
-    '#': 'tasks',     # project
-    '%': 'briefcase', # asset
-}
+
+# hashtag-related stuff should be done via template filters
+hashtags = (
+    dict(sigil='@', url_base='/contacts/', css='user'),
+    dict(sigil='#', url_base='/projects/', css='tasks'),
+    dict(sigil='%', url_base='/assets/', css='briefcase'),
+)
 regex_to_css = []
-for hashtag, css_class in hashtag_to_css.items():
-    regex = re.compile(r'(^|[^\w]){0}([A-Za-z][A-Za-z0-9_\-]+)'.format(hashtag))
-    template = r'\1<a href="#"><i class="icon-{0}"></i>&nbsp;\2</a>'.format(css_class)
+for hashtag in hashtags:
+    regex = re.compile(r'(^|[^\w]){0}([A-Za-z][A-Za-z0-9_\-]+)'.format(hashtag['sigil']))
+    template = r'\1<a href="{0}\2"><i class="icon-{1}"></i>&nbsp;\2</a>'.format(
+        hashtag['url_base'], hashtag['css'])
     regex_to_css.append((regex, template))
 
 
