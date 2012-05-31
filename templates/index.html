@@ -69,7 +69,7 @@
                             <span class="label label-info"><i class="icon-time icon-white"></i> {{ plan.time.strftime('%H:%M') }}</span>
                         {% endif %}
                         <span style="{% if plan.state == 'done' %}color: darkgrey; text-decoration: line-through;{% endif %}">
-                            {{ plan.text|safe|urlize }}
+                            {{ plan.text|hashtagify|safe|urlize }}
                         </span>
                     </td>
                     <td>{% if plan.estimate %}<span class="badge badge-info">{{ plan.estimate }}</span>{% endif %}</td>
