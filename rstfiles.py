@@ -148,7 +148,10 @@ def extract_items(path, src_ver=2):
 def get_day_plans(root_dir, date=None):
     date = date or datetime.date.today()  # XXX beware UTC vs local time
     day_dir = '{root}/{date.year}/{date.month:0>2}'.format(root=root_dir, date=date)
-    files = os.listdir(day_dir)
+    try:
+        files = os.listdir(day_dir)
+    except OSError:
+        return []
     docs = [f for f in files if f.endswith('.rst')]
     print docs
     today_fn = '{date.day:0>2}.rst'.format(date=date)
