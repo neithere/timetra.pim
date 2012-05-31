@@ -185,16 +185,14 @@ def get_day_plans(root_dir, date=None):
     return extract_items(today_path, src_ver=src_ver)
 
 
-def get_projects(root_dir):
-    directory = os.path.join(root_dir, 'projects')
+def get_rst_files_list(root_dir, subdir):
+    directory = os.path.join(root_dir, subdir)
     files = [f for f in os.listdir(directory) if f.endswith('.rst')]
-    names = (name for name, ext in (os.path.splitext(f) for f in files))
-    return names
+    return sorted(name for name, ext in (os.path.splitext(f) for f in files))
 
 
-def get_project(root_dir, slug):
-    directory = os.path.join(root_dir, 'projects')
-    print directory
+def render_rst_file(root_dir, subdir, slug):
+    directory = os.path.join(root_dir, subdir)
     path = '{root}/{slug}.rst'.format(root=directory, slug=slug)
     if not os.path.exists(path):
         return
@@ -203,4 +201,50 @@ def get_project(root_dir, slug):
         conf = dict(initial_header_level=2)
         doc = docutils.core.publish_parts(raw_document, writer_name='html',
                                           settings_overrides=conf)
-        return doc
+        #for key in doc.keys():
+        #    if key in ('whole', 'stylesheet'):
+        #        continue
+        #    print
+        #    print '-- ', key
+        #    print doc[key]
+        #    print
+        #    print
+        return dict(
+            title = doc['title'],
+            # many documents start with a fieldlist; docutils treat it as
+            # document metadata and cuts out from the rest of the body.
+            # we don't need this and simply staple them together:
+            body = '\n'.join((doc['docinfo'], doc['body']))
+        )
+
+
+def get_asset_list(root_dir):
+    return get_rst_files_list(root_dir, 'assets')
+
+
+def get_asset(root_dir, slug):
+    return render_rst_file(root_dir, 'assets', slug)
+
+
+def get_contact_list(root_dir):
+    return get_rst_files_list(root_dir, 'people')
+
+
+def get_contact(root_dir, slug):
+    return render_rst_file(root_dir, 'people', slug)
+
+
+def get_project_list(root_dir):
+    return get_rst_files_list(root_dir, 'projects')
+
+
+def get_project(root_dir, slug):
+    return render_rst_file(root_dir, 'projects', slug)
+
+
+def get_reference_list(root_dir):
+    return get_rst_files_list(root_dir, 'reference')
+
+
+def get_reference(root_dir, slug):
+    return render_rst_file(root_dir, 'reference', slug)

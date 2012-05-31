@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block heading %} Справочная {% endblock %}
+{% block content %}
+    <ul>
+    {% for item in items %}
+        <li>
+            <a href="{{ url_for('reference_detail', slug=item) }}">{{ item }}</a>
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}
+

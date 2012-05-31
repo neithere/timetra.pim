@@ -25,10 +25,38 @@ def day_view(year=None, month=None, day=None):
     return render_template('index.html', items=items, date=date, prev=prev, next=next)
 
 
+@app.route('/assets/')
+def asset_index():
+    root = app.config['SOURCE_RST_ROOT']
+    items = rstfiles.get_asset_list(root)
+    return render_template('asset_index.html', items=items)
+
+
+@app.route('/assets/<slug>/')
+def asset_detail(slug):
+    root = app.config['SOURCE_RST_ROOT']
+    item = rstfiles.get_asset(root, slug=slug)
+    return render_template('asset_detail.html', item=item, slug=slug)
+
+
+@app.route('/contacts/')
+def contact_index():
+    root = app.config['SOURCE_RST_ROOT']
+    items = rstfiles.get_contact_list(root)
+    return render_template('contact_index.html', items=items)
+
+
+@app.route('/contacts/<slug>/')
+def contact_detail(slug):
+    root = app.config['SOURCE_RST_ROOT']
+    item = rstfiles.get_contact(root, slug=slug)
+    return render_template('contact_detail.html', item=item, slug=slug)
+
+
 @app.route('/projects/')
 def project_index():
     root = app.config['SOURCE_RST_ROOT']
-    items = rstfiles.get_projects(root)
+    items = rstfiles.get_project_list(root)
     return render_template('project_index.html', items=items)
 
 
@@ -37,6 +65,20 @@ def project_detail(slug):
     root = app.config['SOURCE_RST_ROOT']
     item = rstfiles.get_project(root, slug=slug)
     return render_template('project_detail.html', item=item, slug=slug)
+
+
+@app.route('/reference/')
+def reference_index():
+    root = app.config['SOURCE_RST_ROOT']
+    items = rstfiles.get_reference_list(root)
+    return render_template('reference_index.html', items=items)
+
+
+@app.route('/reference/<slug>/')
+def reference_detail(slug):
+    root = app.config['SOURCE_RST_ROOT']
+    item = rstfiles.get_reference(root, slug=slug)
+    return render_template('reference_detail.html', item=item, slug=slug)
 
 
 if __name__ == "__main__":

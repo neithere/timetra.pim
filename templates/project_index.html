@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block heading %} Проекты {% endblock %}
+{% block content %}
+    <ul>
+    {% for item in items %}
+        <li>
+            <a href="{{ url_for('project_detail', slug=item) }}">{{ item }}</a>
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}
+
