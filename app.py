@@ -94,6 +94,7 @@ hashtags = (
     dict(sigil='@', url_base='/contacts/', css='user'),
     dict(sigil='#', url_base='/projects/', css='tasks'),
     dict(sigil='%', url_base='/assets/', css='briefcase'),
+    dict(sigil='\?', url_base='/reference/', css='book'),
 )
 regex_to_css = []
 for hashtag in hashtags:
