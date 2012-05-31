@@ -27,4 +27,4 @@ def day_view(year=None, month=None, day=None):
 
 if __name__ == "__main__":
     app.config.from_pyfile('conf.py')
-    app.run()
+    app.run(port=6061)

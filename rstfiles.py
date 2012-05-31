@@ -17,16 +17,12 @@ hashtag_to_css = {
 }
 regex_to_css = []
 for hashtag, css_class in hashtag_to_css.items():
-    regex = re.compile(r'([^\w]){0}([A-Za-z][A-Za-z0-9_\-]+)'.format(hashtag))
+    regex = re.compile(r'(^|[^\w]){0}([A-Za-z][A-Za-z0-9_\-]+)'.format(hashtag))
     template = r'\1<a href="#"><i class="icon-{0}"></i>&nbsp;\2</a>'.format(css_class)
     regex_to_css.append((regex, template))
 
 
 def replace_hashtags(text):
-    contexts = 'pc', 'home', 'city'
-    text = re.sub(r'([^\w])@({0})'.format('|'.join(contexts)),
-                  r'\1<span class="label"><i class="icon-white icon-globe"></i>&nbsp;\2</span>',
-                  text)
 
     for regex, template in regex_to_css:
         text = re.sub(regex, template, text)
@@ -41,17 +37,26 @@ def parse_task(line, src_ver, context=None, from_yesterday=False, fixed_time=Fal
         'from_yesterday': from_yesterday,
         'fixed_time': fixed_time,
         'waiting_for': waiting_for,
-        'context': [],
+        'contexts': [],
     }
 
     if context:
-        item['context'].append(context)
+        item['contexts'].append(context)
 
     if '**BIGSTONE**' in line:
         item.update(
             text = item['text'].replace('**BIGSTONE**', ''),
             bigstone = True
         )
+
+    # this is hack; ideally we should make a dedicated sigil
+    # currently @context clashes with @contact
+    contexts = 'pc', 'home', 'city', 'phone'
+    for c in contexts:
+        pattern = re.compile(r'([^\w])@({0})'.format(c))
+        if pattern.search(item['text']):
+            item['contexts'].append(c)
+            item['text'] = pattern.sub('', item['text'])
 
     if src_ver == 1:
         states = {'[ ]': 'todo', '[x]': 'done'}
@@ -135,7 +140,6 @@ def extract_items(path, src_ver=2):
                 print 'OK SECT', line
                 # possible remainder from another section
                 if prev:
-                    #data.append(parse_task(prev, context, src_version=src_ver, **sections[section]))
                     yield prepare_task()
                     prev = None
                 section = line
@@ -150,8 +154,6 @@ def extract_items(path, src_ver=2):
                 print 'OK TASK', line
                 if prev:
                     yield prepare_task()
-                    #data.append(parse_task(prev, context,
-                    #                       src_version=src_ver, **sections[section]))
                 prev = line
             else:
                 print "FAIL Don't know how to treat line", repr(line)
