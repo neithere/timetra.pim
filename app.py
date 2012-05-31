@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 import datetime
+import re
 
 from flask import Flask, render_template
 #from timetra import storage as timetra_storage
@@ -79,6 +80,40 @@ def reference_detail(slug):
     root = app.config['SOURCE_RST_ROOT']
     item = rstfiles.get_reference(root, slug=slug)
     return render_template('reference_detail.html', item=item, slug=slug)
+
+
+@app.route('/someday/')
+def someday():
+    root = app.config['SOURCE_RST_ROOT']
+    item = rstfiles.render_rst_file(root, '', 'someday')
+    return render_template('someday.html', item=item)
+
+
+# hashtag-related stuff should be done via template filters
+hashtags = (
+    dict(sigil='@', url_base='/contacts/', css='user'),
+    dict(sigil='#', url_base='/projects/', css='tasks'),
+    dict(sigil='%', url_base='/assets/', css='briefcase'),
+)
+regex_to_css = []
+for hashtag in hashtags:
+    regex = re.compile(r'(^|[>\(\s]){0}([A-Za-z][A-Za-z0-9_\-]+)'.format(hashtag['sigil']))
+    template = r'\1<a href="{0}\2"><i class="icon-{1}"></i>&nbsp;\2</a>'.format(
+        hashtag['url_base'], hashtag['css'])
+    regex_to_css.append((regex, template))
+
+
+def replace_hashtags(text):
+
+    for regex, template in regex_to_css:
+        text = re.sub(regex, template, text)
+    return text
+
+
+@app.template_filter('hashtagify')
+def hashtags_filter(s):
+    print 'replacing hashtags', s
+    return replace_hashtags(s)
 
 
 if __name__ == "__main__":

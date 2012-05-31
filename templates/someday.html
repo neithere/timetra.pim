@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block heading %} Someday/Maybe {% endblock %}
+{% block content %}
+    {{ item.body|hashtagify|safe }}
+{% endblock %}
+

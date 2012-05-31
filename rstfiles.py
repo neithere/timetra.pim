@@ -13,27 +13,6 @@ __all__ = ['get_day_plans']
 garbage = re.compile(r'^[\-=]+$')
 
 
-# hashtag-related stuff should be done via template filters
-hashtags = (
-    dict(sigil='@', url_base='/contacts/', css='user'),
-    dict(sigil='#', url_base='/projects/', css='tasks'),
-    dict(sigil='%', url_base='/assets/', css='briefcase'),
-)
-regex_to_css = []
-for hashtag in hashtags:
-    regex = re.compile(r'(^|[^\w]){0}([A-Za-z][A-Za-z0-9_\-]+)'.format(hashtag['sigil']))
-    template = r'\1<a href="{0}\2"><i class="icon-{1}"></i>&nbsp;\2</a>'.format(
-        hashtag['url_base'], hashtag['css'])
-    regex_to_css.append((regex, template))
-
-
-def replace_hashtags(text):
-
-    for regex, template in regex_to_css:
-        text = re.sub(regex, template, text)
-    return text
-
-
 def parse_task(line, src_ver, context=None, from_yesterday=False, fixed_time=False,
                waiting_for=False):
     item = {
@@ -102,8 +81,7 @@ def parse_task(line, src_ver, context=None, from_yesterday=False, fixed_time=Fal
             estimate = match_est.groups()[0]  # NOT group(0)! :(
         )
 
-
-    item['text'] = replace_hashtags(item['text'])
+#    item['text'] = replace_hashtags(item['text'])
     return item
 
 
@@ -198,7 +176,9 @@ def render_rst_file(root_dir, subdir, slug):
         return
     with codecs.open(path, encoding='utf-8') as f:
         raw_document = f.read()
-        conf = dict(initial_header_level=2)
+        conf = dict(
+            initial_header_level=2,
+        )
         doc = docutils.core.publish_parts(raw_document, writer_name='html',
                                           settings_overrides=conf)
         #for key in doc.keys():
@@ -209,12 +189,17 @@ def render_rst_file(root_dir, subdir, slug):
         #    print doc[key]
         #    print
         #    print
+
+        # many documents start with a fieldlist; docutils treat it as
+        # document metadata and cuts out from the rest of the body.
+        # we don't need this and simply staple them together:
+        body = '\n'.join((doc['docinfo'], doc['body']))
+        # unescape some HTML entities used later on in hashtags
+        # (dunno how to do it in a cleaner way)
+        body = body.replace('&#64;', '@').replace('','')
         return dict(
             title = doc['title'],
-            # many documents start with a fieldlist; docutils treat it as
-            # document metadata and cuts out from the rest of the body.
-            # we don't need this and simply staple them together:
-            body = '\n'.join((doc['docinfo'], doc['body']))
+            body = body
         )
 
 

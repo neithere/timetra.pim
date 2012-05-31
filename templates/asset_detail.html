@@ -3,7 +3,7 @@
 {% block heading %} Единица имущества {{ item.title }} {% endblock %}
 {% block content %}
     {% if item %}
-        {{ item.body|safe }}
+        {{ item.body|hashtagify|safe }}
     {% else %}
         <div class="alert alert-block">
             <h2 class="alert-heading">Нет данных</h2>
