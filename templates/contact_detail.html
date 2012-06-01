@@ -2,13 +2,14 @@
 
 {% from "_helpers.html" import render_tasks %}
 
+{% block title %}@{{ item.slug }} — {{ super() }}{% endblock %}
 {% block heading %} Контакт {{ item.title }} {% endblock %}
 {% block content %}
     {% if agenda %}
         {{ render_tasks(agenda) }}
     {% endif %}
 
-    {% if item %}
+    {% if item.body %}
         {{ item.body|hashtagify|safe }}
     {% else %}
         <div class="alert alert-block">

@@ -176,7 +176,9 @@ def render_rst_file(root_dir, subdir, slug):
     directory = os.path.join(root_dir, subdir)
     path = '{root}/{slug}.rst'.format(root=directory, slug=slug)
     if not os.path.exists(path):
-        return
+        return dict(
+            slug = slug,
+        )
     with codecs.open(path, encoding='utf-8') as f:
         raw_document = f.read()
         conf = dict(
@@ -201,6 +203,7 @@ def render_rst_file(root_dir, subdir, slug):
         # (dunno how to do it in a cleaner way)
         body = body.replace('&#64;', '@').replace('','')
         return dict(
+            slug = slug,
             title = doc['title'],
             body = body
         )
