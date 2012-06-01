@@ -3,7 +3,13 @@
 {% from "_helpers.html" import render_tasks %}
 
 {% block title %}@{{ item.slug }} — {{ super() }}{% endblock %}
-{% block heading %} Контакт {{ item.title }} {% endblock %}
+{% block heading %}
+    {% if item.title %}
+        {{ item.title }}
+    {% else %}
+        Неизвестный контакт {{ item.slug }}
+    {% endif %}
+{% endblock %}
 {% block content %}
     {% if agenda %}
         {{ render_tasks(agenda) }}
