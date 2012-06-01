@@ -218,11 +218,11 @@ def get_asset(root_dir, slug):
 
 
 def get_contact_list(root_dir):
-    return get_rst_files_list(root_dir, 'people')
+    return get_rst_files_list(root_dir, 'contacts')
 
 
 def get_contact(root_dir, slug):
-    return render_rst_file(root_dir, 'people', slug)
+    return render_rst_file(root_dir, 'contacts', slug)
 
 
 def get_project_list(root_dir):
