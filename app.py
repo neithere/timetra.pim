@@ -129,6 +129,9 @@ def hashtags_filter(s):
     return replace_hashtags(s)
 
 
+app.jinja_env.globals['now'] = datetime.datetime.now
+
+
 if __name__ == "__main__":
     app.config.from_pyfile('conf.py')
     app.config.NAV_ITEMS = (

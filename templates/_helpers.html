@@ -45,6 +45,15 @@
                     </td>
                     #}
                     <td style="{% if plan.bigstone %}font-size: 1.2em;{% endif %}">
+                        {% if plan.deadline %}
+                            {% if plan.deadline == now().date() %}
+                                <span class="badge badge-warning">сегодня</span>
+                            {% elif plan.deadline < now().date() %}
+                                <span class="badge badge-important" title="{{ plan.deadline }}">{{ now().date() - plan.deadline }}</span>
+                            {% else %}
+                                <span class="badge badge-info">{{ plan.deadline }}</span>
+                            {% endif %}
+                        {% endif %}
                         {% if plan.time %}
                             <span class="label label-info"><i class="icon-time icon-white"></i> {{ plan.time.strftime('%H:%M') }}</span>
                         {% endif %}

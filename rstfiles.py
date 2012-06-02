@@ -5,6 +5,7 @@ import os
 import re
 
 import docutils.core
+import yaml
 
 
 __all__ = ['get_day_plans']
@@ -22,10 +23,22 @@ def parse_task(line, src_ver, context=None, from_yesterday=False, fixed_time=Fal
         'fixed_time': fixed_time,
         'waiting_for': waiting_for,
         'contexts': [],
+        'deadline': None,
     }
 
     if context:
         item['contexts'].append(context)
+
+    meta_pattern = re.compile(r'(^|\s)(?P<data>\{.+?\})(\s|$)')
+    if meta_pattern.search(item['text']):
+        print 'META'
+        raw_meta = meta_pattern.search(item['text']).group('data')
+        print '  raw:', repr(raw_meta)
+        meta = yaml.load(raw_meta)
+        print '  parsed:', meta
+        item.update(meta)
+        item['text'] = meta_pattern.sub('', item['text'])
+
 
     if '**BIGSTONE**' in line:
         item.update(
