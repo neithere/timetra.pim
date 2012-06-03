@@ -15,7 +15,7 @@ garbage = re.compile(r'^[\-=]+$')
 
 
 def parse_task(line, src_ver, context=None, from_yesterday=False, fixed_time=False,
-               waiting_for=False):
+               waiting_for=False, deadline=None):
     item = {
         'text': line,
         'bigstone': False,
@@ -23,7 +23,7 @@ def parse_task(line, src_ver, context=None, from_yesterday=False, fixed_time=Fal
         'fixed_time': fixed_time,
         'waiting_for': waiting_for,
         'contexts': [],
-        'deadline': None,
+        'deadline': deadline,
     }
 
     if context:
@@ -98,15 +98,15 @@ def parse_task(line, src_ver, context=None, from_yesterday=False, fixed_time=Fal
     return item
 
 
-def extract_items(path, src_ver=2):
+def extract_items(path, src_ver=2, day=None):
 
     sections = {
         1: {
-            u'Календарь': {'fixed_time': True},
+            u'Календарь': {'deadline': day},
             u'Следующие действия': {},
         },
         2: {
-            u'Календарь': {'fixed_time': True},
+            u'Календарь': {'deadline': day},
             u'Перенесенное со вчера': {'from_yesterday': True},
             u'Ежедневные дела': {},
             u'Разовые дела': {},
@@ -176,7 +176,7 @@ def get_day_plans(root_dir, date=None):
         src_ver = 1
     else:
         src_ver = 2
-    return extract_items(today_path, src_ver=src_ver)
+    return extract_items(today_path, src_ver=src_ver, day=date)
 
 
 def get_rst_files_list(root_dir, subdir):
