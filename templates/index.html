@@ -16,7 +16,7 @@
     </ul>
 
     {% if items %}
-        {{ render_tasks(items) }}
+        {{ render_tasks(items, day=date) }}
     {% else %}
         <div class="alert alert-block">
             <h2 class="alert-heading">Нет данных</h2>

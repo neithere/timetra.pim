@@ -1,4 +1,4 @@
-{% macro render_tasks(items) %}
+{% macro render_tasks(items, day=None) %}
 
     <table class="table table-striped">
         <thead>
@@ -46,10 +46,10 @@
                     #}
                     <td style="{% if plan.bigstone %}font-size: 1.2em;{% endif %}">
                         {% if plan.deadline %}
-                            {% if plan.deadline == now().date() %}
-                                <span class="badge badge-warning">сегодня</span>
-                            {% elif plan.deadline < now().date() %}
-                                <span class="badge badge-important" title="{{ plan.deadline }}">{{ now().date() - plan.deadline }}</span>
+                            {% if plan.deadline == (day or now().date()) %}
+                                <span class="badge badge-{% if plan.state == "done" %}success{% else %}warning{% endif %}">сегодня</span>
+                            {% elif plan.deadline < (day or now().date()) %}
+                                <span class="badge badge-{% if plan.state == "done" %}success{% else %}important{% endif %}" title="{{ plan.deadline }}">{{ now().date() - plan.deadline }}</span>
                             {% else %}
                                 <span class="badge badge-info">{{ plan.deadline }}</span>
                             {% endif %}
