@@ -3,7 +3,7 @@
 {% from "_helpers.html" import render_tasks %}
 
 {% block title %}?{{ item.slug }} — {{ super() }}{% endblock %}
-{% block heading %} Справка по {{ item.title }} {% endblock %}
+{% block heading %} Справка: {{ item.title }} {% endblock %}
 {% block content %}
     {% if agenda %}
         {{ render_tasks(agenda) }}

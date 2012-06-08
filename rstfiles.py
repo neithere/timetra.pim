@@ -185,70 +185,62 @@ def get_rst_files_list(root_dir, subdir):
     return sorted(name for name, ext in (os.path.splitext(f) for f in files))
 
 
-def render_rst_file(root_dir, subdir, slug):
+def get_rst_files_list_annotated(root_dir, subdir):
+    names = get_rst_files_list(root_dir, subdir)
+    for name in names:
+        # Quick and dirty: instead of fully rendering each document, just
+        # snatch the title from the most probable location. This will fail
+        # on some documents but the list will be rendered *much* faster.
+        lines = read_rst_file(root_dir, subdir, name).split('\n')
+        if re.match(r'^[\-=~]+$', lines[0]):
+            # ReST document heading is decorated above and below
+            title = lines[1]
+        else:
+            # ReST document heading is probably decorated only below
+            title = lines[0]
+        yield dict(title=title, slug=name)
+
+
+def read_rst_file(root_dir, subdir, slug):
     directory = os.path.join(root_dir, subdir)
     path = '{root}/{slug}.rst'.format(root=directory, slug=slug)
     if not os.path.exists(path):
-        return dict(
-            slug = slug,
-        )
+        print 'NO FILE', path
+        return None
     with codecs.open(path, encoding='utf-8') as f:
-        raw_document = f.read()
-        conf = dict(
-            initial_header_level=2,
-        )
-        doc = docutils.core.publish_parts(raw_document, writer_name='html',
-                                          settings_overrides=conf)
-        #for key in doc.keys():
-        #    if key in ('whole', 'stylesheet'):
-        #        continue
-        #    print
-        #    print '-- ', key
-        #    print doc[key]
-        #    print
-        #    print
+        return f.read()
 
-        # many documents start with a fieldlist; docutils treat it as
-        # document metadata and cuts out from the rest of the body.
-        # we don't need this and simply staple them together:
-        body = '\n'.join((doc['docinfo'], doc['body']))
-        # unescape some HTML entities used later on in hashtags
-        # (dunno how to do it in a cleaner way)
-        body = body.replace('&#64;', '@').replace('','')
+
+def render_rst_file(root_dir, subdir, slug):
+    raw_document = read_rst_file(root_dir, subdir, slug)
+    if raw_document is None:
+        print 'NO FILE, NO RAW DOC'
         return dict(
             slug = slug,
-            title = doc['title'],
-            body = body
         )
+    conf = dict(
+        initial_header_level=2,
+    )
+    doc = docutils.core.publish_parts(raw_document, writer_name='html',
+                                      settings_overrides=conf)
+    #for key in doc.keys():
+    #    if key in ('whole', 'stylesheet'):
+    #        continue
+    #    print
+    #    print '-- ', key
+    #    print doc[key]
+    #    print
+    #    print
 
-
-def get_asset_list(root_dir):
-    return get_rst_files_list(root_dir, 'assets')
-
-
-def get_asset(root_dir, slug):
-    return render_rst_file(root_dir, 'assets', slug)
-
-
-def get_contact_list(root_dir):
-    return get_rst_files_list(root_dir, 'contacts')
-
-
-def get_contact(root_dir, slug):
-    return render_rst_file(root_dir, 'contacts', slug)
-
-
-def get_project_list(root_dir):
-    return get_rst_files_list(root_dir, 'projects')
-
-
-def get_project(root_dir, slug):
-    return render_rst_file(root_dir, 'projects', slug)
-
-
-def get_reference_list(root_dir):
-    return get_rst_files_list(root_dir, 'reference')
-
-
-def get_reference(root_dir, slug):
-    return render_rst_file(root_dir, 'reference', slug)
+    # many documents start with a fieldlist; docutils treat it as
+    # document metadata and cuts out from the rest of the body.
+    # we don't need this and simply staple them together:
+    body = '\n'.join((doc['docinfo'], doc['body']))
+    # unescape some HTML entities used later on in hashtags
+    # (dunno how to do it in a cleaner way)
+    body = body.replace('&#64;', '@').replace('','')
+    return dict(
+        slug = slug,
+        title = doc['title'],
+        body = body
+    )

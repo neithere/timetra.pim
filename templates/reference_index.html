@@ -1,13 +1,9 @@
 {% extends 'base.html' %}
 
+{% from '_helpers.html' import render_hashtag_index %}
+
 {% block heading %} Справочная {% endblock %}
 {% block content %}
-    <ul>
-    {% for item in items %}
-        <li>
-            <a href="{{ url_for('reference_detail', slug=item) }}">{{ item }}</a>
-        </li>
-    {% endfor %}
-    </ul>
+    {{ render_hashtag_index(items, detail_endpoint='reference_detail', hashtag='?') }}
 {% endblock %}
 

@@ -37,14 +37,14 @@ def get_agenda(pattern):
 @app.route('/assets/')
 def asset_index():
     root = app.config['SOURCE_RST_ROOT']
-    items = rstfiles.get_asset_list(root)
+    items = rstfiles.get_rst_files_list_annotated(root, 'assets')
     return render_template('asset_index.html', items=items)
 
 
 @app.route('/assets/<slug>/')
 def asset_detail(slug):
     root = app.config['SOURCE_RST_ROOT']
-    item = rstfiles.get_asset(root, slug=slug)
+    item = rstfiles.render_rst_file(root, 'assets', slug)
     agenda = get_agenda('%'+slug)
     return render_template('asset_detail.html', item=item, agenda=agenda)
 
@@ -52,14 +52,14 @@ def asset_detail(slug):
 @app.route('/contacts/')
 def contact_index():
     root = app.config['SOURCE_RST_ROOT']
-    items = rstfiles.get_contact_list(root)
+    items = rstfiles.get_rst_files_list_annotated(root, 'contacts')
     return render_template('contact_index.html', items=items)
 
 
 @app.route('/contacts/<slug>/')
 def contact_detail(slug):
     root = app.config['SOURCE_RST_ROOT']
-    item = rstfiles.get_contact(root, slug=slug)
+    item = rstfiles.render_rst_file(root, 'contacts', slug)
     agenda = get_agenda('@'+slug)
     return render_template('contact_detail.html', item=item, agenda=agenda)
 
@@ -67,14 +67,14 @@ def contact_detail(slug):
 @app.route('/projects/')
 def project_index():
     root = app.config['SOURCE_RST_ROOT']
-    items = rstfiles.get_project_list(root)
+    items = rstfiles.get_rst_files_list_annotated(root, 'projects')
     return render_template('project_index.html', items=items)
 
 
 @app.route('/projects/<slug>/')
 def project_detail(slug):
     root = app.config['SOURCE_RST_ROOT']
-    item = rstfiles.get_project(root, slug=slug)
+    item = rstfiles.render_rst_file(root, 'projects', slug)
     agenda = get_agenda('#'+slug)
     return render_template('project_detail.html', item=item, agenda=agenda)
 
@@ -82,14 +82,14 @@ def project_detail(slug):
 @app.route('/reference/')
 def reference_index():
     root = app.config['SOURCE_RST_ROOT']
-    items = rstfiles.get_reference_list(root)
+    items = rstfiles.get_rst_files_list_annotated(root, 'reference')
     return render_template('reference_index.html', items=items)
 
 
 @app.route('/reference/<slug>/')
 def reference_detail(slug):
     root = app.config['SOURCE_RST_ROOT']
-    item = rstfiles.get_reference(root, slug=slug)
+    item = rstfiles.render_rst_file(root, 'reference', slug)
     agenda = get_agenda('?'+slug)
     return render_template('reference_detail.html', item=item, agenda=agenda)
 

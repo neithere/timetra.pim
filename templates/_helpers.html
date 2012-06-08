@@ -78,3 +78,24 @@
     </table>
 
 {% endmacro %}
+
+
+{% macro render_hashtag_index(items, detail_endpoint, hashtag='') %}
+    {# renders a list of known hashtags with titles and links to detail views #}
+
+    <table class="table table-striped table-condensed">
+        <thead>
+            <th>Hashtag</th>
+            <th>Title</th>
+        </thead>
+        <tbody>
+            {% for item in items %}
+                <tr>
+                    <td><a href="{{ url_for(detail_endpoint, slug=item.slug) }}">{{ hashtag }}{{ item.slug }}</a></td>
+                    <td>{{ item.title }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endmacro %}
