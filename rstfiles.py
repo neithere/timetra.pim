@@ -185,20 +185,43 @@ def get_rst_files_list(root_dir, subdir):
     return sorted(name for name, ext in (os.path.splitext(f) for f in files))
 
 
+def split_meta_data(raw_data):
+    sep = '\n---\n'
+    if sep in raw_data:
+        raw_meta, _, data = raw_data.partition('\n---\n')
+        meta = yaml.load(raw_meta)
+        return meta, data
+    else:
+        return {}, raw_data
+
+
+def get_rst_file_parts(root_dir, subdir, slug):
+    raw_data = read_rst_file(root_dir, subdir, slug)
+    meta, data = split_meta_data(raw_data)
+    meta.update(slug=slug)
+    return meta, data
+
+
 def get_rst_files_list_annotated(root_dir, subdir):
+    """ Returns a list of metadata dictionaries for ReST files.
+    """
     names = get_rst_files_list(root_dir, subdir)
     for name in names:
-        # Quick and dirty: instead of fully rendering each document, just
-        # snatch the title from the most probable location. This will fail
-        # on some documents but the list will be rendered *much* faster.
-        lines = read_rst_file(root_dir, subdir, name).split('\n')
-        if re.match(r'^[\-=~]+$', lines[0]):
-            # ReST document heading is decorated above and below
-            title = lines[1]
+        meta, data = get_rst_file_parts(root_dir, subdir, name)
+        if 'title' in meta:
+            yield meta
         else:
-            # ReST document heading is probably decorated only below
-            title = lines[0]
-        yield dict(title=title, slug=name)
+            # Quick and dirty: instead of fully rendering each document, just
+            # snatch the title from the most probable location. This will fail
+            # on some documents but the list will be rendered *much* faster.
+            lines = data.split('\n')
+            if re.match(r'^[\-=~]+$', lines[0]):
+                # ReST document heading is decorated above and below
+                title = lines[1]
+            else:
+                # ReST document heading is probably decorated only below
+                title = lines[0]
+            yield dict(meta, title=title)
 
 
 def read_rst_file(root_dir, subdir, slug):
@@ -212,12 +235,10 @@ def read_rst_file(root_dir, subdir, slug):
 
 
 def render_rst_file(root_dir, subdir, slug):
-    raw_document = read_rst_file(root_dir, subdir, slug)
+    meta, raw_document = get_rst_file_parts(root_dir, subdir, slug)
     if raw_document is None:
         print 'NO FILE, NO RAW DOC'
-        return dict(
-            slug = slug,
-        )
+        return meta
     conf = dict(
         initial_header_level=2,
     )
@@ -239,8 +260,7 @@ def render_rst_file(root_dir, subdir, slug):
     # unescape some HTML entities used later on in hashtags
     # (dunno how to do it in a cleaner way)
     body = body.replace('&#64;', '@').replace('','')
-    return dict(
-        slug = slug,
-        title = doc['title'],
-        body = body
-    )
+    meta.update(body=body)
+    if not 'title' in meta:
+        meta.update(title=doc['title'])
+    return meta

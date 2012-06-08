@@ -1,10 +1,12 @@
 {% extends 'base.html' %}
 
-{% from "_helpers.html" import render_tasks %}
+{% from "_helpers.html" import render_tasks, render_doc_meta %}
 
 {% block title %}%{{ item.slug }} — {{ super() }}{% endblock %}
 {% block heading %} Имущество: {{ item.title }} {% endblock %}
 {% block content %}
+    {{ render_doc_meta(item) }}
+
     {% if agenda %}
         {{ render_tasks(agenda) }}
     {% endif %}
