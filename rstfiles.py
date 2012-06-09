@@ -187,6 +187,8 @@ def get_rst_files_list(root_dir, subdir):
 
 def split_meta_data(raw_data):
     sep = '\n---\n'
+    if raw_data is None:
+        return {}, None
     if sep in raw_data:
         raw_meta, _, data = raw_data.partition('\n---\n')
         meta = yaml.load(raw_meta)
