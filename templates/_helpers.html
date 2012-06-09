@@ -138,6 +138,10 @@
                     {% endfor %}
             {% endif %}
 
+            {% if meta.emails %}
+                <a href="https://mail.google.com/mail/u/0/?shva=1#search/{{ meta.emails|join(' OR ') }}"><i class="icon-envelope"></i> Переписка</a>
+            {% endif %}
+
             {% if meta.mail_label %}
                 <a href="https://mail.google.com/mail/u/0/?shva=1#label/{{ meta.mail_label.replace('/', '%2F') }}"><i class="icon-envelope"></i> Переписка</a>
             {% endif %}
