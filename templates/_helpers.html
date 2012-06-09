@@ -95,15 +95,15 @@
                 <tr>
                     <td>
                         {% if item.state == 'active' %}
-                            <span class="badge badge-success">активен</span>
+                            <span class="badge badge-success">актуально</span>
                         {% elif item.state == 'closed' %}
-                            <span class="badge">закрыт</span>
+                            <span class="badge">закрыто</span>
                         {% else %}
                             <span class="badge">{{ item.state or '?' }}</span>
                         {% endif %}
                     </td>
                     <td><a href="{{ url_for(detail_endpoint, slug=item.slug) }}">{{ hashtag }}{{ item.slug }}</a></td>
-                    <td>{{ item.title }}</td>
+                    <td><a href="{{ url_for(detail_endpoint, slug=item.slug) }}">{{ item.title }}</a></td>
                     <td>
                         {% if item.categories %}
                             {% for category in item.categories %}
@@ -121,24 +121,27 @@
 {% macro render_doc_meta(meta) %}
 
     {% if meta|count > 3 %}  {# i.e. if not just the title, slug and body #}
-        <dl class="dl-horizontal well">
-            {% if meta.categories %}
-                <dt>Категории</dt>
-                <dd>
-                    {% for tag in meta.categories %}
-                        <span class="label">{{ tag }}</span>
-                    {% endfor %}
-                </dd>
-            {% endif %}
-            {% if meta.mail_url %}
-                <dt>Почта</dt>
-                <dd><a href="{{ meta.mail_url }}">Переписка по теме</a></dd>
-            {% endif %}
+        <div style="padding: 1em 0;">
             {% if meta.state %}
-                <dt>Состояние</dt>
-                <dd>{{ meta.state }}</dd>
+                {% if meta.state == 'active' %}
+                    <span class="badge badge-success">актуально</span>
+                {% elif meta.state == 'closed' %}
+                    <span class="badge">закрыто</span>
+                {% else %}
+                    <span class="badge">{{ meta.state }}</span>
+                {% endif %}
             {% endif %}
-        </dl>
+
+            {% if meta.categories %}
+                    {% for tag in meta.categories %}
+                        <span class="label"><i class="icon-white icon-tag"></i> {{ tag }}</span>
+                    {% endfor %}
+            {% endif %}
+
+            {% if meta.mail_label %}
+                <a href="https://mail.google.com/mail/u/0/?shva=1#label/{{ meta.mail_label.replace('/', '%2F') }}"><i class="icon-envelope"></i> Переписка</a>
+            {% endif %}
+        </div>
     {% endif %}
 
 {% endmacro %}
