@@ -133,18 +133,34 @@
             {% endif %}
 
             {% if meta.categories %}
+                <span style="padding: .5em 2ex">
                     {% for tag in meta.categories %}
                         <span class="label"><i class="icon-white icon-tag"></i> {{ tag }}</span>
                     {% endfor %}
+                </span>
             {% endif %}
 
             {% if meta.emails %}
-                <a href="https://mail.google.com/mail/u/0/?shva=1#search/{{ meta.emails|join(' OR ') }}"><i class="icon-envelope"></i> Переписка</a>
+                <span style="padding: .5em 2ex">
+                    <a href="https://mail.google.com/mail/u/0/?shva=1#search/{{ meta.emails|join(' OR ') }}"><i class="icon-envelope"></i> Переписка</a>
+                </span>
             {% endif %}
 
             {% if meta.mail_label %}
-                <a href="https://mail.google.com/mail/u/0/?shva=1#label/{{ meta.mail_label.replace('/', '%2F') }}"><i class="icon-envelope"></i> Переписка</a>
+                <span style="padding: .5em 2ex">
+                    <a href="https://mail.google.com/mail/u/0/?shva=1#label/{{ meta.mail_label.replace('/', '%2F') }}"><i class="icon-envelope"></i> Переписка</a>
+                </span>
             {% endif %}
+
+            {% if meta.stakeholders %}
+                <span style="padding: .5em 2ex">
+                    Заинтересованы
+                    {% for person in meta.stakeholders %}
+                        {{ ("@"+person)|hashtagify|safe }}
+                    {% endfor %}
+                </span>
+            {% endif %}
+
         </div>
     {% endif %}
 
