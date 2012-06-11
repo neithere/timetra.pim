@@ -1,34 +1,49 @@
 {% macro render_tasks(items, day=None) %}
 
-    <table class="table table-striped">
+    <table class="table">
         <thead>
             <tr>
-                <th>Problem</th>
-                <th>Solution</th>
-                <th>Outcome</th>
+                <th>Проблема</th>
+                <th>Решение</th>
+                <th>Результат</th>
             </tr>
         </thead>
         <tbody>
             {% for item in items %}
-                <tr>
-                    <td>
-                        <p style="font-size: .8em; font-style: italic;">{{ item.note }}</p>
-                        {{ item.risk }}
+                <tr class="item
+                           {% if item.mode == 'solved' %}
+                               solved
+                           {% elif item.plan %}
+                               open
+                           {% else %}
+                               new
+                           {% endif %}
+                          ">
+                    <td class="{% if item.risk %}problem{% else %}idea{% endif %}">
+                        {% if item.risk %}
+                            <p title="{{ item.note }}">
+                                {{ item.risk }}
+                            </p>
+                        {% else %}
+                            <p style="font-size: .8em; font-style: italic;">{{ item.note }}</p>
+                        {% endif %}
                     </td>
-                    <td>
+                    <td class="solution">
                         <ul>
-                        {% for task in item.task %}
+                        {% for task in item.plan %}
                             <li>
-                                {{ task.status }}
-                                {% if task.closed %}
-                                    {{ task.closed.strftime('%d.%m.%Y %H:%M') }}
+                                {% if task.status %}
+                                    <span class="label">{{ task.status }}</span>
                                 {% endif %}
                                 {{ task.action }}
+                                {% if task.closed %}
+                                    <span class="label">Закрыто {{ task.closed.strftime('%d.%m.%Y %H:%M') }}</span>
+                                {% endif %}
                             </li>
                         {% endfor %}
                         </ul>
                     </td>
-                    <td>
+                    <td class="outcome">
                         {% if item.stakeholders %}
                             <p>
                                 {% for s in item.stakeholders %} @{{ s }}{% endfor %}:
