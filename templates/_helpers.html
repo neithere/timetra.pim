@@ -1,0 +1,44 @@
+{% macro render_tasks(items, day=None) %}
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Problem</th>
+                <th>Solution</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+                <tr>
+                    <td>
+                        <p style="font-size: .8em; font-style: italic;">{{ item.note }}</p>
+                        {{ item.risk }}
+                    </td>
+                    <td>
+                        <ul>
+                        {% for task in item.task %}
+                            <li>
+                                {{ task.status }}
+                                {% if task.closed %}
+                                    {{ task.closed.strftime('%d.%m.%Y %H:%M') }}
+                                {% endif %}
+                                {{ task.action }}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </td>
+                    <td>
+                        {% if item.stakeholders %}
+                            <p>
+                                {% for s in item.stakeholders %} @{{ s }}{% endfor %}:
+                            </p>
+                        {% endif %}
+                        {{ item.need }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endmacro %}
