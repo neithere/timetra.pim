@@ -1,5 +1,4 @@
 {% macro render_tasks(items, day=None) %}
-
     <table class="table">
         <thead>
             <tr>
@@ -20,6 +19,9 @@
                            {% endif %}
                           ">
                     <td class="{% if item.risk %}problem{% else %}idea{% endif %}">
+                        <div class="triangle-container">
+                            <p class="triangle"></p>
+                        </div>
                         {% if item.risk %}
                             <p title="{{ item.note }}">
                                 {{ item.risk }}
@@ -29,6 +31,9 @@
                         {% endif %}
                     </td>
                     <td class="solution">
+                        <div class="triangle-container">
+                            <p class="triangle"></p>
+                        </div>
                         <ul>
                         {% for task in item.plan %}
                             <li>

@@ -8,20 +8,48 @@
             body {
                 padding-top: 50px;
             }
+
+            .triangle-container {
+                position: relative;
+            }
+            .triangle {
+                position: absolute;
+                top: 0;
+                right: -18px;
+                border-top: 15px solid transparent;
+                border-right: 5px solid transparent;
+                border-left: 5px solid white;
+                border-bottom: 15px solid transparent;
+            }
+
             table tr.item.new    td.idea     { background: Gainsboro }
             table tr.item.new    td.problem  { background: IndianRed; color: white; }
             table tr.item.new    td.solution { background: Gainsboro; }
             table tr.item.new    td.outcome  { background: Gainsboro; }
 
+            table tr.item.new    td.idea     .triangle { border-left-color: Gainsboro; }
+            table tr.item.new    td.problem  .triangle { border-left-color: IndianRed; }
+            table tr.item.new    td.solution .triangle { border-left-color: Gainsboro; }
+
             table tr.item.open   td.idea     { background: PowderBlue; }
             table tr.item.open   td.problem  { background: IndianRed; color: white; }
+            /*table tr.item.open    td.problem  { background: white; color: IndianRed; }*/
             table tr.item.open   td.solution { background: Moccasin; }
             table tr.item.open   td.outcome  { background: Gainsboro; }
+
+            table tr.item.open   td.idea     .triangle { border-left-color: PowderBlue; }
+            table tr.item.open   td.problem  .triangle { border-left-color: IndianRed; }
+            table tr.item.open   td.solution .triangle { border-left-color: Moccasin; }
 
             table tr.item.solved td.idea     { background: Gainsboro }
             table tr.item.solved td.problem  { background: Gainsboro; }
             table tr.item.solved td.solution { background: Gainsboro; }
-            table tr.item.solved td.outcome  { background: YellowGreen; }
+            table tr.item.solved td.outcome  { background: YellowGreen; color: black; }
+
+            table tr.item.solved td.idea     .triangle { border-left-color: Gainsboro; }
+            table tr.item.solved td.problem  .triangle { border-left-color: Gainsboro; }
+            table tr.item.solved td.solution .triangle { border-left-color: Gainsboro; }
+
         </style>
     </head>
     <body>
