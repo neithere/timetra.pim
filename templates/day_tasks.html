@@ -1,6 +1,26 @@
 {% extends 'base.html' %}
 
 {% block heading %} Задачи на {{ date.strftime('%e.%m.%Y') }} {% endblock %}
+{% block meta %}
+    <style type="text/css">
+        dl.needs-and-plans dt {
+            margin-top: .5em;
+            border-top: 1px solid #ddd;
+            font-weight: normal;
+            color: #777;
+            line-height: 1.7em;
+        }
+        dl.needs-and-plans dt em {
+            font-style: normal;
+        }
+        dl.needs-and-plans dd {
+            line-height: 2em;
+        }
+        dl.needs-and-plans dd del {
+            color: ForestGreen;
+        }
+    </style>
+{% endblock %}
 {% block content %}
 
     <ul class="nav nav-tabs">
@@ -21,17 +41,17 @@
     </ul>
 
     {% if items %}
-        <dl>
+        <dl class="needs-and-plans">
         {% for item in items %}
-            <dt style="color: gray; font-weight: normal;">
+            <dt>
                 {% if item.need %}
-                    {{ item.need }} — для этого:
+                    <em>{{ item.need }}</em> — для этого:
                 {% else %}
                     Цель не указана:
                 {% endif %}
             </dt>
             {% for task in item.plan %}
-                <dd style="line-height: 2em;">
+                <dd>
                     <span class="label
                         {% if task.status == 'done' %}
                             label-success
@@ -42,7 +62,11 @@
                         {% endif %}
                     ">
                         {{ task.status or "todo" }}</span>
-                    {{ task.action }}
+                    {% if task.status == 'done' %}
+                        <del>{{ task.action }}</del>
+                    {% else %}
+                        {{ task.action }}
+                    {% endif %}
                     <!--p style="color: gray;">→ {{ item.need }}</p-->
                 </dd>
             {% endfor %}
