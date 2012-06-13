@@ -278,11 +278,18 @@ class ReStructuredTextFilesProvider:
 
     @staticmethod
     def _transform_task(item):
+        if item.get('time'):
+            assert item.get('deadline')
+            date_time = datetime.datetime.combine(item['deadline'], item['time'])
+        else:
+            date_time = None
+
         return dict(
             action = capfirst(item['text']),
+            status = item.get('state', 'todo'),
             context = item['contexts'],   # XXX src contains list!
-            status = item['state'],
             srcmeta = item,
+            time = date_time,
         )
 
     def get_day_plans(self, date):
