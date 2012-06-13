@@ -21,20 +21,27 @@
     </ul>
 
     {% if items %}
-        <ul>
+        <dl>
         {% for item in items %}
-            <span style="color: gray;">Чтобы «{{ item.need }}», надо:</span>
-            <ul>
+            <dt style="color: gray; font-weight: normal;">{{ item.need }} — для этого:</dt>
             {% for task in item.plan %}
-                <li>
-                    {{ task.status }}
+                <dd style="line-height: 2em;">
+                    <span class="label
+                        {% if task.status == 'done' %}
+                            label-success
+                        {% elif task.status == 'waiting' %}
+                            label-info
+                        {% elif not task.status or task.status == 'todo' %}
+                            label-warning
+                        {% endif %}
+                    ">
+                        {{ task.status or "todo" }}</span>
                     {{ task.action }}
                     <!--p style="color: gray;">→ {{ item.need }}</p-->
-                </li>
+                </dd>
             {% endfor %}
-            </ul>
         {% endfor %}
-        </ul>
+        </dl>
     {% else %}
         <div class="alert alert-block">
             <h2 class="alert-heading">Нет данных</h2>
