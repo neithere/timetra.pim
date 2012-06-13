@@ -18,6 +18,9 @@ def _unfold_list_of_dicts(value, default_key):
         return [value]
     if isinstance(value, unicode):
         return [{default_key: value}]
+    if isinstance(value, list):
+        if not all(isinstance(x, dict) for x in value):
+            return [{default_key: x} if isinstance(x, unicode) else x for x in value]
     return value
 
 
@@ -38,11 +41,13 @@ class Item(modeling.TypedDictReprMixin,
                 repeat = unicode,
                 effort = unicode,
                 context = unicode,
+                srcmeta = dict,
             )
         ],
         mode = u'open',
         date = datetime.date,
         stakeholders = [unicode],
+        important = False,
     )
 
     def __init__(self, **kwargs):

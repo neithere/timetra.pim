@@ -21,6 +21,8 @@ def make_app(conf_path='conf.py'):
     rst_provider = rstfiles.configure_provider(app)
     app.data_providers = [yaml_provider, rst_provider]
 
+    app.jinja_env.globals['now'] = datetime.datetime.now
+
     return app
 
 
@@ -37,34 +39,32 @@ def collect_needs(date):
     return items
 
 
-@flare.route('/')
-@flare.route('<int:year>/<int:month>/<int:day>/')
-def day_full(year=None, month=None, day=None):
+def day_view(year=None, month=None, day=None, template=None):
+    assert template
     if year and month and day:
         date = datetime.date(year, month, day)
     else:
         date = datetime.date.today()
-    #root = app.config['SOURCE_YAML_ROOT']
-    #items = yamlfiles.get_day_plans(root, date)
     items = collect_needs(date)
     prev = date - datetime.timedelta(days=1)
     next = date + datetime.timedelta(days=1)
-    return render_template('day.html', items=items, date=date, prev=prev, next=next)
+    return render_template(template, items=items, date=date, prev=prev, next=next)
+
+
+@flare.route('/')
+@flare.route('<int:year>/<int:month>/<int:day>/')
+def day_full(**kwargs):
+    return day_view(template='day.html', **kwargs)
 
 
 @flare.route('<int:year>/<int:month>/<int:day>/tasks/')
-def day_tasks(year=None, month=None, day=None):
-    if year and month and day:
-        date = datetime.date(year, month, day)
-    else:
-        date = datetime.date.today()
-    items = collect_needs(date)
-    #items = []
-    #for provider in app.data_providers:
-    #    items.extend(provider.get_day_plans(date))
-    prev = date - datetime.timedelta(days=1)
-    next = date + datetime.timedelta(days=1)
-    return render_template('day_tasks.html', items=items, date=date, prev=prev, next=next)
+def day_tasks(**kwargs):
+    return day_view(template='day_tasks.html', **kwargs)
+
+
+@flare.route('<int:year>/<int:month>/<int:day>/notes/')
+def day_notes(**kwargs):
+    return day_view(template='day_notes.html', **kwargs)
 
 
 if __name__ == "__main__":

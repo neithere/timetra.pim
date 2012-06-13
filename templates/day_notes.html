@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block heading %} Заметки на {{ date.strftime('%e.%m.%Y') }} {% endblock %}
+{% block content %}
+
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#">Заметки</a>
+        </li>
+        <li><a href="{{ url_for('flare.day_full', year=date.year,  month=date.month, day=date.day) }}">Обзор</a></li>
+        <li><a href="{{ url_for('flare.day_tasks', year=date.year, month=date.month, day=date.day) }}">Задачи</a></li>
+    </ul>
+
+    <ul class="pager">
+        <li> {# class="previous">#}
+            <a href="{{ url_for('flare.day_notes', year=prev.year, month=prev.month, day=prev.day) }}">&larr; {{ prev.strftime('%e %b') }}</a>
+        </li>
+        <li>{{ date.strftime('%e %b %Y') }}</li>
+        <li> {# class="next">#}
+            <a href="{{ url_for('flare.day_notes', year=next.year, month=next.month, day=next.day) }}">{{ next.strftime('%e %b') }} &rarr;</a>
+        </li>
+    </ul>
+
+    {% if items %}
+        <ul>
+        {% for item in items %}
+            {% if item.note %}
+                <li>
+                    {% if item.risk or item.need or item.plan %}
+                        <span class="label label-success">Обработано</span>
+                    {% else %}
+                        <span class="label label-warning">Новое</span>
+                    {% endif %}
+                    {{ item.note }}
+                </li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    {% else %}
+        <div class="alert alert-block">
+            <h2 class="alert-heading">Нет данных</h2>
+            Попробуйте другой день.
+        </div>
+    {% endif %}
+{% endblock %}
