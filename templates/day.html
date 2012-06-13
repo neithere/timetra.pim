@@ -8,16 +8,16 @@
     <ul class="nav nav-tabs">
         <li class="active">
             <a href="#">Всё</a>
-        <li><a href="{{ url_for('day_tasks', year=date.year, month=date.month, day=date.day) }}">Задачи</a></li>
+        <li><a href="{{ url_for('flare.day_tasks', year=date.year, month=date.month, day=date.day) }}">Задачи</a></li>
     </ul>
 
     <ul class="pager">
         <li> {# class="previous">#}
-            <a href="{{ url_for('day_full', year=prev.year, month=prev.month, day=prev.day) }}">&larr; {{ prev.strftime('%e %b') }}</a>
+            <a href="{{ url_for('flare.day_full', year=prev.year, month=prev.month, day=prev.day) }}">&larr; {{ prev.strftime('%e %b') }}</a>
         </li>
         <li>{{ date.strftime('%e %b %Y') }}</li>
         <li> {# class="next">#}
-            <a href="{{ url_for('day_full', year=next.year, month=next.month, day=next.day) }}">{{ next.strftime('%e %b') }} &rarr;</a>
+            <a href="{{ url_for('flare.day_full', year=next.year, month=next.month, day=next.day) }}">{{ next.strftime('%e %b') }} &rarr;</a>
         </li>
     </ul>
 

@@ -4,7 +4,7 @@
 {% block content %}
 
     <ul class="nav nav-tabs">
-        <li><a href="{{ url_for('day_full', year=date.year, month=date.month, day=date.day) }}">Всё</a></li>
+        <li><a href="{{ url_for('flare.day_full', year=date.year, month=date.month, day=date.day) }}">Всё</a></li>
         <li class="active">
             <a href="#">Задачи</a>
         </li>
@@ -12,18 +12,24 @@
 
     <ul class="pager">
         <li> {# class="previous">#}
-            <a href="{{ url_for('day_tasks', year=prev.year, month=prev.month, day=prev.day) }}">&larr; {{ prev.strftime('%e %b') }}</a>
+            <a href="{{ url_for('flare.day_tasks', year=prev.year, month=prev.month, day=prev.day) }}">&larr; {{ prev.strftime('%e %b') }}</a>
         </li>
         <li>{{ date.strftime('%e %b %Y') }}</li>
         <li> {# class="next">#}
-            <a href="{{ url_for('day_tasks', year=next.year, month=next.month, day=next.day) }}">{{ next.strftime('%e %b') }} &rarr;</a>
+            <a href="{{ url_for('flare.day_tasks', year=next.year, month=next.month, day=next.day) }}">{{ next.strftime('%e %b') }} &rarr;</a>
         </li>
     </ul>
 
     {% if items %}
         <dl>
         {% for item in items %}
-            <dt style="color: gray; font-weight: normal;">{{ item.need }} — для этого:</dt>
+            <dt style="color: gray; font-weight: normal;">
+                {% if item.need %}
+                    {{ item.need }} — для этого:
+                {% else %}
+                    Цель не указана:
+                {% endif %}
+            </dt>
             {% for task in item.plan %}
                 <dd style="line-height: 2em;">
                     <span class="label
