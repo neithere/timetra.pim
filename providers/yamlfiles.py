@@ -4,6 +4,8 @@ import datetime
 import os
 import yaml
 
+from . import Item
+
 
 def get_day_plans(root_dir, date=None):
     date = date or datetime.date.today()  # XXX beware UTC vs local time
@@ -37,7 +39,7 @@ class YAMLFilesProvider:
         for key in ('idea', 'note', 'risk', 'need'):
             if item.get(key):
                 item[key] = capfirst(item[key])
-        return item
+        return Item(**item)
 
     def get_day_plans(self, date):
         items = get_day_plans(self.root_dir, date)
