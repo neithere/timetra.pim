@@ -266,3 +266,40 @@ def render_rst_file(root_dir, subdir, slug):
     if not 'title' in meta:
         meta.update(title=doc['title'])
     return meta
+
+
+def capfirst(value):
+    return value[0].upper() + value[1:] if value else value
+
+
+class ReStructuredTextFilesProvider:
+    def __init__(self, root_dir):
+        self.root_dir = root_dir
+
+    @staticmethod
+    def _transform_task(item):
+        return dict(
+            action = capfirst(item['text']),
+            context = item['contexts'],   # XXX src contains list!
+            status = item['state'],
+            srcmeta = item,
+        )
+
+    def get_day_plans(self, date):
+        items = get_day_plans(self.root_dir, date)
+        plan = [self._transform_task(x) for x in items]
+        print 'plan', plan
+        # все задачи объединены под одной пустой целью
+        return [
+            dict(
+                note = None,
+                risk = None,
+                need = None,
+                plan = plan  #[self._transform_task(x) for x in items]
+            )
+        ]
+
+
+def configure_provider(app):
+    root_dir = app.config['SOURCE_RST_ROOT']
+    return ReStructuredTextFilesProvider(root_dir)
