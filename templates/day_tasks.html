@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block heading %} Задачи на {{ date.strftime('%e.%m.%Y') }} {% endblock %}
+{% block content %}
+
+    <ul class="nav nav-tabs">
+        <li><a href="{{ url_for('day_full', year=date.year, month=date.month, day=date.day) }}">Всё</a></li>
+        <li class="active">
+            <a href="#">Задачи</a>
+        </li>
+    </ul>
+
+    <ul class="pager">
+        <li> {# class="previous">#}
+            <a href="{{ url_for('day_tasks', year=prev.year, month=prev.month, day=prev.day) }}">&larr; {{ prev.strftime('%e %b') }}</a>
+        </li>
+        <li>{{ date.strftime('%e %b %Y') }}</li>
+        <li> {# class="next">#}
+            <a href="{{ url_for('day_tasks', year=next.year, month=next.month, day=next.day) }}">{{ next.strftime('%e %b') }} &rarr;</a>
+        </li>
+    </ul>
+
+    {% if items %}
+        <ul>
+        {% for item in items %}
+            <span style="color: gray;">Чтобы «{{ item.need }}», надо:</span>
+            <ul>
+            {% for task in item.plan %}
+                <li>
+                    {{ task.status }}
+                    {{ task.action }}
+                    <!--p style="color: gray;">→ {{ item.need }}</p-->
+                </li>
+            {% endfor %}
+            </ul>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <div class="alert alert-block">
+            <h2 class="alert-heading">Нет данных</h2>
+            Попробуйте другой день.
+        </div>
+    {% endif %}
+{% endblock %}
