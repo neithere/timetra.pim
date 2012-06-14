@@ -66,9 +66,9 @@
                     {% if item.need %}
                         {% if item.mode == 'solved' %}
                             <i class="icon-ok icon-white"></i>
-                            {{ item.need }}
+                            {{ item.need|capfirst|hashtagify|safe|urlize }}
                         {% else %}
-                            <em>{{ item.need }}</em> — для этого:
+                            <em>{{ item.need|capfirst|hashtagify|safe|urlize }}</em> — для этого:
                         {% endif %}
                     {% else %}
                         Цель не указана:
@@ -111,9 +111,9 @@
                         {% endif %}
 
                         {% if task.status == 'done' %}
-                            <del>{{ task.action|urlize }}</del>
+                            <del>{{ task.action|capfirst|urlize }}</del>
                         {% else %}
-                            {{ task.action|urlize }}
+                            {{ task.action|capfirst|hashtagify|safe|urlize }}
                         {% endif %}
                         <!--p style="color: gray;">→ {{ item.need }}</p-->
                     </dd>

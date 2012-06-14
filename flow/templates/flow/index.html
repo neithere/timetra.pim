@@ -15,8 +15,8 @@
         </li>
     </ul>
 
-    {% if items %}
-        {{ render_tasks(items, day=date) }}
+    {% if plans %}
+        {{ render_tasks(plans, day=date) }}
     {% else %}
         <div class="alert alert-block">
             <h2 class="alert-heading">Нет данных</h2>

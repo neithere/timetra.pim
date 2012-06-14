@@ -8,23 +8,13 @@ from flask import Blueprint, current_app, render_template
 flare = Blueprint('flare', __name__, template_folder='templates')
 
 
-def collect_needs(date):
-    """ Returns a list of needs and respective tasks collected from all
-    available data providers.
-    """
-    items = []
-    for provider in current_app.data_providers:
-        items.extend(provider.get_day_plans(date))
-    return items
-
-
 def day_view(year=None, month=None, day=None, template=None):
     assert template
     if year and month and day:
         date = datetime.date(year, month, day)
     else:
         date = datetime.date.today()
-    items = collect_needs(date)
+    items = current_app.data_providers.get_items(date)
     prev = date - datetime.timedelta(days=1)
     next = date + datetime.timedelta(days=1)
     return render_template(template, items=items, date=date, prev=prev, next=next)

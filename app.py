@@ -5,7 +5,7 @@ import re
 
 from flask import Flask
 
-from providers import rstfiles, yamlfiles
+from providers import DataProvidersManager, rstfiles, yamlfiles
 from flow import flow
 from flare import flare
 
@@ -51,12 +51,15 @@ def make_app(conf_path='conf.py'):
 
     yaml_provider = yamlfiles.configure_provider(app)
     rst_provider = rstfiles.configure_provider(app)
-    app.data_providers = [yaml_provider, rst_provider]
+    app.data_providers = DataProvidersManager([yaml_provider, rst_provider])
 
     @app.template_filter('hashtagify')
     def hashtags_filter(s):
-        print 'replacing hashtags', s
         return replace_hashtags(s)
+
+    @app.template_filter('capfirst')
+    def capfirst_filter(value):
+        return value[0].upper() + value[1:] if value else value
 
     app.jinja_env.globals['now'] = datetime.datetime.now
 

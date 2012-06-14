@@ -7,6 +7,8 @@ import re
 import docutils.core
 import yaml
 
+from . import Item, Plan
+
 
 __all__ = ['get_day_plans']
 
@@ -268,10 +270,6 @@ def render_rst_file(root_dir, subdir, slug):
     return meta
 
 
-def capfirst(value):
-    return value[0].upper() + value[1:] if value else value
-
-
 class ReStructuredTextFilesProvider:
     def __init__(self, root_dir):
         self.root_dir = root_dir
@@ -284,28 +282,36 @@ class ReStructuredTextFilesProvider:
         else:
             date_time = None
 
-        return dict(
-            action = capfirst(item['text']),
+        return Plan(
+            action = item['text'],
             status = item.get('state', 'todo'),
+            effort = item.get('effort'),
+            time = date_time,
             context = item['contexts'],
             srcmeta = item,
-            time = date_time,
-            effort = item.get('effort'),
         )
 
-    def get_day_plans(self, date):
-        items = get_day_plans(self.root_dir, date)
-        plan = [self._transform_task(x) for x in items]
-        print 'plan', plan
+    def get_items(self, date):
+        plans = list(self.get_plans(date))
         # все задачи объединены под одной пустой целью
         return [
-            dict(
+            Item(
                 note = None,
                 risk = None,
                 need = None,
-                plan = plan  #[self._transform_task(x) for x in items]
+                plan = plans  #[self._transform_task(x) for x in items]
             )
         ]
+
+    def get_plans(self, date):
+        plans = get_day_plans(self.root_dir, date)
+        return (self._transform_task(x) for x in plans)
+
+    def get_document_list(self, category):
+        return get_rst_files_list_annotated(self.root_dir, category)
+
+    def get_document(self, category, slug):
+        return render_rst_file(self.root_dir, category, slug)
 
 
 def configure_provider(app):
