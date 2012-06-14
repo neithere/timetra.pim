@@ -1,0 +1,33 @@
+{% extends 'flare/base.html' %}
+
+{% from "flare/_helpers.html" import render_tasks %}
+
+{% block heading %} Цели и задачи на {{ date.strftime('%e.%m.%Y') }} {% endblock %}
+{% block content %}
+
+    <ul class="nav nav-tabs">
+        <li><a href="{{ url_for('flare.day_notes', year=date.year, month=date.month, day=date.day) }}">Заметки</a></li>
+        <li class="active">
+            <a href="#">Обзор</a>
+        <li><a href="{{ url_for('flare.day_tasks', year=date.year, month=date.month, day=date.day) }}">Задачи</a></li>
+    </ul>
+
+    <ul class="pager">
+        <li> {# class="previous">#}
+            <a href="{{ url_for('flare.day_full', year=prev.year, month=prev.month, day=prev.day) }}">&larr; {{ prev.strftime('%e %b') }}</a>
+        </li>
+        <li>{{ date.strftime('%e %b %Y') }}</li>
+        <li> {# class="next">#}
+            <a href="{{ url_for('flare.day_full', year=next.year, month=next.month, day=next.day) }}">{{ next.strftime('%e %b') }} &rarr;</a>
+        </li>
+    </ul>
+
+    {% if items %}
+        {{ render_tasks(items, day=date) }}
+    {% else %}
+        <div class="alert alert-block">
+            <h2 class="alert-heading">Нет данных</h2>
+            Попробуйте другой день.
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+    <head>
+        <title>{% block title %}Flare{% endblock %}</title>
+        <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/pygments.css') }}" rel="stylesheet">
+        <style type="text/css">
+            body {
+                padding-top: 50px;
+            }
+
+            .triangle-container {
+                position: relative;
+            }
+            .triangle {
+                position: absolute;
+                top: 0;
+                right: -18px;
+                border-top: 15px solid transparent;
+                border-right: 5px solid transparent;
+                border-left: 5px solid white;
+                border-bottom: 15px solid transparent;
+            }
+
+            table tr.item.new    td.idea     { background: Gainsboro }
+            table tr.item.new    td.problem  { background: IndianRed; color: white; }
+            table tr.item.new    td.solution { background: Gainsboro; }
+            table tr.item.new    td.outcome  { background: Gainsboro; }
+
+            table tr.item.new    td.idea     .triangle { border-left-color: Gainsboro; }
+            table tr.item.new    td.problem  .triangle { border-left-color: IndianRed; }
+            table tr.item.new    td.solution .triangle { border-left-color: Gainsboro; }
+
+            table tr.item.open   td.idea     { background: PowderBlue; }
+            table tr.item.open   td.problem  { background: IndianRed; color: white; }
+            /*table tr.item.open    td.problem  { background: white; color: IndianRed; }*/
+            table tr.item.open   td.solution { background: Moccasin; }
+            table tr.item.open   td.outcome  { background: Gainsboro; }
+
+            table tr.item.open   td.idea     .triangle { border-left-color: PowderBlue; }
+            table tr.item.open   td.problem  .triangle { border-left-color: IndianRed; }
+            table tr.item.open   td.solution .triangle { border-left-color: Moccasin; }
+
+            table tr.item.solved td.idea     { background: Gainsboro }
+            table tr.item.solved td.problem  { background: Gainsboro; }
+            table tr.item.solved td.solution { background: Gainsboro; }
+            table tr.item.solved td.outcome  { background: YellowGreen; color: black; }
+
+            table tr.item.solved td.idea     .triangle { border-left-color: Gainsboro; }
+            table tr.item.solved td.problem  .triangle { border-left-color: Gainsboro; }
+            table tr.item.solved td.solution .triangle { border-left-color: Gainsboro; }
+
+        </style>
+
+        {% block meta %}
+        {% endblock %}
+
+    </head>
+    <body>
+    <div class="container">
+        <div class="navbar navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <ul class="nav">
+                        {% for endpoint, label in config.NAV_ITEMS %}
+                            <li class="{% if request.url_rule.endpoint == endpoint %}active{% endif %}">
+                                <a href="{{ url_for(endpoint) }}">{{ label }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="pull-right">
+                        <a class="brand" href="/">Flow</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h1>{% block heading %} Flare {% endblock %}</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message|safe }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        {% block content %}
+            <p>(nothing here yet)</p>
+        {% endblock %}
+    </div>
+    </body>
+</html>

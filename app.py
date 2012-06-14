@@ -7,6 +7,8 @@ from flask import Flask
 
 from flow import flow
 from flow.providers import rstfiles
+from flare import flare
+from flare.providers import yamlfiles
 
 
 # hashtag-related stuff should be done via template filters
@@ -42,14 +44,15 @@ def make_app(conf_path='conf.py'):
         ('flow.contact_index', u'Контакты'),
         ('flow.reference_index', u'Справка'),
         ('flow.someday', u'Когда-нибудь'),
+        ('flare.day_full', u'Цепочки'),
     )
 
     app.register_blueprint(flow, url_prefix='/')
+    app.register_blueprint(flare, url_prefix='/flare/')
 
-#    yaml_provider = yamlfiles.configure_provider(app)
+    yaml_provider = yamlfiles.configure_provider(app)
     rst_provider = rstfiles.configure_provider(app)
-#    app.data_providers = [yaml_provider, rst_provider]
-    app.data_providers = [rst_provider]
+    app.data_providers = [yaml_provider, rst_provider]
 
     @app.template_filter('hashtagify')
     def hashtags_filter(s):

@@ -1,0 +1,131 @@
+{% extends 'flare/base.html' %}
+
+{% block heading %} Планы на {{ date.strftime('%e.%m.%Y') }} {% endblock %}
+{% block meta %}
+    <style type="text/css">
+        dl.needs-and-plans dt {
+            margin-top: .5em;
+            border-top: 1px solid #ddd;
+            font-weight: normal;
+            color: #aaa;
+            line-height: 1.7em;
+        }
+        dl.needs-and-plans dt.important {
+            font-size: 1.2em;
+        }
+        dl.needs-and-plans dt em {
+            font-style: normal;
+            color: #777;
+        }
+        dl.needs-and-plans dd {
+            line-height: 2em;
+        }
+        dl.needs-and-plans dd del {
+            color: ForestGreen;
+        }
+        dl.needs-and-plans dt.solved {
+            background: YellowGreen;
+            color: white;
+            text-shadow: 0 0 1px ForestGreen;
+        }
+        dl.needs-and-plans dd.solved {
+            border-left: 2px solid YellowGreen;
+            margin-left: 0;
+            padding-left: 1ex;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+
+    <ul class="nav nav-tabs">
+        <li><a href="{{ url_for('flare.day_notes', year=date.year, month=date.month, day=date.day) }}">Заметки</a></li>
+        <li><a href="{{ url_for('flare.day_full', year=date.year, month=date.month, day=date.day) }}">Цепочки</a></li>
+        <li class="active">
+            <a href="#">Задачи</a>
+        </li>
+    </ul>
+
+    <ul class="pager">
+        <li> {# class="previous">#}
+            <a href="{{ url_for('flare.day_tasks', year=prev.year, month=prev.month, day=prev.day) }}">&larr; {{ prev.strftime('%e %b') }}</a>
+        </li>
+        <li>{{ date.strftime('%e %b %Y') }}</li>
+        <li> {# class="next">#}
+            <a href="{{ url_for('flare.day_tasks', year=next.year, month=next.month, day=next.day) }}">{{ next.strftime('%e %b') }} &rarr;</a>
+        </li>
+    </ul>
+
+    {% if items %}
+        <dl class="needs-and-plans">
+        {% for item in items %}
+            {% if item.plan %}
+                <dt class="{% if item.important %}important{% endif %}
+                           {% if item.mode == 'solved' %}solved{% endif %}
+                          ">
+
+                    {% if item.need %}
+                        {% if item.mode == 'solved' %}
+                            <i class="icon-ok icon-white"></i>
+                            {{ item.need }}
+                        {% else %}
+                            <em>{{ item.need }}</em> — для этого:
+                        {% endif %}
+                    {% else %}
+                        Цель не указана:
+                        {{item|pprint}}
+                    {% endif %}
+                </dt>
+                {% for task in item.plan %}
+                    <dd class="{% if item.mode == 'solved' %}solved{% endif %}">
+                        {% if task.status == 'done' %}
+                            {% if task.srcmeta and task.srcmeta.from_yesterday %}
+                                <span class="label label-success">at last!</span>
+                            {% else %}
+                                <span class="label label-success">done</span>
+                            {% endif %}
+                        {% elif task.status == 'unclear' %}
+                            <span class="label label-important">unclear</span>
+                        {% elif task.status == 'waiting' %}
+                            <span class="label label-info">waiting</span>
+                        {% elif task.srcmeta and task.srcmeta.from_yesterday %}
+                            <span class="label label-warning">drag</span>
+                        {% elif task.srcmeta and task.srcmeta.bigstone %}
+                            <span class="label label-warning">big stone</span>
+                        {% else %}
+                            <span class="label label-warning">to do</span>
+                        {% endif %}
+
+                        {% if task.time %}
+                            <span class="label label-info"><i class="icon-time icon-white"></i> {{ task.time.strftime('%H:%M') }}</span>
+
+                            {% if task.status != 'done' %}
+                                {% if task.time.date() < (day or now().date()) %}
+                                    <span class="badge badge-{% if task.status == "done" %}success{% else %}important{% endif %}" title="{{ task.time }}">{{ now() - task.time }} назад</span>
+                                {% else %}
+                                    <span class="badge
+                                    {% if (task.time - now()).total_seconds() < 60*60*24 %}badge-warning{% else %}badge-info{% endif %}
+                                    ">
+                                    осталось {{ task.time - now() }}</span>
+                                {% endif %}
+                            {% endif %}
+
+                        {% endif %}
+
+                        {% if task.status == 'done' %}
+                            <del>{{ task.action|urlize }}</del>
+                        {% else %}
+                            {{ task.action|urlize }}
+                        {% endif %}
+                        <!--p style="color: gray;">→ {{ item.need }}</p-->
+                    </dd>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        </dl>
+    {% else %}
+        <div class="alert alert-block">
+            <h2 class="alert-heading">Нет данных</h2>
+            Попробуйте другой день.
+        </div>
+    {% endif %}
+{% endblock %}

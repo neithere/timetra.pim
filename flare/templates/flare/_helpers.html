@@ -1,0 +1,64 @@
+{% macro render_tasks(items, day=None) %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Проблема</th>
+                <th>Решение</th>
+                <th>Результат</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+                <tr class="item
+                           {% if item.mode == 'solved' %}
+                               solved
+                           {% elif item.plan %}
+                               open
+                           {% else %}
+                               new
+                           {% endif %}
+                          ">
+                    <td class="{% if item.risk %}problem{% else %}idea{% endif %}">
+                        <div class="triangle-container">
+                            <p class="triangle"></p>
+                        </div>
+                        {% if item.risk %}
+                            <p title="{{ item.note }}">
+                                {{ item.risk }}
+                            </p>
+                        {% else %}
+                            <p style="font-size: .8em; font-style: italic;">{{ item.note }}</p>
+                        {% endif %}
+                    </td>
+                    <td class="solution">
+                        <div class="triangle-container">
+                            <p class="triangle"></p>
+                        </div>
+                        <ul>
+                        {% for task in item.plan %}
+                            <li>
+                                {% if task.status %}
+                                    <span class="label">{{ task.status }}</span>
+                                {% endif %}
+                                {{ task.action }}
+                                {% if task.closed %}
+                                    <span class="label">Закрыто {{ task.closed.strftime('%d.%m.%Y %H:%M') }}</span>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </td>
+                    <td class="outcome">
+                        {% if item.stakeholders %}
+                            <p>
+                                {% for s in item.stakeholders %} @{{ s }}{% endfor %}:
+                            </p>
+                        {% endif %}
+                        {{ item.need }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endmacro %}
