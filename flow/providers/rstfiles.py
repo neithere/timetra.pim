@@ -91,7 +91,7 @@ def parse_task(line, src_ver, context=None, from_yesterday=False, fixed_time=Fal
     if match_est:
         item.update(
             text = re.sub(est_pattern, '', item['text']),
-            estimate = match_est.groups()[0]  # NOT group(0)! :(
+            effort = match_est.groups()[0]  # NOT group(0)! :(
         )
 
 #    item['text'] = replace_hashtags(item['text'])
@@ -287,9 +287,10 @@ class ReStructuredTextFilesProvider:
         return dict(
             action = capfirst(item['text']),
             status = item.get('state', 'todo'),
-            context = item['contexts'],   # XXX src contains list!
+            context = item['contexts'],
             srcmeta = item,
             time = date_time,
+            effort = item.get('effort'),
         )
 
     def get_day_plans(self, date):

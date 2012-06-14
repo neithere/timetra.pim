@@ -15,9 +15,7 @@ def get_day_plans(root_dir, date=None):
     except OSError:
         return []
     docs = [f for f in files if f.endswith('.yaml')]
-    print docs
     today_fn = '{date.day:0>2}.yaml'.format(date=date)
-    print today_fn
     if today_fn not in docs:
         return []
     today_path = os.path.join(day_dir, today_fn)

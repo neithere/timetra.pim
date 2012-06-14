@@ -24,6 +24,13 @@ def _unfold_list_of_dicts(value, default_key):
     return value
 
 
+def _unfold_list(value):
+    if value and not isinstance(value, list):
+        return [value]
+    else:
+        return value
+
+
 class Item(modeling.TypedDictReprMixin,
            modeling.DotExpandedDictMixin,
            modeling.StructuredDictMixin,
@@ -40,7 +47,7 @@ class Item(modeling.TypedDictReprMixin,
                 status = u'todo',
                 repeat = unicode,
                 effort = unicode,
-                context = unicode,
+                context = [unicode],
                 srcmeta = dict,
             )
         ],
@@ -53,6 +60,16 @@ class Item(modeling.TypedDictReprMixin,
     def __init__(self, **kwargs):
         data = kwargs.copy()
 
+        # разворачиваем строку или словарь в список словарей
         data['plan'] = _unfold_list_of_dicts(data.get('plan'), 'action')
+
+        # заворачиваем строку в список
+        if data['plan']:
+            tasks = []
+            for task in data['plan']:
+                if task.get('context'):
+                    task['context'] = _unfold_list(task['context'])
+                tasks.append(task)
+            data['plan'] = tasks
 
         super(Item, self).__init__(**data)

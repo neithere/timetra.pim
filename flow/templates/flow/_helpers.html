@@ -21,17 +21,17 @@
             {% for plan in items %}
                 <tr>
                     <td>
-                        {% if plan.state == 'done' %}
-                            {% if plan.from_yesterday %}
+                        {% if plan.status == 'done' %}
+                            {% if plan.srcmeta and plan.from_yesterday %}
                                 <span class="label label-success">at last!</span>
                             {% else %}
                                 <span class="label label-success">done</span>
                             {% endif %}
-                        {% elif plan.waiting_for %}
+                        {% elif plan.status == 'waiting' %}
                             <span class="label label-info">waiting</span>
-                        {% elif plan.from_yesterday %}
+                        {% elif plan.srcmeta and plan.srcmeta.from_yesterday %}
                             <span class="label label-warning">drag</span>
-                        {% elif plan.bigstone %}
+                        {% elif plan.srcmeta and plan.bigstone %}
                             <span class="label label-warning">big stone</span>
                         {% else %}
                             <span class="label label-warning">to do</span>
@@ -61,14 +61,18 @@
                             {{ plan.action|hashtagify|safe|urlize }}
                         </span>
                     </td>
-                    <td>{% if plan.estimate %}<span class="badge badge-info">{{ plan.estimate }}</span>{% endif %}</td>
+                    <td>
+                        {% if plan.effort %}
+                            <span class="badge badge-info">{{ plan.effort }}</span>
+                        {% endif %}
+                    </td>
                     {#
                     <td>{% if plan.from_yesterday %}<i class="icon-ok-sign"></i>{% else %}—{% endif %}</td>
                     <td>{% if plan.fixed_time %}<i class="icon-ok-sign"></i>{% else %}—{% endif %}</td>
                     <td>{% if plan.waiting_for %}<i class="icon-ok-sign"></i>{% else %}—{% endif %}</td>
                     #}
                     <td>
-                        {% for context in plan.contexts %}
+                        {% for context in plan.context %}
                             <span class="label"><i class="icon-globe icon-white"></i> {{ context }}</span>
                         {% endfor %}
                     </td>
