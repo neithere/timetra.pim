@@ -5,7 +5,7 @@ import datetime
 from flask import Blueprint, current_app, render_template
 #from timetra import storage as timetra_storage
 
-from flow.providers import rstfiles
+from providers import rstfiles
 
 
 flow = Blueprint('flow', __name__, template_folder='templates')

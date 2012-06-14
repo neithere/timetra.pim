@@ -5,10 +5,9 @@ import re
 
 from flask import Flask
 
+from providers import rstfiles, yamlfiles
 from flow import flow
-from flow.providers import rstfiles
 from flare import flare
-from flare.providers import yamlfiles
 
 
 # hashtag-related stuff should be done via template filters
