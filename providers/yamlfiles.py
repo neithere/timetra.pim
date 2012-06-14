@@ -33,6 +33,7 @@ class YAMLFilesProvider:
 
     @staticmethod
     def _transform_item(item):
+        item = {'note': item} if isinstance(item, unicode) else item
         item = dict(item)
         for key in ('idea', 'note', 'risk', 'need'):
             if item.get(key):
