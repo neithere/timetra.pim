@@ -3,102 +3,10 @@
 import datetime
 import re
 
-from flask import Flask, render_template
-#from timetra import storage as timetra_storage
+from flask import Flask
 
-import rstfiles
-
-
-app = Flask(__name__)
-
-
-@app.route('/')
-@app.route('/<int:year>/<int:month>/<int:day>')
-def day_view(year=None, month=None, day=None):
-    if year and month and day:
-        date = datetime.date(year, month, day)
-    else:
-        date = datetime.date.today()
-    root = app.config['SOURCE_RST_ROOT']
-    items = rstfiles.get_day_plans(root, date)
-    prev = date - datetime.timedelta(days=1)
-    next = date + datetime.timedelta(days=1)
-    return render_template('index.html', items=items, date=date, prev=prev, next=next)
-
-
-def get_agenda(pattern):
-    date = datetime.date.today()
-    root = app.config['SOURCE_RST_ROOT']
-    all_items = rstfiles.get_day_plans(root, date)
-    items = [item for item in all_items if pattern in item['text']]
-    return items
-
-
-@app.route('/assets/')
-def asset_index():
-    root = app.config['SOURCE_RST_ROOT']
-    items = rstfiles.get_rst_files_list_annotated(root, 'assets')
-    return render_template('asset_index.html', items=items)
-
-
-@app.route('/assets/<slug>/')
-def asset_detail(slug):
-    root = app.config['SOURCE_RST_ROOT']
-    item = rstfiles.render_rst_file(root, 'assets', slug)
-    agenda = get_agenda('%'+slug)
-    return render_template('asset_detail.html', item=item, agenda=agenda)
-
-
-@app.route('/contacts/')
-def contact_index():
-    root = app.config['SOURCE_RST_ROOT']
-    items = rstfiles.get_rst_files_list_annotated(root, 'contacts')
-    return render_template('contact_index.html', items=items)
-
-
-@app.route('/contacts/<slug>/')
-def contact_detail(slug):
-    root = app.config['SOURCE_RST_ROOT']
-    item = rstfiles.render_rst_file(root, 'contacts', slug)
-    agenda = get_agenda('@'+slug)
-    return render_template('contact_detail.html', item=item, agenda=agenda)
-
-
-@app.route('/projects/')
-def project_index():
-    root = app.config['SOURCE_RST_ROOT']
-    items = rstfiles.get_rst_files_list_annotated(root, 'projects')
-    return render_template('project_index.html', items=items)
-
-
-@app.route('/projects/<slug>/')
-def project_detail(slug):
-    root = app.config['SOURCE_RST_ROOT']
-    item = rstfiles.render_rst_file(root, 'projects', slug)
-    agenda = get_agenda('#'+slug)
-    return render_template('project_detail.html', item=item, agenda=agenda)
-
-
-@app.route('/reference/')
-def reference_index():
-    root = app.config['SOURCE_RST_ROOT']
-    items = rstfiles.get_rst_files_list_annotated(root, 'reference')
-    return render_template('reference_index.html', items=items)
-
-
-@app.route('/reference/<slug>/')
-def reference_detail(slug):
-    root = app.config['SOURCE_RST_ROOT']
-    item = rstfiles.render_rst_file(root, 'reference', slug)
-    agenda = get_agenda('?'+slug)
-    return render_template('reference_detail.html', item=item, agenda=agenda)
-
-
-@app.route('/someday/')
-def someday():
-    root = app.config['SOURCE_RST_ROOT']
-    item = rstfiles.render_rst_file(root, '', 'someday')
-    return render_template('someday.html', item=item)
+from flow import flow
+from flow.providers import rstfiles
 
 
 # hashtag-related stuff should be done via template filters
@@ -123,23 +31,36 @@ def replace_hashtags(text):
     return text
 
 
-@app.template_filter('hashtagify')
-def hashtags_filter(s):
-    print 'replacing hashtags', s
-    return replace_hashtags(s)
+def make_app(conf_path='conf.py'):
+    app = Flask(__name__)
 
+    app.config.from_pyfile(conf_path)
+    app.config.NAV_ITEMS = (
+        ('flow.day_view', u'Планы'),
+        ('flow.project_index', u'Проекты'),
+        ('flow.asset_index', u'Имущество'),
+        ('flow.contact_index', u'Контакты'),
+        ('flow.reference_index', u'Справка'),
+        ('flow.someday', u'Когда-нибудь'),
+    )
 
-app.jinja_env.globals['now'] = datetime.datetime.now
+    app.register_blueprint(flow, url_prefix='/')
+
+#    yaml_provider = yamlfiles.configure_provider(app)
+    rst_provider = rstfiles.configure_provider(app)
+#    app.data_providers = [yaml_provider, rst_provider]
+    app.data_providers = [rst_provider]
+
+    @app.template_filter('hashtagify')
+    def hashtags_filter(s):
+        print 'replacing hashtags', s
+        return replace_hashtags(s)
+
+    app.jinja_env.globals['now'] = datetime.datetime.now
+
+    return app
 
 
 if __name__ == "__main__":
-    app.config.from_pyfile('conf.py')
-    app.config.NAV_ITEMS = (
-        ('day_view', u'Планы'),
-        ('project_index', u'Проекты'),
-        ('asset_index', u'Имущество'),
-        ('contact_index', u'Контакты'),
-        ('reference_index', u'Справка'),
-        ('someday', u'Когда-нибудь'),
-    )
+    app = make_app()
     app.run(port=6061)

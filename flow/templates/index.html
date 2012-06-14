@@ -7,11 +7,11 @@
 
     <ul class="pager">
         <li> {# class="previous">#}
-            <a href="{{ url_for('day_view', year=prev.year, month=prev.month, day=prev.day) }}">&larr; {{ prev.strftime('%e %b') }}</a>
+            <a href="{{ url_for('flow.day_view', year=prev.year, month=prev.month, day=prev.day) }}">&larr; {{ prev.strftime('%e %b') }}</a>
         </li>
         <li>{{ date.strftime('%e %b %Y') }}</li>
         <li> {# class="next">#}
-            <a href="{{ url_for('day_view', year=next.year, month=next.month, day=next.day) }}">{{ next.strftime('%e %b') }} &rarr;</a>
+            <a href="{{ url_for('flow.day_view', year=next.year, month=next.month, day=next.day) }}">{{ next.strftime('%e %b') }} &rarr;</a>
         </li>
     </ul>
 
