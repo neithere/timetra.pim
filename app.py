@@ -43,6 +43,7 @@ def make_app(conf_path='conf.py'):
         ('flow.contact_index', u'Контакты'),
         ('flow.reference_index', u'Справка'),
         ('flow.someday', u'Когда-нибудь'),
+        ('flow.context_index', u'Контексты'),
         ('flare.day_full', u'Цепочки'),
     )
 

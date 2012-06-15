@@ -45,6 +45,25 @@ def day_view(year=None, month=None, day=None):
     return render_template('flow/index.html', plans=plans, date=date, prev=prev, next=next)
 
 
+@flow.route('contexts/')
+def context_index():
+    date = datetime.date.today()
+    plans = current_app.data_providers.get_plans(date)
+    grouped = (p.context for p in plans if 'context' in p)
+    slugs = list(set(itertools.chain(*grouped)))
+    contexts = ({'title': x, 'slug': x} for x in slugs)
+    return render_template('flow/context_index.html', contexts=contexts)
+
+
+@flow.route('contexts/<slug>/')
+def context_detail(slug):
+    date = datetime.date.today()
+    plans = current_app.data_providers.get_plans(date)
+    filtered = (p for p in plans if 'context' in p and slug in p.context)
+    item = {'title': slug, 'slug': slug}
+    return render_template('flow/context_detail.html', item=item, plans=filtered)
+
+
 @flow.route('assets/')
 def asset_index():
     items = get_document_list('assets')

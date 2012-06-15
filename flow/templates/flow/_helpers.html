@@ -73,7 +73,10 @@
                     #}
                     <td>
                         {% for context in plan.context %}
-                            <span class="label"><i class="icon-globe icon-white"></i> {{ context }}</span>
+                            <a href="{{ url_for('flow.context_detail', slug=context) }}" class="label">
+                                <i class="icon-globe icon-white"></i>
+                                {{ context }}
+                            </a>
                         {% endfor %}
                     </td>
                 </tr>

@@ -1,0 +1,8 @@
+{% extends 'flow/base.html' %}
+
+{% from 'flow/_helpers.html' import render_hashtag_index %}
+
+{% block heading %} Контексты {% endblock %}
+{% block content %}
+    {{ render_hashtag_index(contexts, detail_endpoint='flow.context_detail', hashtag='@') }}
+{% endblock %}
