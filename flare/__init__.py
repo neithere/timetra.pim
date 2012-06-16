@@ -39,8 +39,8 @@ def day_notes(**kwargs):
 @flare.route('items/')
 def item_index(**kwargs):
     items = current_app.data_providers.get_items(date=None)
-    items = (x for x in items if ('need' in x and x.need) or
-                                 ('risk' in x and x.risk))
+    items = [x for x in items if ('need' in x and x.need) or
+                                 ('risk' in x and x.risk)]
     return render_template('flare/item_index.html', items=items)
 
 

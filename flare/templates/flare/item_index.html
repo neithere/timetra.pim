@@ -8,41 +8,47 @@
 {% block content %}
 
     {% if items %}
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>Mode</th>
-                    <th>Description</th>
-                    <th>Planned</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in items %}
-                    <tr>
-                        <td>{{ render_item_type_label(item) }}</td>
-                        <td>{{ render_item_mode_label(item) }}</td>
-                        <td>
-                            {{ render_item_importance_label(item) }}
-                            <a href="{{ url_for('flare.item_detail', text=(item.need or item.risk)) }}">
-                                {{ (item.risk or item.need)|capfirst }}
-                            </a>
-                        </td>
-                        <td>
-                            {% if item.plan %}
-                                <span class="badge badge-success">да</span>
-                            {% else %}
-                                <span class="badge badge-important">no</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <h2>Проблемы, риски</h2>
+        {{ render_items(items, has_risk=True) }}
+        <h2>Потребности</h2>
+        {{ render_items(items, has_risk=False) }}
     {% else %}
         <div class="alert alert-block">
             <h2 class="alert-heading">Нет данных</h2>
             Вероятно, вы достигли нирваны.
         </div>
     {% endif %}
+
 {% endblock %}
+
+{% macro render_items(items, has_risk=True) %}
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Mode</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+                {% if has_risk == (True if item.get('risk') else False) %}
+                    <tr>
+                        <td>{{ render_item_mode_label(item) }}</td>
+                        <td>
+                            {{ render_item_importance_label(item) }}
+                            <a href="{{ url_for('flare.item_detail', text=(item.need or item.risk)) }}">
+                                {{ (item.risk or item.need)|capfirst }}
+                            </a>
+
+                            {% if not item.plan %}
+                                <span class="badge badge-important">no plans</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endmacro %}
