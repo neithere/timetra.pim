@@ -144,3 +144,35 @@
     {{ render_item_importance_label(item) }}
 
 {% endmacro %}
+
+{% macro render_delta(dt1, dt2) %}
+
+    {% set delta = relativedelta(dt1, dt2) %}
+
+    {% if delta.years %}
+        {{ delta.years }} years
+    {% endif %}
+
+    {% if delta.months %}
+        {{ delta.months }} months
+    {% endif %}
+
+    {% if delta.weeks %}
+        {{ delta.weeks }} weeks
+    {% endif %}
+
+    {% if delta.days %}
+        {{ delta.days }} days
+    {% endif %}
+
+    {% if delta.hours %}
+        {{ delta.hours }}h
+    {% endif %}
+
+    {% if delta.minutes %}
+        {{ delta.minutes }}m
+    {% else %}
+        только что
+    {% endif %}
+
+{% endmacro %}

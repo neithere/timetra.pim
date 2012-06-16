@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 import datetime
+from dateutil.relativedelta import relativedelta
 import re
 
 from flask import Flask
@@ -64,6 +65,7 @@ def make_app(conf_path='conf.py'):
         return value[0].upper() + value[1:] if value else value
 
     app.jinja_env.globals['now'] = datetime.datetime.now
+    app.jinja_env.globals['relativedelta'] = relativedelta
 
     return app
 

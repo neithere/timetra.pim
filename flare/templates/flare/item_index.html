@@ -2,7 +2,9 @@
 
 {% from 'flare/_helpers.html' import render_item_type_label,
                                      render_item_mode_label,
-                                     render_item_importance_label %}
+                                     render_item_importance_label,
+                                     render_delta
+                                     %}
 
 {% block heading %} Проблемы и потребности {% endblock %}
 {% block content %}
@@ -28,6 +30,7 @@
             <tr>
                 <th>Mode</th>
                 <th>Description</th>
+                <th>Age</th>
             </tr>
         </thead>
         <tbody>
@@ -43,6 +46,11 @@
 
                             {% if not item.plan %}
                                 <span class="badge badge-important">no plans</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.meta and item.meta.created %}
+                                {{ render_delta(now(), item.meta.created) }}
                             {% endif %}
                         </td>
                     </tr>

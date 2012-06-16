@@ -1,6 +1,6 @@
 {% extends 'flare/base.html' %}
 
-{% from 'flare/_helpers.html' import render_plan, render_item_labels %}
+{% from 'flare/_helpers.html' import render_plan, render_item_labels, render_delta %}
 
 {% block heading %}
     {% if item %}
@@ -15,11 +15,16 @@
 
         <p>{{ render_item_labels(item) }}</p>
 
-        <dl>
+        <dl class="dl-horizontal">
+
+        {% if item.meta and item.meta.created %}
+            <dt>Возраст</dt>
+            <dd>{{ render_delta(now(), item.meta.created) }}</dd>
+        {% endif %}
 
         {% if item.note %}
             <dt>Заметка</dt>
-            <dd>{{ item.note }}.</dd>
+            <dd>{{ item.note|capfirst|hashtagify|safe }}.</dd>
         {% endif %}
 
         {% if item.risk %}
