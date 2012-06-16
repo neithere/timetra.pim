@@ -45,6 +45,7 @@ def make_app(conf_path='conf.py'):
         ('flow.someday', u'Когда-нибудь'),
         ('flow.context_index', u'Контексты'),
         ('flare.day_full', u'Цепочки'),
+        ('flare.item_index', u'Элементы'),
     )
 
     app.register_blueprint(flow, url_prefix='/')

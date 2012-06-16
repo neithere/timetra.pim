@@ -1,0 +1,30 @@
+{% extends 'flare/base.html' %}
+
+{% from 'flare/_helpers.html' import render_item_labels %}
+
+{% block heading %} Требования {% endblock %}
+{% block content %}
+
+    {% if items %}
+        <ul>
+        {% for item in items %}
+            <li>
+                {{ render_item_labels(item) }}
+
+                <a href="{{ url_for('flare.item_detail', text=(item.need or item.risk)) }}">
+                    {% if item.need %}
+                        {{ item.need|capfirst }}
+                    {% else %}
+                        Устранена проблема: {{ item.risk|capfirst }}
+                    {% endif %}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <div class="alert alert-block">
+            <h2 class="alert-heading">Нет данных</h2>
+            Вероятно, вы достигли нирваны.
+        </div>
+    {% endif %}
+{% endblock %}

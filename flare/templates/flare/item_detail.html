@@ -1,0 +1,44 @@
+{% extends 'flare/base.html' %}
+
+{% from 'flare/_helpers.html' import render_plan, render_item_labels %}
+
+{% block heading %}
+    {% if item %}
+        {{ (item.need or item.risk)|capfirst }}
+    {% else %}
+        (Несуществующий элемент)
+    {% endif %}
+{% endblock %}
+{% block content %}
+
+    {% if item %}
+
+
+
+        <p>{{ render_item_labels(item) }}</p>
+
+        {% if item.stakeholders %}
+            <h2>Заинтересованные лица</h2>
+            <p>
+            {% for person in item.stakeholders %}
+                <a href="{{ url_for('flow.contact_detail', slug=person) }}"><i class="icon-user"></i> {{ person }}</a>
+            {% endfor %}
+            </p>
+
+        {% endif %}
+
+        <h2>Планы по реализации</h2>
+        {% for plan in item.plan %}
+            <p>{{ render_plan(plan) }}</p>
+        {% endfor %}
+
+    {% else %}
+
+        <div class="alert alert-block">
+            <h2 class="alert-heading">Нет данных</h2>
+            Вероятно, такого требования нет.
+        </div>
+
+    {% endif %}
+
+{% endblock %}

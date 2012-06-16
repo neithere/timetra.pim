@@ -37,7 +37,11 @@ class Model(modeling.TypedDictReprMixin,
             modeling.DotExpandedDictMixin,
             modeling.StructuredDictMixin,
             dict):
-    pass
+
+    def __init__(self, *args, **kwargs):
+        super(Model, self).__init__(*args, **kwargs)
+        self._insert_defaults()
+        self._make_dot_expanded()
 
 
 class Plan(Model):

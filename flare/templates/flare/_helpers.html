@@ -62,3 +62,69 @@
     </table>
 
 {% endmacro %}
+
+{% macro render_plan(plan) %}
+
+    {% if plan.status == 'done' %}
+        {% if plan.srcmeta and plan.srcmeta.from_yesterday %}
+            <span class="label label-success">at last!</span>
+        {% else %}
+            <span class="label label-success">done</span>
+        {% endif %}
+    {% elif plan.status == 'unclear' %}
+        <span class="label label-important">unclear</span>
+    {% elif plan.status == 'waiting' %}
+        <span class="label label-info">waiting</span>
+    {% elif plan.srcmeta and plan.srcmeta.from_yesterday %}
+        <span class="label label-warning">drag</span>
+    {% elif plan.srcmeta and plan.srcmeta.bigstone %}
+        <span class="label label-warning">big stone</span>
+    {% else %}
+        <span class="label label-warning">to do</span>
+    {% endif %}
+
+    {% if plan.time %}
+        <span class="label label-info"><i class="icon-time icon-white"></i> {{ plan.time.strftime('%H:%M') }}</span>
+
+        {% if plan.status != 'done' %}
+            {% if plan.time.date() < (day or now().date()) %}
+                <span class="badge badge-{% if plan.status == "done" %}success{% else %}important{% endif %}" title="{{ plan.time }}">{{ now() - plan.time }} назад</span>
+            {% else %}
+                <span class="badge
+                {% if (plan.time - now()).total_seconds() < 60*60*24 %}badge-warning{% else %}badge-info{% endif %}
+                ">
+                осталось {{ plan.time - now() }}</span>
+            {% endif %}
+        {% endif %}
+
+    {% endif %}
+
+    {% if plan.status == 'done' %}
+        <del>{{ plan.action|capfirst|urlize }}</del>
+    {% else %}
+        {{ plan.action|capfirst|hashtagify|safe|urlize }}
+    {% endif %}
+
+{% endmacro %}
+
+{% macro render_item_labels(item) %}
+
+    {% if item.risk %}
+        <span class="label label-important">Проблема</span>
+    {% else %}
+        <span class="label label-info">Потребность</span>
+    {% endif %}
+
+    {% if item.mode == 'open' %}
+        <span class="label label-warning">Актуально</span>
+    {% elif item.mode == 'cancelled' %}
+        <span class="label label-success">Решено</span>
+    {% else %}
+        <span class="label">Отменено</span>
+    {% endif %}
+
+    {% if item.important %}
+        <span class="label label-warning">Важно!</span>
+    {% endif %}
+
+{% endmacro %}

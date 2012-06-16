@@ -34,3 +34,24 @@ def day_tasks(**kwargs):
 @flare.route('<int:year>/<int:month>/<int:day>/notes/')
 def day_notes(**kwargs):
     return day_view(template='flare/day_notes.html', **kwargs)
+
+
+@flare.route('items/')
+def item_index(**kwargs):
+    items = current_app.data_providers.get_items(date=None)
+    items = (x for x in items if ('need' in x and x.need) or
+                                 ('risk' in x and x.risk))
+    return render_template('flare/item_index.html', items=items)
+
+
+@flare.route('items/<text>/')
+def item_detail(text):
+    # очевидный костыль: поскольку нет идентификаторов у items, используем
+    # текст элементов item'а
+    items = current_app.data_providers.get_items(date=None)
+    chosen_item = None
+    for item in items:
+        if text in (item.need, item.risk):
+            chosen_item = item
+            break
+    return render_template('flare/item_detail.html', item=chosen_item)

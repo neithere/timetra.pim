@@ -1,5 +1,7 @@
 {% extends 'flare/base.html' %}
 
+{% from 'flare/_helpers.html' import render_plan %}
+
 {% block heading %} Планы на {{ date.strftime('%e.%m.%Y') }} {% endblock %}
 {% block meta %}
     <style type="text/css">
@@ -12,6 +14,10 @@
         }
         dl.needs-and-plans dt.important {
             font-size: 1.2em;
+        }
+        dl.needs-and-plans dt.important,
+        dl.needs-and-plans dt.important em {
+            color: black;
         }
         dl.needs-and-plans dt em {
             font-style: normal;
@@ -76,46 +82,7 @@
                 </dt>
                 {% for task in item.plan %}
                     <dd class="{% if item.mode == 'solved' %}solved{% endif %}">
-                        {% if task.status == 'done' %}
-                            {% if task.srcmeta and task.srcmeta.from_yesterday %}
-                                <span class="label label-success">at last!</span>
-                            {% else %}
-                                <span class="label label-success">done</span>
-                            {% endif %}
-                        {% elif task.status == 'unclear' %}
-                            <span class="label label-important">unclear</span>
-                        {% elif task.status == 'waiting' %}
-                            <span class="label label-info">waiting</span>
-                        {% elif task.srcmeta and task.srcmeta.from_yesterday %}
-                            <span class="label label-warning">drag</span>
-                        {% elif task.srcmeta and task.srcmeta.bigstone %}
-                            <span class="label label-warning">big stone</span>
-                        {% else %}
-                            <span class="label label-warning">to do</span>
-                        {% endif %}
-
-                        {% if task.time %}
-                            <span class="label label-info"><i class="icon-time icon-white"></i> {{ task.time.strftime('%H:%M') }}</span>
-
-                            {% if task.status != 'done' %}
-                                {% if task.time.date() < (day or now().date()) %}
-                                    <span class="badge badge-{% if task.status == "done" %}success{% else %}important{% endif %}" title="{{ task.time }}">{{ now() - task.time }} назад</span>
-                                {% else %}
-                                    <span class="badge
-                                    {% if (task.time - now()).total_seconds() < 60*60*24 %}badge-warning{% else %}badge-info{% endif %}
-                                    ">
-                                    осталось {{ task.time - now() }}</span>
-                                {% endif %}
-                            {% endif %}
-
-                        {% endif %}
-
-                        {% if task.status == 'done' %}
-                            <del>{{ task.action|capfirst|urlize }}</del>
-                        {% else %}
-                            {{ task.action|capfirst|hashtagify|safe|urlize }}
-                        {% endif %}
-                        <!--p style="color: gray;">→ {{ item.need }}</p-->
+                        {{ render_plan(task) }}
                     </dd>
                 {% endfor %}
             {% endif %}
