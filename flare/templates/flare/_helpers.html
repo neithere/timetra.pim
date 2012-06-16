@@ -107,24 +107,40 @@
 
 {% endmacro %}
 
-{% macro render_item_labels(item) %}
-
-    {% if item.risk %}
-        <span class="label label-important">Проблема</span>
-    {% else %}
-        <span class="label label-info">Потребность</span>
-    {% endif %}
+{% macro render_item_mode_label(item) %}
 
     {% if item.mode == 'open' %}
-        <span class="label label-warning">Актуально</span>
+        <span class="label label-warning">open</span>
     {% elif item.mode == 'cancelled' %}
-        <span class="label label-success">Решено</span>
+        <span class="label">cancelled</span>
     {% else %}
-        <span class="label">Отменено</span>
+        <span class="label label-success">solved</span>
     {% endif %}
+
+{% endmacro %}
+
+{% macro render_item_type_label(item) %}
+
+    {% if item.risk %}
+        <span class="label label-important">risk</span>
+    {% else %}
+        <span class="label label-info">need</span>
+    {% endif %}
+
+{% endmacro %}
+
+{% macro render_item_importance_label(item) %}
 
     {% if item.important %}
         <span class="label label-warning">Важно!</span>
     {% endif %}
+
+{% endmacro %}
+
+{% macro render_item_labels(item) %}
+
+    {{ render_item_type_label(item) }}
+    {{ render_item_mode_label(item) }}
+    {{ render_item_importance_label(item) }}
 
 {% endmacro %}

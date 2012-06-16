@@ -4,7 +4,7 @@
 
 {% block heading %}
     {% if item %}
-        {{ (item.need or item.risk)|capfirst }}
+        {{ (item.risk or item.need)|capfirst|hashtagify|safe }}
     {% else %}
         (Несуществующий элемент)
     {% endif %}
@@ -13,21 +13,35 @@
 
     {% if item %}
 
-
-
         <p>{{ render_item_labels(item) }}</p>
 
-        {% if item.stakeholders %}
-            <h2>Заинтересованные лица</h2>
-            <p>
-            {% for person in item.stakeholders %}
-                <a href="{{ url_for('flow.contact_detail', slug=person) }}"><i class="icon-user"></i> {{ person }}</a>
-            {% endfor %}
-            </p>
+        <dl>
 
+        {% if item.note %}
+            <dt>Заметка</dt>
+            <dd>{{ item.note }}.</dd>
         {% endif %}
 
-        <h2>Планы по реализации</h2>
+        {% if item.risk %}
+            {% if item.need %}
+                <dt>Цель</dt>
+                <dd>{{ item.need }}.</dd>
+            {% else %}
+                <dt>Цель</dt>
+                <dd>(Положительный результат не проработан.)</dd>
+            {% endif %}
+        {% endif %}
+
+        {% if item.stakeholders %}
+            <dt>Заинтересованные лица</dt>
+            {% for person in item.stakeholders %}
+                <dd><a href="{{ url_for('flow.contact_detail', slug=person) }}"><i class="icon-user"></i> {{ person }}</a></dd>
+            {% endfor %}
+        {% endif %}
+
+        </dl>
+
+        <h2>Планы</h2>
         {% for plan in item.plan %}
             <p>{{ render_plan(plan) }}</p>
         {% endfor %}

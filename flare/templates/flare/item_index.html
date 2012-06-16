@@ -1,26 +1,44 @@
 {% extends 'flare/base.html' %}
 
-{% from 'flare/_helpers.html' import render_item_labels %}
+{% from 'flare/_helpers.html' import render_item_type_label,
+                                     render_item_mode_label,
+                                     render_item_importance_label %}
 
-{% block heading %} Требования {% endblock %}
+{% block heading %} Проблемы и потребности {% endblock %}
 {% block content %}
 
     {% if items %}
-        <ul>
-        {% for item in items %}
-            <li>
-                {{ render_item_labels(item) }}
-
-                <a href="{{ url_for('flare.item_detail', text=(item.need or item.risk)) }}">
-                    {% if item.need %}
-                        {{ item.need|capfirst }}
-                    {% else %}
-                        Устранена проблема: {{ item.risk|capfirst }}
-                    {% endif %}
-                </a>
-            </li>
-        {% endfor %}
-        </ul>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Mode</th>
+                    <th>Description</th>
+                    <th>Planned</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>{{ render_item_type_label(item) }}</td>
+                        <td>{{ render_item_mode_label(item) }}</td>
+                        <td>
+                            {{ render_item_importance_label(item) }}
+                            <a href="{{ url_for('flare.item_detail', text=(item.need or item.risk)) }}">
+                                {{ (item.risk or item.need)|capfirst }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if item.plan %}
+                                <span class="badge badge-success">да</span>
+                            {% else %}
+                                <span class="badge badge-important">no</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% else %}
         <div class="alert alert-block">
             <h2 class="alert-heading">Нет данных</h2>
