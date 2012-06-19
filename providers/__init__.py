@@ -44,17 +44,34 @@ class Model(modeling.TypedDictReprMixin,
         self._make_dot_expanded()
 
 
+class Log(Model):
+    """ A log record.
+
+    The :attr:`data` dictionary contains newly set values of the parent object.
+    """
+    structure = dict(
+        time = datetime.datetime,
+        note = unicode,
+        data = dict,
+    )
+
+
 class Plan(Model):
     """ A planned activity.
     """
+    STATUS_TODO = u'todo'
+    STATUS_WAITING = u'waiting'
+
     structure = dict(
         action = unicode,
-        status = u'todo',
+        status = STATUS_TODO,
         repeat = unicode,
         effort = unicode,
         context = [unicode],
         srcmeta = dict,
+        log = [Log.structure]
     )
+
     def __init__(self, **kwargs):
         data = kwargs.copy()
 
@@ -67,15 +84,22 @@ class Plan(Model):
 class Item(Model):
     """ An item containing observation, problem definition, goal and plan.
     """
+    MODE_OPEN = u'open'
+
     structure = dict(
         note = unicode,
         risk = unicode,
         need = unicode,
         plan = [Plan.structure],
-        mode = u'open',
+        mode = MODE_OPEN,
         date = datetime.date,
+        cost = dict(
+            amount = float,
+            currency = unicode,
+        ),
         stakeholders = [unicode],
         important = False,
+        log = [Log.structure]
     )
 
     def __init__(self, **kwargs):
@@ -88,6 +112,14 @@ class Item(Model):
         data['plan'] = [Plan(**x) for x in data['plan']]
 
         super(Item, self).__init__(**data)
+
+    def has_next_action(self):
+        if not self.plan:
+            return False
+        for plan in self.plan:
+            if plan.status in (Plan.STATUS_TODO, Plan.STATUS_WAITING):
+                return True
+        return False
 
 
 class Document(Model):

@@ -44,12 +44,26 @@
             {% endfor %}
         {% endif %}
 
+        {% if item.cost %}
+            <dt>Стоимость</dt>
+            <dd>{{ item.cost.amount }} <em>{{ item.cost.currency }}</em></dd>
+        {% endif %}
         </dl>
 
         <h2>Планы</h2>
         {% for plan in item.plan %}
             <p>{{ render_plan(plan) }}</p>
         {% endfor %}
+
+        {% if item.log %}
+            <h2>История</h2>
+            <dl class="dl-horizontal">
+                {% for record in item.log %}
+                    <dt>{{ record.time }}</dt>
+                    <dd>{{ record.mode }}</dd>
+                {% endfor %}
+            </dl>
+        {% endif %}
 
     {% else %}
 

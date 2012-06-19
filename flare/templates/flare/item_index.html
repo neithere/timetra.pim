@@ -7,6 +7,17 @@
                                      %}
 
 {% block heading %} Проблемы и потребности {% endblock %}
+{% block meta %}
+<style type="text/css">
+    table.items tr.important td.description {
+        font-size: 1.1em;
+    }
+    table.items tr.solved td a {
+        color: SeaGreen;
+        text-decoration: line-through;
+    }
+</style>
+{% endblock %}
 {% block content %}
 
     {% if items %}
@@ -25,7 +36,7 @@
 
 {% macro render_items(items, has_risk=True) %}
 
-    <table class="table table-striped">
+    <table class="table table-striped items">
         <thead>
             <tr>
                 <th>Mode</th>
@@ -36,19 +47,27 @@
         <tbody>
             {% for item in items %}
                 {% if has_risk == (True if item.get('risk') else False) %}
-                    <tr>
-                        <td>{{ render_item_mode_label(item) }}</td>
-                        <td>
-                            {{ render_item_importance_label(item) }}
+                    <tr class="
+                        {% if item.mode == 'solved' %}solved{% endif %}
+                        {% if item.important %}important{% endif %}
+                    ">
+                        <td class="mode">{{ render_item_mode_label(item) }}</td>
+                        <td class="description">
                             <a href="{{ url_for('flare.item_detail', text=(item.need or item.risk)) }}">
                                 {{ (item.risk or item.need)|capfirst }}
                             </a>
 
-                            {% if not item.plan %}
-                                <span class="badge badge-important">no plans</span>
+                            {% if item.mode == item.MODE_OPEN %}
+                                {% if item.plan %}
+                                    {% if not item.has_next_action() %}
+                                        <span class="badge badge-warning">no next action</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge badge-important">no plans</span>
+                                {% endif %}
                             {% endif %}
                         </td>
-                        <td>
+                        <td class="age">
                             {% if item.meta and item.meta.created %}
                                 {{ render_delta(now(), item.meta.created) }}
                             {% endif %}

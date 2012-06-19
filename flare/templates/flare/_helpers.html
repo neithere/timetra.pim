@@ -71,6 +71,8 @@
         {% else %}
             <span class="label label-success">done</span>
         {% endif %}
+    {% elif plan.status == 'cancelled' %}
+        <span class="label">cancelled</span>
     {% elif plan.status == 'unclear' %}
         <span class="label label-important">unclear</span>
     {% elif plan.status == 'waiting' %}
@@ -99,7 +101,7 @@
 
     {% endif %}
 
-    {% if plan.status == 'done' %}
+    {% if plan.status in ('done', 'cancelled') %}
         <del>{{ plan.action|capfirst|urlize }}</del>
     {% else %}
         {{ plan.action|capfirst|hashtagify|safe|urlize }}
