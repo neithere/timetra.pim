@@ -26,11 +26,13 @@ def day_full(**kwargs):
     return day_view(template='flare/day.html', **kwargs)
 
 
+@flare.route('tasks/')
 @flare.route('<int:year>/<int:month>/<int:day>/tasks/')
 def day_tasks(**kwargs):
     return day_view(template='flare/day_tasks.html', **kwargs)
 
 
+@flare.route('notes/')
 @flare.route('<int:year>/<int:month>/<int:day>/notes/')
 def day_notes(**kwargs):
     return day_view(template='flare/day_notes.html', **kwargs)

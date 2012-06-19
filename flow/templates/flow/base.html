@@ -1,46 +1,11 @@
-<!doctype html>
-<html>
-    <head>
-        <title>{% block title %}Flow{% endblock %}</title>
-        <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
-        <link href="{{ url_for('static', filename='css/font-awesome.css') }}" rel="stylesheet">
-        <link href="{{ url_for('static', filename='css/pygments.css') }}" rel="stylesheet">
-        <style type="text/css">
-            body {
-                padding-top: 50px;
-            }
-        </style>
-    </head>
-    <body>
-    <div class="container">
-        <div class="navbar navbar-fixed-top">
-            <div class="navbar-inner">
-                <div class="container">
-                    <ul class="nav">
-                        {% for endpoint, label in config.NAV_ITEMS %}
-                            <li class="{% if request.url_rule.endpoint == endpoint %}active{% endif %}">
-                                <a href="{{ url_for(endpoint) }}">{{ label }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    <div class="pull-right">
-                        <a class="brand" href="/">Flow</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+{% extends "base.html" %}
 
-        <h1>{% block heading %} Flow {% endblock %}</h1>
+{% block head %}
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message|safe }}</div>
-            {% endfor %}
-        {% endwith %}
+<style type="text/css">
+    body {
+        padding-top: 50px;
+    }
+</style>
 
-        {% block content %}
-            <p>(nothing here yet)</p>
-        {% endblock %}
-    </div>
-    </body>
-</html>
+{% endblock %}

@@ -7,10 +7,10 @@
                                      %}
 
 {% block heading %} Проблемы и потребности {% endblock %}
-{% block meta %}
+{% block head %}
 <style type="text/css">
     table.items tr.important td.description {
-        font-size: 1.1em;
+        font-size: 1.2em;
     }
     table.items tr.solved td,
     table.items tr.solved td a
@@ -68,10 +68,10 @@
                             {% if item.mode == item.MODE_OPEN %}
                                 {% if item.plan %}
                                     {% if not item.has_next_action() %}
-                                        <span class="badge badge-warning">no next action</span>
+                                        <span class="badge badge-warning">нет дальнейших планов</span>
                                     {% endif %}
                                 {% else %}
-                                    <span class="badge badge-important">no plans</span>
+                                    <span class="badge badge-important">нет планов</span>
                                 {% endif %}
                             {% endif %}
                         </td>
