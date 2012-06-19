@@ -46,7 +46,7 @@ def make_app(conf_path='conf.py'):
         ('flow.someday', u'Когда-нибудь', ''),
         ('flow.context_index', u'Контексты', 'map-marker'),
         ('flare.day_full', u'Цепочки', ''),
-        ('flare.item_index', u'Элементы', 'pushpin'),
+        ('flare.item_index', u'Заботы', 'pushpin'),  # concerns
         ('flare.day_notes', u'Входящие', 'inbox'),
     )
 

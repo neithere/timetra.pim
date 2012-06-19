@@ -2,6 +2,7 @@
 
 {% from "flow/_helpers.html" import render_tasks %}
 
+{% block title %} Планы на {{ date.strftime('%e.%m.%Y') }} {% endblock %}
 {% block heading %} Планы на {{ date.strftime('%e.%m.%Y') }} {% endblock %}
 {% block content %}
 

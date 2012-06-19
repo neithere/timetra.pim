@@ -2,6 +2,7 @@
 
 {% from 'flare/_helpers.html' import render_plan %}
 
+{% block title %} Планы на {{ date.strftime('%e.%m.%Y') }} {% endblock %}
 {% block heading %} Планы на {{ date.strftime('%e.%m.%Y') }} {% endblock %}
 {% block head %}
     <style type="text/css">

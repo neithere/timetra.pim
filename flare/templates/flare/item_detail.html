@@ -2,6 +2,7 @@
 
 {% from 'flare/_helpers.html' import render_plan, render_item_labels, render_delta %}
 
+{% block title %}Забота: {{ item.risk or item.need }}{% endblock %}
 {% block heading %}
     {% if item %}
         {{ (item.risk or item.need)|capfirst|hashtagify|safe }}
