@@ -38,7 +38,7 @@
         {% endif %}
 
         {% if item.stakeholders %}
-            <dt>Заинтересованные лица</dt>
+            <dt>Участники</dt>
             {% for person in item.stakeholders %}
                 <dd><a href="{{ url_for('flow.contact_detail', slug=person) }}"><i class="icon-user"></i> {{ person }}</a></dd>
             {% endfor %}
