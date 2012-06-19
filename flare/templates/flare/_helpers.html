@@ -66,23 +66,26 @@
 {% macro render_plan(plan) %}
 
     {% if plan.status == 'done' %}
+        <i class="icon icon-check"></i>
         {% if plan.srcmeta and plan.srcmeta.from_yesterday %}
             <span class="label label-success">at last!</span>
-        {% else %}
-            <span class="label label-success">done</span>
         {% endif %}
-    {% elif plan.status == 'cancelled' %}
-        <span class="label">cancelled</span>
-    {% elif plan.status == 'unclear' %}
-        <span class="label label-important">unclear</span>
     {% elif plan.status == 'waiting' %}
-        <span class="label label-info">waiting</span>
-    {% elif plan.srcmeta and plan.srcmeta.from_yesterday %}
-        <span class="label label-warning">drag</span>
-    {% elif plan.srcmeta and plan.srcmeta.bigstone %}
-        <span class="label label-warning">big stone</span>
+        <i class="icon icon-phone"></i>
+    {% elif plan.status == 'cancelled' %}
+        <i class="icon icon-remove-sign"></i>
     {% else %}
-        <span class="label label-warning">to do</span>
+        <i class="icon icon-check-empty"></i>
+        {% if plan.srcmeta and plan.srcmeta.from_yesterday %}
+            <span class="label label-warning">drag</span>
+        {% endif %}
+        {% if plan.srcmeta and plan.srcmeta.bigstone %}
+            <i class="icon icon-heart"></i>
+        {% endif %}
+    {% endif %}
+
+    {% if plan.status == 'unclear' %}
+        <i class="icon icon-question-sign"></i>
     {% endif %}
 
     {% if plan.time %}
