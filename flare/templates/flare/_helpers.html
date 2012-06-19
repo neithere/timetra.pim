@@ -124,9 +124,9 @@
 {% macro render_item_type_label(item) %}
 
     {% if item.risk %}
-        <span class="label label-important">risk</span>
+        <i class="icon icon-warning-sign"></i>
     {% else %}
-        <span class="label label-info">need</span>
+        <i class="icon icon-gift"></i>
     {% endif %}
 
 {% endmacro %}
@@ -134,7 +134,7 @@
 {% macro render_item_importance_label(item) %}
 
     {% if item.important %}
-        <span class="label label-warning">Важно!</span>
+        <i class="icon icon-heart"></i>
     {% endif %}
 
 {% endmacro %}
