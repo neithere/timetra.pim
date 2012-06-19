@@ -12,8 +12,17 @@
     table.items tr.important td.description {
         font-size: 1.1em;
     }
-    table.items tr.solved td a {
+    table.items tr.solved td,
+    table.items tr.solved td a
+    {
         color: SeaGreen;
+    }
+    table.items tr.cancelled td,
+    table.items tr.cancelled td a {
+        color: Gray;
+    }
+    table.items tr.solved    td a,
+    table.items tr.cancelled td a {
         text-decoration: line-through;
     }
 </style>
@@ -39,7 +48,6 @@
     <table class="table table-striped items">
         <thead>
             <tr>
-                <th>Mode</th>
                 <th>Description</th>
                 <th>Age</th>
             </tr>
@@ -48,11 +56,11 @@
             {% for item in items %}
                 {% if has_risk == (True if item.get('risk') else False) %}
                     <tr class="
-                        {% if item.mode == 'solved' %}solved{% endif %}
+                        {{ item.mode }}
                         {% if item.important %}important{% endif %}
                     ">
-                        <td class="mode">{{ render_item_mode_label(item) }}</td>
                         <td class="description">
+                            {{ render_item_mode_label(item) }}
                             <a href="{{ url_for('flare.item_detail', text=(item.need or item.risk)) }}">
                                 {{ (item.risk or item.need)|capfirst }}
                             </a>

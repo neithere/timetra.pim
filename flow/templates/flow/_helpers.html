@@ -22,19 +22,20 @@
                 <tr>
                     <td>
                         {% if plan.status == 'done' %}
-                            {% if plan.srcmeta and plan.from_yesterday %}
+                            <i class="icon icon-check"></i>
+                            {% if plan.srcmeta and plan.srcmeta.from_yesterday %}
                                 <span class="label label-success">at last!</span>
-                            {% else %}
-                                <span class="label label-success">done</span>
                             {% endif %}
                         {% elif plan.status == 'waiting' %}
-                            <span class="label label-info">waiting</span>
-                        {% elif plan.srcmeta and plan.srcmeta.from_yesterday %}
-                            <span class="label label-warning">drag</span>
-                        {% elif plan.srcmeta and plan.bigstone %}
-                            <span class="label label-warning">big stone</span>
+                            <i class="icon icon-phone"></i>
                         {% else %}
-                            <span class="label label-warning">to do</span>
+                            <i class="icon icon-check-empty"></i>
+                            {% if plan.srcmeta and plan.srcmeta.from_yesterday %}
+                                <span class="label label-warning">drag</span>
+                            {% endif %}
+                            {% if plan.srcmeta and plan.srcmeta.bigstone %}
+                                <i class="icon icon-heart"></i>
+                            {% endif %}
                         {% endif %}
                     </td>
                     {#

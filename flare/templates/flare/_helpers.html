@@ -112,11 +112,11 @@
 {% macro render_item_mode_label(item) %}
 
     {% if item.mode == 'open' %}
-        <span class="label label-warning">open</span>
+        <i class="icon icon-pushpin"></i>
     {% elif item.mode == 'cancelled' %}
-        <span class="label">cancelled</span>
+        <i class="icon icon-remove"></i>
     {% else %}
-        <span class="label label-success">solved</span>
+        <i class="icon icon-ok"></i>
     {% endif %}
 
 {% endmacro %}
