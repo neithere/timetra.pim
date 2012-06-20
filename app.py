@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
+from collections import namedtuple
 import datetime
 from dateutil.relativedelta import relativedelta
 import re
@@ -38,17 +39,26 @@ def make_app(conf_path='conf.py'):
     app = Flask(__name__)
 
     app.config.from_pyfile(conf_path)
+
+    Item = namedtuple('Item', 'endpoint label icon')
+    Dropdown = namedtuple('Dropdown', 'label items')
+    divider = None
+
     app.config.NAV_ITEMS = (
-        ('flow.day_view', u'Планы', 'tasks'),
-        ('flow.project_index', u'Проекты', 'folder-open'),
-        ('flow.asset_index', u'Имущество', 'briefcase'),
-        ('flow.contact_index', u'Контакты', 'user'),
-        ('flow.reference_index', u'Справка', 'book'),
-        ('flow.someday', u'Когда-нибудь', ''),
-        ('flow.context_index', u'Контексты', 'map-marker'),
-        ('flare.day_full', u'Цепочки', ''),
-        ('flare.item_index', u'Заботы', 'pushpin'),  # concerns
-        ('flare.day_notes', u'Входящие', 'inbox'),
+        Item('flare.day_notes', u'Входящие', 'inbox'),
+        Item('flare.item_index', u'Заботы', 'pushpin'),  # concerns
+        Item('flare.day_tasks', u'Планы', 'tasks'),
+        divider,
+        Item('flow.project_index', u'Проекты', 'folder-open'),
+        Item('flow.asset_index', u'Имущество', 'briefcase'),
+        Item('flow.contact_index', u'Контакты', 'user'),
+        Item('flow.reference_index', u'Справка', 'book'),
+        Item('flow.context_index', u'Контексты', 'map-marker'),
+        divider,
+        Dropdown(u'More', (
+            Item('flare.day_full', u'Цепочки', ''),
+            Item('flow.someday', u'Когда-нибудь', ''),
+        ))
     )
 
     app.register_blueprint(flow, url_prefix='/')

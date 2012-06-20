@@ -22,10 +22,28 @@
             <div class="navbar-inner">
                 <div class="container">
                     <ul class="nav">
-                        {% for endpoint, label, icon in config.NAV_ITEMS %}
-                            <li class="{% if request.url_rule.endpoint == endpoint %}active{% endif %}">
-                                <a href="{{ url_for(endpoint) }}">{% if icon %}<i class="icon icon-{{ icon }}"></i>{% endif %} {{ label }}</a>
-                            </li>
+                        {% for node in config.NAV_ITEMS %}
+                            {% if node.endpoint %}
+                                <li class="{% if request.url_rule.endpoint == node.endpoint %}active{% endif %}">
+                                    <a href="{{ url_for(node.endpoint) }}">{% if node.icon %}<i class="icon icon-{{ node.icon }}"></i>{% endif %} {{ node.label }}</a>
+                                </li>
+                            {% elif node.items %}
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                        {{ node.label }}
+                                        <b class="caret"></b>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        {% for subnode in node.items %}
+                                            <li>
+                                                <a href="{{ url_for(subnode.endpoint) }}">{% if subnode.icon %}<i class="icon icon-{{ subnode.icon }}"></i>{% endif %} {{ subnode.label }}</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            {% else %}
+                                <li class="divider-vertical"></li>
+                            {% endif %}
                         {% endfor %}
                     </ul>
                     <div class="pull-right">
@@ -47,5 +65,10 @@
             <p>(nothing here yet)</p>
         {% endblock %}
     </div>
+
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{{ url_for('static', filename='js/jquery-1.7.2.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
     </body>
 </html>
