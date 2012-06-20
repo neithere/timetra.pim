@@ -70,12 +70,17 @@
                            {% if item.mode == 'solved' %}solved{% endif %}
                           ">
 
-                    {% if item.need %}
+                    {% if item.risk or item.need %}
                         {% if item.mode == 'solved' %}
                             <i class="icon-ok icon-white"></i>
-                            {{ item.need|capfirst|hashtagify|safe|urlize }}
+                            {{ (item.risk or item.need)|capfirst|hashtagify|safe|urlize }}
                         {% else %}
-                            <em>{{ item.need|capfirst|hashtagify|safe|urlize }}</em> — для этого:
+                            {% if item.risk %}
+                                <em>{{
+                                item.risk|capfirst|hashtagify|safe|urlize }}</em> — чтобы этого избежать:
+                            {% else %}
+                                <em>{{ item.need|capfirst|hashtagify|safe|urlize }}</em> — для этого:
+                            {% endif %}
                         {% endif %}
                     {% else %}
                         Цель не указана:

@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 import datetime
+from operator import itemgetter
 
 from flask import Blueprint, current_app, render_template
 
@@ -15,6 +16,7 @@ def day_view(year=None, month=None, day=None, template=None):
     else:
         date = datetime.date.today()
     items = current_app.data_providers.get_items(date)
+    items = list(sorted(items, key=itemgetter('important'), reverse=True))
     prev = date - datetime.timedelta(days=1)
     next = date + datetime.timedelta(days=1)
     return render_template(template, items=items, date=date, prev=prev, next=next)
@@ -41,6 +43,7 @@ def day_notes(**kwargs):
 @flare.route('items/')
 def item_index(**kwargs):
     items = current_app.data_providers.get_items(date=None)
+    items = sorted(items, key=itemgetter('important'), reverse=True)
     items = [x for x in items if ('need' in x and x.need) or
                                  ('risk' in x and x.risk)]
     return render_template('flare/item_index.html', items=items)

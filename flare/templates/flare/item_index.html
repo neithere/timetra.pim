@@ -31,9 +31,9 @@
 {% block content %}
 
     {% if items %}
-        <h2>Проблемы, риски</h2>
+        <h2><i class="icon icon-warning-sign"></i> Проблемы, риски</h2>
         {{ render_items(items, has_risk=True) }}
-        <h2>Потребности</h2>
+        <h2><i class="icon icon-gift"></i> Потребности</h2>
         {{ render_items(items, has_risk=False) }}
     {% else %}
         <div class="alert alert-block">
