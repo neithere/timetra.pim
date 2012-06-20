@@ -18,9 +18,12 @@
 
         <dl class="dl-horizontal">
 
-        {% if item.meta and item.meta.created %}
-            <dt>Возраст</dt>
-            <dd>{{ render_delta(item.meta.created, now()) }}</dd>
+        {% if item.log %}
+            <dt>Создан</dt>
+            <dd>{{ render_delta(item.first_log_entry.time, now()) }} назад</dd>
+
+            <dt>Изменен</dt>
+            <dd>{{ render_delta(item.last_log_entry.time, now()) }} назад</dd>
         {% endif %}
 
         {% if item.note %}

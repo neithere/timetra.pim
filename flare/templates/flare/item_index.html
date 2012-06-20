@@ -76,8 +76,8 @@
                             {% endif %}
                         </td>
                         <td class="age">
-                            {% if item.meta and item.meta.created %}
-                                {{ render_delta(item.meta.created, now()) }}
+                            {% if item.log %}
+                                {{ render_delta(item.first_log_entry.time, now()) }}
                             {% endif %}
                         </td>
                     </tr>

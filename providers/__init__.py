@@ -121,6 +121,16 @@ class Item(Model):
                 return True
         return False
 
+    @property
+    def first_log_entry(self):
+        if self.log:
+            return self.log[0]
+
+    @property
+    def last_log_entry(self):
+        if self.log:
+            return self.log[-1]
+
 
 class Document(Model):
     """ An item with slug, title and body.
