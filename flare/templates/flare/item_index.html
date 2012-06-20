@@ -2,8 +2,7 @@
 
 {% from 'flare/_helpers.html' import render_item_type_label,
                                      render_item_mode_label,
-                                     render_item_importance_label,
-                                     render_delta
+                                     render_item_importance_label
                                      %}
 
 {% block title %} Заботы {% endblock %}
@@ -78,7 +77,7 @@
                         </td>
                         <td class="age">
                             {% if item.meta and item.meta.created %}
-                                {{ render_delta(now(), item.meta.created) }}
+                                {{ render_delta(item.meta.created, now()) }}
                             {% endif %}
                         </td>
                     </tr>

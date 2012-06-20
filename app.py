@@ -9,6 +9,7 @@ from flask import Flask
 from providers import DataProvidersManager, rstfiles, yamlfiles
 from flow import flow
 from flare import flare
+import utils.formatdelta
 
 
 # hashtag-related stuff should be done via template filters
@@ -67,6 +68,7 @@ def make_app(conf_path='conf.py'):
 
     app.jinja_env.globals['now'] = datetime.datetime.now
     app.jinja_env.globals['relativedelta'] = relativedelta
+    app.jinja_env.globals['render_delta'] = utils.formatdelta.render_delta
 
     return app
 
