@@ -67,11 +67,11 @@
         {% for item in items %}
             {% if item.plan %}
                 <dt class="{% if item.important %}important{% endif %}
-                           {% if item.mode == 'solved' %}solved{% endif %}
+                           {% if item.solved %}solved{% endif %}
                           ">
 
                     {% if item.risk or item.need %}
-                        {% if item.mode == 'solved' %}
+                        {% if item.solved %}
                             <i class="icon-ok icon-white"></i>
                             {{ (item.risk or item.need)|capfirst|hashtagify|safe|urlize }}
                         {% else %}
@@ -87,7 +87,7 @@
                     {% endif %}
                 </dt>
                 {% for task in item.plan %}
-                    <dd class="{% if item.mode == 'solved' %}solved{% endif %}">
+                    <dd class="{% if item.solved %}solved{% endif %}">
                         {{ render_plan(task) }}
                     </dd>
                 {% endfor %}

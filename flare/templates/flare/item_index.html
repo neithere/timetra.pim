@@ -55,7 +55,9 @@
         <tbody>
             {% for item in items %}
                 {% if has_risk == (True if item.get('risk') else False) %}
-                    <tr class="{{ item.mode }} {% if item.important %}important{% endif %}">
+                    <tr class="{% if item.solved %}solved{% elif item.closed %}cancelled{% else %}open{% endif %}
+                               {% if item.important %}important{% endif %}
+                              ">
                         <td class="description">
                             {{ render_item_mode_label(item) }}
                             <a href="{{ url_for('flare.item_detail', text=(item.need or item.risk)) }}">
@@ -71,6 +73,8 @@
                                     <span class="badge badge-important">нет планов</span>
                                 {% endif %}
                             {% endif %}
+
+                            {% if item.date %}<span class="label label-info">{{ 'сегодня' if now().date() == item.date else item.date }}</span>{% endif %}
                         </td>
                         <td class="age">
                             {% if item.opened %}

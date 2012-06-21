@@ -84,15 +84,12 @@ class Plan(Model):
 class Item(Model):
     """ An item containing observation, problem definition, goal and plan.
     """
-    MODE_OPEN = u'open'
-
     structure = dict(
         note = unicode,
         risk = unicode,
         need = unicode,
         haze = unicode,  # неясность; вопросы, требующие прояснения. mess, uncertainty
         plan = [Plan.structure],
-        mode = MODE_OPEN,
         date = datetime.date,
         cost = dict(
             amount = float,
@@ -102,6 +99,7 @@ class Item(Model):
         important = False,
         opened = datetime.datetime,
         closed = datetime.datetime,
+        solved = False,
         log = [Log.structure]
     )
 

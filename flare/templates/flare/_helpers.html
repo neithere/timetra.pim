@@ -10,7 +10,7 @@
         <tbody>
             {% for item in items %}
                 <tr class="item
-                           {% if item.mode == 'solved' %}
+                           {% if item.solved %}
                                solved
                            {% elif item.plan %}
                                open
@@ -114,12 +114,12 @@
 
 {% macro render_item_mode_label(item) %}
 
-    {% if item.mode == 'open' %}
-        <i class="icon icon-pushpin"></i>
-    {% elif item.mode == 'cancelled' %}
+    {% if item.solved %}
+        <i class="icon icon-ok"></i>
+    {% elif item.closed %}
         <i class="icon icon-remove"></i>
     {% else %}
-        <i class="icon icon-ok"></i>
+        <i class="icon icon-pushpin"></i>
     {% endif %}
 
 {% endmacro %}
