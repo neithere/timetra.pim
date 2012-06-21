@@ -5,7 +5,7 @@
 {% block title %}Забота: {{ item.risk or item.need }}{% endblock %}
 {% block heading %}
     {% if item %}
-        {{ (item.risk or item.need)|capfirst|hashtagify|safe }}
+        {{ (item.risk or item.need)|capfirst|hashtagify|safe|urlize }}
     {% else %}
         (Несуществующий элемент)
     {% endif %}
@@ -18,27 +18,34 @@
 
         <dl class="dl-horizontal">
 
-        {% if item.log %}
-            <dt>Создан</dt>
-            <dd>{{ render_delta(item.first_log_entry.time, now()) }} назад</dd>
+        {% if item.opened %}
+            <dt>Открыто</dt>
+            <dd>{{ render_delta(item.opened, now()) }} назад</dd>
+        {% endif %}
 
-            <dt>Изменен</dt>
-            <dd>{{ render_delta(item.last_log_entry.time, now()) }} назад</dd>
+        {% if item.closed %}
+            <dt>Закрыто</dt>
+            <dd>{{ render_delta(item.closed, now()) }} назад</dd>
         {% endif %}
 
         {% if item.note %}
             <dt>Заметка</dt>
-            <dd>{{ item.note|capfirst|hashtagify|safe }}.</dd>
+            <dd>{{ item.note|capfirst|hashtagify|safe|urlize }}.</dd>
         {% endif %}
 
         {% if item.risk %}
             {% if item.need %}
                 <dt>Цель</dt>
-                <dd>{{ item.need }}.</dd>
+                <dd>{{ item.need|capfirst|hashtagify|safe|urlize }}.</dd>
             {% else %}
                 <dt>Цель</dt>
                 <dd>(Положительный результат не проработан.)</dd>
             {% endif %}
+        {% endif %}
+
+        {% if item.haze %}
+            <dt>Неясности</dt>
+            <dd>{{ item.haze|capfirst|hashtagify|safe|urlize }}.</dd>
         {% endif %}
 
         {% if item.stakeholders %}

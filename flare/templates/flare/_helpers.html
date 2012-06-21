@@ -105,9 +105,9 @@
     {% endif %}
 
     {% if plan.status in ('done', 'cancelled') %}
-        <del>{{ plan.action|capfirst|urlize }}</del>
+        <del>{{ plan.action|urlize|capfirst }}</del>
     {% else %}
-        {{ plan.action|capfirst|hashtagify|safe|urlize }}
+        {{ plan.action|hashtagify|safe|urlize|capfirst }}
     {% endif %}
 
 {% endmacro %}

@@ -90,6 +90,7 @@ class Item(Model):
         note = unicode,
         risk = unicode,
         need = unicode,
+        haze = unicode,  # неясность; вопросы, требующие прояснения. mess, uncertainty
         plan = [Plan.structure],
         mode = MODE_OPEN,
         date = datetime.date,
@@ -99,6 +100,8 @@ class Item(Model):
         ),
         stakeholders = [unicode],
         important = False,
+        opened = datetime.datetime,
+        closed = datetime.datetime,
         log = [Log.structure]
     )
 
@@ -120,16 +123,6 @@ class Item(Model):
             if plan.status in (Plan.STATUS_TODO, Plan.STATUS_WAITING):
                 return True
         return False
-
-    @property
-    def first_log_entry(self):
-        if self.log:
-            return self.log[0]
-
-    @property
-    def last_log_entry(self):
-        if self.log:
-            return self.log[-1]
 
 
 class Document(Model):

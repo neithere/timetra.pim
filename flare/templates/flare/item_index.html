@@ -30,9 +30,9 @@
 {% block content %}
 
     {% if items %}
-        <h2><i class="icon icon-warning-sign"></i> Проблемы, риски</h2>
+        <h2><i class="icon icon-warning-sign"></i> Что меня беспокоит</h2>
         {{ render_items(items, has_risk=True) }}
-        <h2><i class="icon icon-gift"></i> Потребности</h2>
+        <h2><i class="icon icon-gift"></i> К чему я стремлюсь</h2>
         {{ render_items(items, has_risk=False) }}
     {% else %}
         <div class="alert alert-block">
@@ -55,10 +55,7 @@
         <tbody>
             {% for item in items %}
                 {% if has_risk == (True if item.get('risk') else False) %}
-                    <tr class="
-                        {{ item.mode }}
-                        {% if item.important %}important{% endif %}
-                    ">
+                    <tr class="{{ item.mode }} {% if item.important %}important{% endif %}">
                         <td class="description">
                             {{ render_item_mode_label(item) }}
                             <a href="{{ url_for('flare.item_detail', text=(item.need or item.risk)) }}">
@@ -76,8 +73,8 @@
                             {% endif %}
                         </td>
                         <td class="age">
-                            {% if item.log %}
-                                {{ render_delta(item.first_log_entry.time, now()) }}
+                            {% if item.opened %}
+                                {{ render_delta(item.opened, now()) }}
                             {% endif %}
                         </td>
                     </tr>
