@@ -30,15 +30,15 @@
         dl.needs-and-plans dd del {
             color: ForestGreen;
         }
-        dl.needs-and-plans dt.solved {
-            background: YellowGreen;
-            color: white;
-            text-shadow: 0 0 1px ForestGreen;
+        dl.needs-and-plans dt.solved,
+        dl.needs-and-plans dd.solved,
+        dl.needs-and-plans dt.solved a,
+        dl.needs-and-plans dd.solved a {
+            color: ForestGreen;
         }
-        dl.needs-and-plans dd.solved {
-            border-left: 2px solid YellowGreen;
-            margin-left: 0;
-            padding-left: 1ex;
+        dl.needs-and-plans dd.solved span.label {
+            /* hide contexts, etc. */
+            display: none;
         }
     </style>
 {% endblock %}
@@ -71,16 +71,19 @@
                           ">
 
                     {% if item.risk or item.need %}
+                        {#  {{ (item.risk or item.need)|capfirst|hashtagify|safe|urlize }} — #}
+                        <a href="{{ url_for('flare.item_detail', text=(item.risk or item.need)) }}">
+                            {{ (item.risk or item.need)|capfirst }}
+                        </a> —
                         {% if item.solved %}
-                            <i class="icon-ok icon-white"></i>
-                            {{ (item.risk or item.need)|capfirst|hashtagify|safe|urlize }}
+                            решено!
                         {% else %}
                             {% if item.risk %}
-                                <em>{{
-                                item.risk|capfirst|hashtagify|safe|urlize }}</em> — чтобы этого избежать:
+                                чтобы этого избежать:
                             {% else %}
-                                <em>{{ item.need|capfirst|hashtagify|safe|urlize }}</em> — для этого:
+                                для этого:
                             {% endif %}
+                            {% if item.date %}<span class="label label-info">{{ 'сегодня' if now().date() == item.date else item.date }}</span>{% endif %}
                         {% endif %}
                     {% else %}
                         Цель не указана:
@@ -89,8 +92,14 @@
                 {% for task in item.plan %}
                     <dd class="{% if item.solved %}solved{% endif %}">
                         {{ render_plan(task) }}
+                        {% for tag in task.context %}
+                            <span class="label">{{ tag }}</span>
+                        {% endfor %}
                     </dd>
                 {% endfor %}
+                {% if not item.closed and not item.has_next_action() %}
+                    <dd><i class="icon icon-check-empty"></i> Закрыть вопрос или добавить план.</dd>
+                {% endif %}
             {% endif %}
         {% endfor %}
         </dl>
