@@ -2,6 +2,8 @@
 import datetime
 from monk import modeling
 
+import utils  # XXX для yamlfiles; надо бы переместить
+
 
 __all__ = ['Item']
 

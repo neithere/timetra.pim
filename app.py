@@ -76,7 +76,7 @@ def make_app(conf_path='conf.py'):
     def capfirst_filter(value):
         return value[0].upper() + value[1:] if value else value
 
-    app.jinja_env.globals['now'] = datetime.datetime.now
+    app.jinja_env.globals['now'] = datetime.datetime.utcnow
     app.jinja_env.globals['relativedelta'] = relativedelta
     app.jinja_env.globals['render_delta'] = utils.formatdelta.render_delta
 
