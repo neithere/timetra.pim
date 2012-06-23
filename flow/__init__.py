@@ -17,11 +17,22 @@ def get_document(category, slug):
     return current_app.data_providers.get_document(category, slug)
 
 
-def get_agenda(pattern):
+def get_agenda(category, slug):
+    category_to_hashtag = {
+        'assets': '%',
+        'projects': '#',
+        'contacts': '@',
+        'reference': '?',
+    }
+    hashtag = category_to_hashtag.get(category)
+    pattern = hashtag + slug
     date = datetime.date.today()
     items = current_app.data_providers.get_items(date)
     filtered = []
     for item in items:
+        if category == 'contacts' and slug in item.stakeholders:
+            filtered.append(item)
+            break
         if item.need and pattern in item.need:
             filtered.append(item)
             break
@@ -73,7 +84,7 @@ def asset_index():
 @flow.route('assets/<slug>/')
 def asset_detail(slug):
     item = get_document('assets', slug)
-    agenda = get_agenda('%'+slug)
+    agenda = get_agenda('assets', slug)
     return render_template('flow/asset_detail.html', item=item, agenda=agenda)
 
 
@@ -86,7 +97,7 @@ def contact_index():
 @flow.route('contacts/<slug>/')
 def contact_detail(slug):
     item = get_document('contacts', slug)
-    agenda = get_agenda('@'+slug)
+    agenda = get_agenda('contacts', slug)
     return render_template('flow/contact_detail.html', item=item, agenda=agenda)
 
 
@@ -99,7 +110,7 @@ def project_index():
 @flow.route('projects/<slug>/')
 def project_detail(slug):
     item = get_document('projects', slug)
-    agenda = get_agenda('#'+slug)
+    agenda = get_agenda('projects', slug)
     return render_template('flow/project_detail.html', item=item, agenda=agenda)
 
 
@@ -112,7 +123,7 @@ def reference_index():
 @flow.route('reference/<slug>/')
 def reference_detail(slug):
     item = get_document('reference', slug)
-    agenda = get_agenda('?'+slug)
+    agenda = get_agenda('reference', slug)
     return render_template('flow/reference_detail.html', item=item, agenda=agenda)
 
 
