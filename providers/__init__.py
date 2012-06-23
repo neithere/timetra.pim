@@ -145,6 +145,14 @@ class BaseDataProvider(object):
         """
         raise NotImplementedError
 
+    def filter_items(self, opened=None, closed=None):
+        """ Returns a list of :class:`Item` objects for given date.
+
+        :opened: a date; default is None.
+        :closed: a date; default is None.
+        """
+        raise NotImplementedError
+
     def get_plans(self, date=None):
         """ Returns a list of :class:`Plan` objects for given date.
 
@@ -197,6 +205,18 @@ class DataProvidersManager(object):
         :date: if not specified, current date is used.
         """
         return self._collect('get_items', args, kwargs)
+
+    def filter_items(self, *args, **kwargs):
+        """ Returns a list of :class:`Item` objects for given date.
+
+        :opened: a date; default is None.
+        :closed: a date; default is None.
+        """
+        if 'opened' in args:
+            kwargs['opened'] = utils.to_date(kwargs['opened'])
+        if 'closed' in args:
+            kwargs['closed'] = utils.to_date(kwargs['closed'])
+        return self._collect('filter_items', args, kwargs)
 
     def get_plans(self, *args, **kwargs):
         """ Returns a list of :class:`Plan` objects for given date.

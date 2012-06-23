@@ -7,7 +7,7 @@ import re
 import docutils.core
 import yaml
 
-from . import Item, Plan
+from . import BaseDataProvider, Item, Plan
 
 
 __all__ = ['get_day_plans']
@@ -270,7 +270,7 @@ def render_rst_file(root_dir, subdir, slug):
     return meta
 
 
-class ReStructuredTextFilesProvider:
+class ReStructuredTextFilesProvider(BaseDataProvider):
     def __init__(self, root_dir):
         self.root_dir = root_dir
 

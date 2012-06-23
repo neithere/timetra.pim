@@ -56,6 +56,7 @@ def make_app(conf_path='conf.py'):
         Item('flow.context_index', u'Контексты', 'map-marker'),
         divider,
         Dropdown(u'More', (
+            Item('flow.timeline', u'Лента', ''),
             Item('flare.day_full', u'Цепочки', ''),
             Item('flow.someday', u'Когда-нибудь', ''),
         ))

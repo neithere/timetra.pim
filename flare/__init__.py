@@ -1,6 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 import datetime
+import itertools
+from dateutil import rrule
 from operator import itemgetter
 
 from flask import Blueprint, current_app, render_template
@@ -60,3 +62,19 @@ def item_detail(text):
             chosen_item = item
             break
     return render_template('flare/item_detail.html', item=chosen_item)
+
+
+@flare.route('timeline/')
+def item_timeline():
+    depth = 5
+    since = datetime.datetime.utcnow() - datetime.timedelta(days=depth)
+    rule = rrule.rrule(rrule.DAILY, dtstart=since, count=depth)
+    dates = (x.date() for x in rule)
+    history = []
+    for date in dates:
+        opened = current_app.data_providers.filter_items(opened=date)
+        closed = current_app.data_providers.filter_items(closed=date)
+        items = itertools.chain(opened, closed)
+#        items = sorted(items, key=itemgetter('opened', 'closed'))
+        history.append((date, items))
+    return render_template('flare/item_timeline.html', history=history)

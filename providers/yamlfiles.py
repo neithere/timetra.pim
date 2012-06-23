@@ -32,7 +32,7 @@ def get_current_items(root_dir):
     """ Возвращает записи из текущего набора.
     """
     path = os.path.join(root_dir, 'items.yaml')
-    return load_path(path)
+    return load_path(path) or []
 
 
 class YAMLFilesProvider(BaseDataProvider):
@@ -55,6 +55,18 @@ class YAMLFilesProvider(BaseDataProvider):
             )
         return list(items)
 
+    def filter_items(self, opened=None, closed=None):
+        items = get_current_items(self.root_dir)
+        items = (self._transform_item(x) for x in items)
+        if opened:
+            items = (x for x in items
+                if x.opened and utils.to_date(opened) == utils.to_date(x.opened)
+            )
+        if closed:
+            items = (x for x in items
+                if x.closed and utils.to_date(closed) == utils.to_date(x.closed)
+            )
+        return list(items)
 
     def get_plans(self, date=None):
         items = self.get_items(date)
