@@ -11,7 +11,6 @@ def to_date(obj):
 
 
 def to_datetime(obj):
-    print 'to_datetime', obj
     if isinstance(obj, datetime):
         return obj
     if isinstance(obj, date):
