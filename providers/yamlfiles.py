@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import codecs
 import datetime
+import itertools
 import os
 import yaml
 
@@ -19,6 +20,7 @@ def load_path(path):
         return None
 
 
+# FIXME удалить эту функцию, перенеся старые данные
 def get_items_for_day(root_dir, date=None):
     """ Возвращает записи для указанного (или сегодняшнего) дня.
     """
@@ -31,8 +33,9 @@ def get_items_for_day(root_dir, date=None):
 def get_current_items(root_dir):
     """ Возвращает записи из текущего набора.
     """
-    path = os.path.join(root_dir, 'items.yaml')
-    return load_path(path) or []
+    names = (x for x in os.listdir(root_dir) if x.endswith('.yaml'))
+    paths = (os.path.join(root_dir, x) for x in names)
+    return itertools.chain(*(load_path(x) for x in paths))
 
 
 class YAMLFilesProvider(BaseDataProvider):
