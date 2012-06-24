@@ -49,6 +49,7 @@
         <thead>
             <tr>
                 <th>Description</th>
+                <th>Status</th>
                 <th>Age</th>
             </tr>
         </thead>
@@ -64,17 +65,27 @@
                                 {{ (item.risk or item.need)|capfirst }}
                             </a>
 
+                            {% if item.date %}<span class="label label-info">{{ 'сегодня' if now().date() == item.date else item.date }}</span>{% endif %}
+                        </td>
+                        <td class="labels">
                             {% if not item.closed %}
                                 {% if item.plan %}
                                     {% if not item.has_next_action() %}
-                                        <span class="badge badge-warning">нет дальнейших планов</span>
+                                        <span class="label label-warning">нет дальнейших планов</span>
+                                    {% endif %}
+                                    {% if not item.has_completed_action() %}
+                                        <span class="label label-warning">есть план</span>
+                                    {% endif %}
+                                    {% if item.is_waiting() %}
+                                        <span class="label label-info">ожидание</span>
+                                    {% endif %}
+                                    {% if item.has_next_action() and item.has_completed_action() and not item.is_waiting() %}
+                                        <span class="label label-success">в работе</span>
                                     {% endif %}
                                 {% else %}
-                                    <span class="badge badge-important">нет планов</span>
+                                    <span class="label label-important">нет планов</span>
                                 {% endif %}
                             {% endif %}
-
-                            {% if item.date %}<span class="label label-info">{{ 'сегодня' if now().date() == item.date else item.date }}</span>{% endif %}
                         </td>
                         <td class="age">
                             {% if item.opened %}

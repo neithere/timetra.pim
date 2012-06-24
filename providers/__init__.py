@@ -63,6 +63,8 @@ class Plan(Model):
     """
     STATUS_TODO = u'todo'
     STATUS_WAITING = u'waiting'
+    STATUS_DONE = u'done'
+    STATUS_CANCELLED = u'cancelled'
 
     structure = dict(
         action = unicode,
@@ -71,6 +73,7 @@ class Plan(Model):
         effort = unicode,
         context = [unicode],
         srcmeta = dict,
+        delegated = unicode,
         log = [Log.structure]
     )
 
@@ -116,13 +119,25 @@ class Item(Model):
 
         super(Item, self).__init__(**data)
 
-    def has_next_action(self):
+    def _check_has_plan(self, status):
+        status_list = (status,) if isinstance(status, unicode) else status
         if not self.plan:
             return False
         for plan in self.plan:
-            if plan.status in (Plan.STATUS_TODO, Plan.STATUS_WAITING):
+            print plan.status, 'in', status_list, bool(plan.status in
+            status_list)
+            if plan.status in status_list:
                 return True
         return False
+
+    def has_next_action(self):
+        return self._check_has_plan((Plan.STATUS_TODO, Plan.STATUS_WAITING))
+
+    def has_completed_action(self):
+        return self._check_has_plan(Plan.STATUS_DONE)
+
+    def is_waiting(self):
+        return self._check_has_plan(Plan.STATUS_WAITING)
 
 
 class Document(Model):

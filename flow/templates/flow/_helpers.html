@@ -58,6 +58,9 @@
                         {% if plan.time %}
                             <span class="label label-info"><i class="icon-time icon-white"></i> {{ plan.time.strftime('%H:%M') }}</span>
                         {% endif %}
+                        {% if plan.delegated %}
+                            <a href="{{ url_for('flow.contact_detail', slug=plan.delegated) }}"><i class="icon icon-user"></i> {{ plan.delegated }}:</a>
+                        {% endif %}
                         <span style="{% if plan.state == 'done' %}color: darkgrey; text-decoration: line-through;{% endif %}">
                             {{ plan.action|capfirst|hashtagify|safe|urlize }}
                         </span>
