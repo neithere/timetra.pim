@@ -124,8 +124,6 @@ class Item(Model):
         if not self.plan:
             return False
         for plan in self.plan:
-            print plan.status, 'in', status_list, bool(plan.status in
-            status_list)
             if plan.status in status_list:
                 return True
         return False
