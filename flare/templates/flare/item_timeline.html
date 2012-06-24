@@ -1,0 +1,35 @@
+{% extends 'flare/base.html' %}
+
+{% from 'flare/_helpers.html' import render_item_type_label,
+                                     render_item_mode_label,
+                                     render_item_importance_label
+                                     %}
+
+{% block title %} Лента {% endblock %}
+{% block heading %} Лента {% endblock %}
+{% block content %}
+
+<dl>
+{% for date, items in history|reverse %}
+    <dt>{{ date }}</dt>
+    {% for item in items %}
+        <dd>
+            {% if item.opened %}
+                {% if  item.opened == date
+                   or (item.opened.date and item.opened.date() == date) %}
+                    <span class="label label-warning">открыто</span>
+                {% endif %}
+            {% endif %}
+            {% if item.closed %}
+                {% if  item.closed == date
+                   or (item.closed.date and item.closed.date() == date) %}
+                    <span class="label label-success">закрыто</span>
+                {% endif %}
+            {% endif %}
+            {{ item.risk or item.need or item.note }}
+        </dd>
+    {% endfor %}
+{% endfor %}
+</dl>
+
+{% endblock %}
