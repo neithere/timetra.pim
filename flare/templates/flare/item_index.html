@@ -64,7 +64,7 @@
                                 {{ (item.risk or item.need)|capfirst }}
                             </a>
 
-                            {% if item.mode == item.MODE_OPEN %}
+                            {% if not item.closed %}
                                 {% if item.plan %}
                                     {% if not item.has_next_action() %}
                                         <span class="badge badge-warning">нет дальнейших планов</span>

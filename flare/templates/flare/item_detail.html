@@ -63,6 +63,11 @@
         </dl>
 
         <h2>Планы</h2>
+
+        {% if not item.closed and not item.has_next_action() %}
+            <p class="alert alert-warning">Нет дальнейших планов</p>
+        {% endif %}
+
         {% for plan in item.plan %}
             <p>{{ render_plan(plan) }}</p>
         {% endfor %}
