@@ -82,6 +82,9 @@
                                     {% if item.has_next_action() and item.has_completed_action() and not item.is_waiting() %}
                                         <span class="label label-success">в работе</span>
                                     {% endif %}
+
+                                    {# TODO: display "stalled" warning if no plan was completed in the last N days #}
+
                                 {% else %}
                                     <span class="label label-important">нет планов</span>
                                 {% endif %}

@@ -10,6 +10,16 @@
         (Несуществующий элемент)
     {% endif %}
 {% endblock %}
+{% block head %}
+    <style type="text/css">
+        .plan-gap {
+            margin: 0;
+            padding: 0;
+            font-size: .8em;
+            color: gray;
+        }
+    </style>
+{% endblock %}
 {% block content %}
 
     {% if item %}
@@ -68,8 +78,16 @@
             <p class="alert alert-warning">Нет дальнейших планов</p>
         {% endif %}
 
+        {% set prev_plan = None %}
         {% for plan in item.plan %}
+            {% if prev_plan and prev_plan.closed and plan.closed %}
+                <p class="plan-gap">
+                    …{% if plan.delegated %}ждал{% else %}собирался{% endif %}
+                    {{ render_delta(prev_plan.closed, plan.closed) }}…
+                </p>
+            {% endif %}
             <p>{{ render_plan(plan) }}</p>
+            {% set prev_plan = plan %}
         {% endfor %}
 
         {% if item.log %}

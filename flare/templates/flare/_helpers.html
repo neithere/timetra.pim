@@ -72,7 +72,7 @@
         {% endif %}
     {% elif plan.status == 'waiting' %}
         <i class="icon icon-phone"></i>
-    {% elif plan.status == 'cancelled' %}
+    {% elif plan.status == 'cancelled' or (plan.closed and not plan.status == 'done') %}
         <i class="icon icon-remove-sign"></i>
     {% else %}
         <i class="icon icon-check-empty"></i>

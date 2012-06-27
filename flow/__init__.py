@@ -30,6 +30,15 @@ def get_agenda(category, slug):
     items = current_app.data_providers.get_items(date)
     filtered = []
     for item in items:
+        # FIXME тут мы добавляем сразу весь item, но, скажем, в agenda по
+        # водопроводчику не надо запихивать весь список задач по ремонту дома,
+        # достаточно именно одной задачи, в которой упомянут этот
+        # водопроводчик.
+        # С другой стороны, если со срезом связана не задача, а сущность более
+        # высокого уровня (риск/потребность), то надо эту сущность выводить как
+        # есть.
+        # Значит, нужны два списка: риски/потребности и планы, т.е., "цели" и "действия".
+
         if category == 'contacts' and slug in item.stakeholders:
             filtered.append(item)
             break
@@ -40,6 +49,7 @@ def get_agenda(category, slug):
             filtered.append(item)
             break
     # TODO: return whole items (needs fixing document templates)
+    # XXX   ...OR NOT! see "FIXME" above.
     return itertools.chain(*(x.plan for x in filtered if x.plan))
 
 
