@@ -22,8 +22,8 @@ hashtags = (
 )
 regex_to_css = []
 for hashtag in hashtags:
-    regex = re.compile(r'(^|[>\(\s]){0}([A-Za-z][A-Za-z0-9_\-]+)'.format(hashtag['sigil']))
-    template = r'\1<a href="{0}\2"><i class="icon-{1}"></i>&nbsp;\2</a>'.format(
+    regex = re.compile(ur'(^|[>\(\s]){0}([A-Za-zА-Яа-я][A-Za-zА-Яа-я0-9_\-]+)'.format(hashtag['sigil']))
+    template = ur'\1<a href="{0}\2"><i class="icon-{1}"></i>&nbsp;\2</a>'.format(
         hashtag['url_base'], hashtag['css'])
     regex_to_css.append((regex, template))
 

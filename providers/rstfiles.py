@@ -230,7 +230,7 @@ def get_rst_files_list_annotated(root_dir, subdir):
 
 def read_rst_file(root_dir, subdir, slug):
     directory = os.path.join(root_dir, subdir)
-    path = '{root}/{slug}.rst'.format(root=directory, slug=slug)
+    path = u'{root}/{slug}.rst'.format(root=directory, slug=slug)
     if not os.path.exists(path):
         print 'NO FILE', path
         return None
