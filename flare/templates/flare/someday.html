@@ -1,0 +1,66 @@
+{% extends 'flare/base.html' %}
+
+{% block title %} Someday/Maybe {% endblock %}
+{% block heading %} Someday/Maybe {% endblock %}
+{% block head %}
+
+<style type="text/css">
+    ul.notes {
+        list-style: none;
+        margin: 0;
+    }
+</style>
+
+{% endblock %}
+{% block content %}
+
+    {% if items %}
+        <h2>Открытое</h2>
+
+        <ul class="notes">
+            {% for item in items %}
+                {% if not item.closed  %}
+                    <li>
+                        <i class="icon icon-check-empty"></i>
+                        {% if item.note %}
+                            {{ item.note|hashtagify|safe|urlize|capfirst }}
+                        {% endif %}
+                        {% if item.risk or item.need %}
+                            <a href="{{ url_for('flare.item_detail', text=(item.need or item.risk)) }}">
+                                {{ (item.risk or item.need)|capfirst }}
+                            </a>
+                        {% endif %}
+                        {% if item.opened %}({{ render_delta(item.opened, now()) }}){% endif %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+
+        <h2>Закрытое</h2>
+
+        <ul class="notes">
+            {% for item in items %}
+                {% if item.closed  %}
+                    <li>
+                        <i class="icon {% if item.solved %}icon-check{% else %}icon-remove-sign{% endif %}"></i>
+                        {% if item.note %}
+                            {{ item.note|hashtagify|safe|urlize|capfirst }}
+                        {% endif %}
+                        {% if item.risk or item.need %}
+                            <a href="{{ url_for('flare.item_detail', text=(item.need or item.risk)) }}">
+                                {{ (item.risk or item.need)|capfirst }}
+                            </a>
+                        {% endif %}
+                        {% if item.opened %}({{ render_delta(item.opened, now()) }}){% endif %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+
+    {% else %}
+        <div class="alert alert-block">
+            <h2 class="alert-heading">Нет данных</h2>
+            Попробуйте другой день.
+        </div>
+    {% endif %}
+{% endblock %}

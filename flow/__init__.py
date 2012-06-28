@@ -135,9 +135,3 @@ def reference_detail(slug):
     item = get_document('reference', slug)
     agenda = get_agenda('reference', slug)
     return render_template('flow/reference_detail.html', item=item, agenda=agenda)
-
-
-@flow.route('someday/')
-def someday():
-    item = get_document('', 'someday')
-    return render_template('flow/someday.html', item=item)

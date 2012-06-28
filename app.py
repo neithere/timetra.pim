@@ -58,7 +58,7 @@ def make_app(conf_path='conf.py'):
         Dropdown(u'More', (
             Item('flare.item_timeline', u'Лента', ''),
             Item('flare.day_full', u'Цепочки', ''),
-            Item('flow.someday', u'Когда-нибудь', ''),
+            Item('flare.someday', u'Когда-нибудь', ''),
         ))
     )
 

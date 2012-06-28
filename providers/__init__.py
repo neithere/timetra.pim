@@ -105,6 +105,7 @@ class Item(Model):
         opened = datetime.datetime,
         closed = datetime.datetime,
         solved = False,
+        frozen = False,  # if True, it's someday/maybe
         log = [Log.structure]
     )
 
@@ -155,10 +156,11 @@ class BaseDataProvider(object):
         """ Returns a list of :class:`Item` objects for given date.
 
         :date: if not specified, current date is used.
+        :frozen: a bool; default is None (no filtration at all).
         """
         raise NotImplementedError
 
-    def filter_items(self, opened=None, closed=None):
+    def filter_items(self, opened=None, closed=None, frozen=None):
         """ Returns a list of :class:`Item` objects for given date.
 
         :opened: a date; default is None.

@@ -41,7 +41,7 @@
                     <li>
                         <i class="icon icon-check-empty"></i>
                         {{ item.note|hashtagify|safe|urlize|capfirst }}
-                        ({% if item.opened %}{{ render_delta(item.opened, now()) }}{% endif %})
+                        {% if item.opened %}({{ render_delta(item.opened, now()) }}){% endif %}
                     </li>
                 {% endif %}
             {% endfor %}
@@ -55,7 +55,7 @@
                     <li>
                         <i class="icon icon-check"></i>
                         {{ item.note|hashtagify|safe|urlize|capfirst }}
-                        ({% if item.opened %}{{ render_delta(item.opened, now()) }}{% endif %})
+                        {% if item.opened %}({{ render_delta(item.opened, now()) }}){% endif %}
                     </li>
                 {% endif %}
             {% endfor %}

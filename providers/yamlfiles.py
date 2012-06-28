@@ -58,7 +58,7 @@ class YAMLFilesProvider(BaseDataProvider):
             )
         return list(items)
 
-    def filter_items(self, opened=None, closed=None):
+    def filter_items(self, opened=None, closed=None, frozen=None):
         items = get_current_items(self.root_dir)
         items = (self._transform_item(x) for x in items)
         if opened:
@@ -68,6 +68,11 @@ class YAMLFilesProvider(BaseDataProvider):
         if closed:
             items = (x for x in items
                 if x.closed and utils.to_date(closed) == utils.to_date(x.closed)
+            )
+        if frozen is not None:
+            print 'filtering', bool(frozen)
+            items = (x for x in items
+                if bool(frozen) == bool(x.frozen)
             )
         return list(items)
 

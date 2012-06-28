@@ -11,13 +11,18 @@ from flask import Blueprint, current_app, render_template
 flare = Blueprint('flare', __name__, template_folder='templates')
 
 
-def day_view(year=None, month=None, day=None, template=None, processor=None):
+def day_view(year=None, month=None, day=None, template=None, query=None, processor=None):
     assert template
     if year and month and day:
         date = datetime.date(year, month, day)
     else:
         date = datetime.date.today()
-    items = current_app.data_providers.get_items(date)
+
+    if query:
+        items = current_app.data_providers.filter_items(**query)
+    else:
+        items = current_app.data_providers.get_items(date)
+
     if processor:
         items = processor(items)
     items = list(sorted(items, key=itemgetter('important'), reverse=True))
@@ -29,19 +34,28 @@ def day_view(year=None, month=None, day=None, template=None, processor=None):
 @flare.route('/')
 @flare.route('<int:year>/<int:month>/<int:day>/')
 def day_full(**kwargs):
-    return day_view(template='flare/day.html', **kwargs)
+    query = dict(frozen=False)
+    return day_view(template='flare/day.html', query=query, **kwargs)
 
 
 @flare.route('tasks/')
 @flare.route('<int:year>/<int:month>/<int:day>/tasks/')
 def day_tasks(**kwargs):
-    return day_view(template='flare/day_tasks.html', **kwargs)
+    query = dict(frozen=False)
+    return day_view(template='flare/day_tasks.html', query=query,**kwargs)
 
 
 @flare.route('notes/')
 @flare.route('<int:year>/<int:month>/<int:day>/notes/')
 def day_notes(**kwargs):
-    return day_view(template='flare/day_notes.html', **kwargs)
+    query = dict(frozen=False)
+    return day_view(template='flare/day_notes.html', query=query,**kwargs)
+
+
+@flare.route('someday/')
+def someday(**kwargs):
+    query = dict(frozen=True)
+    return day_view(template='flare/someday.html', query=query, **kwargs)
 
 
 @flare.route('items/')
