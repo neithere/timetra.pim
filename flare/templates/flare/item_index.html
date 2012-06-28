@@ -30,7 +30,7 @@
 {% block content %}
 
     {% if items %}
-        <h2><i class="icon icon-warning-sign"></i> Что меня беспокоит</h2>
+        <h2><i class="icon icon-umbrella"></i> Что меня беспокоит</h2>
         {{ render_items(items, has_risk=True) }}
         <h2><i class="icon icon-gift"></i> К чему я стремлюсь</h2>
         {{ render_items(items, has_risk=False) }}
@@ -71,10 +71,10 @@
                             {% if not item.closed %}
                                 {% if item.plan %}
                                     {% if not item.has_next_action() %}
-                                        <i class="icon icon-question-sign" title="нет дальнейших планов"></i> запланировать
+                                        <i class="icon icon-beaker" title="нет дальнейших планов"></i> запланировать
                                     {% endif %}
                                     {% if not item.has_completed_action() %}
-                                        <i class="icon icon-tasks" title="есть план"></i> приступить
+                                        <i class="icon icon-check-empty" title="есть план"></i> приступить
                                     {% endif %}
                                     {% if item.is_waiting() %}
                                         <i class="icon icon-phone" title="ожидание (делегировано)"></i> напомнить
@@ -86,7 +86,7 @@
                                     {# TODO: display "stalled" warning if no plan was completed in the last N days #}
 
                                 {% else %}
-                                    <i class="icon icon-exclamation-sign" title="нет планов"></i>
+                                    <i class="icon icon-beaker" title="нет планов"></i> запланировать
                                 {% endif %}
                             {% else %}
                                 <i class="icon icon-ok-sign"></i> решено!

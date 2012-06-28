@@ -105,17 +105,21 @@
     {% endif %}
 
     {% if plan.status in ('done', 'cancelled') %}
-        <del>{{ plan.delegated or '' }} {{ plan.action|urlize|capfirst }}</del>
-    {% else %}
-        {% if plan.delegated %}
-            <a href="{{ url_for('flow.contact_detail', slug=plan.delegated) }}"><i class="icon icon-user"></i> {{ plan.delegated }}</a> должен
-            {{ plan.action|hashtagify|safe|urlize }}
-            {% if plan.opened %}
-                ({{ render_delta(plan.opened, now()) }} в ожидании)
-            {% endif %}
-        {% else %}
-            {{ plan.action|hashtagify|safe|urlize|capfirst }}
+        <del>
+    {% endif %}
+
+    {% if plan.delegated %}
+        <a href="{{ url_for('flow.contact_detail', slug=plan.delegated) }}"><i class="icon icon-user"></i> {{ plan.delegated }}</a> должен
+        {{ plan.action|hashtagify|safe|urlize }}
+        {% if plan.opened %}
+            ({{ render_delta(plan.opened, (plan.closed or now())) }} в ожидании)
         {% endif %}
+    {% else %}
+        {{ plan.action|hashtagify|safe|urlize|capfirst }}
+    {% endif %}
+
+    {% if plan.status in ('done', 'cancelled') %}
+        </del>
     {% endif %}
 
 {% endmacro %}

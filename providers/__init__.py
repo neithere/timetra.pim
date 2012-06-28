@@ -74,7 +74,9 @@ class Plan(Model):
         context = [unicode],
         srcmeta = dict,
         delegated = unicode,
-        log = [Log.structure]
+        log = [Log.structure],
+        opened = datetime.datetime,
+        closed = datetime.datetime,
     )
 
     def __init__(self, **kwargs):
@@ -136,6 +138,9 @@ class Item(Model):
         return self._check_has_plan(Plan.STATUS_DONE)
 
     def is_waiting(self):
+        if self.plan:
+            if any(x.delegated for x in self.plan if not x.closed):
+                return True
         return self._check_has_plan(Plan.STATUS_WAITING)
 
 
@@ -156,7 +161,6 @@ class BaseDataProvider(object):
         """ Returns a list of :class:`Item` objects for given date.
 
         :date: if not specified, current date is used.
-        :frozen: a bool; default is None (no filtration at all).
         """
         raise NotImplementedError
 
@@ -165,6 +169,7 @@ class BaseDataProvider(object):
 
         :opened: a date; default is None.
         :closed: a date; default is None.
+        :frozen: a bool; default is None (no filtration at all).
         """
         raise NotImplementedError
 
