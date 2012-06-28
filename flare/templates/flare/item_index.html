@@ -49,7 +49,7 @@
         <thead>
             <tr>
                 <th>Description</th>
-                <th>Status</th>
+                <th>What's Next</th>
                 <th>Age</th>
             </tr>
         </thead>
@@ -71,23 +71,25 @@
                             {% if not item.closed %}
                                 {% if item.plan %}
                                     {% if not item.has_next_action() %}
-                                        <span class="label label-warning">нет дальнейших планов</span>
+                                        <i class="icon icon-question-sign" title="нет дальнейших планов"></i> запланировать
                                     {% endif %}
                                     {% if not item.has_completed_action() %}
-                                        <span class="label label-warning">есть план</span>
+                                        <i class="icon icon-tasks" title="есть план"></i> приступить
                                     {% endif %}
                                     {% if item.is_waiting() %}
-                                        <span class="label label-info">ожидание</span>
+                                        <i class="icon icon-phone" title="ожидание (делегировано)"></i> напомнить
                                     {% endif %}
                                     {% if item.has_next_action() and item.has_completed_action() and not item.is_waiting() %}
-                                        <span class="label label-success">в работе</span>
+                                        <i class="icon icon-cogs" title="в работе (часть задач выполнена)"></i> доделать
                                     {% endif %}
 
                                     {# TODO: display "stalled" warning if no plan was completed in the last N days #}
 
                                 {% else %}
-                                    <span class="label label-important">нет планов</span>
+                                    <i class="icon icon-exclamation-sign" title="нет планов"></i>
                                 {% endif %}
+                            {% else %}
+                                <i class="icon icon-ok-sign"></i> решено!
                             {% endif %}
                         </td>
                         <td class="age">
