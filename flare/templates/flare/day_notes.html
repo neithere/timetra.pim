@@ -37,7 +37,7 @@
 
         <ul class="notes">
             {% for item in items %}
-                {% if item.note and not (item.risk or item.need or item.plan) %}
+                {% if item.note and not (item.risk or item.need or item.plan) and not item.closed %}
                     <li>
                         <i class="icon icon-check-empty"></i>
                         {{ item.note|hashtagify|safe|urlize|capfirst }}
@@ -51,7 +51,7 @@
 
         <ul class="notes">
             {% for item in items %}
-                {% if item.note and (item.risk or item.need or item.plan) %}
+                {% if item.note and ((item.risk or item.need or item.plan) or item.closed) %}
                     <li>
                         <i class="icon icon-check"></i>
                         <del>{{ item.note|hashtagify|safe|urlize|capfirst }}</del>
