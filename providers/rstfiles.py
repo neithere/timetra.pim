@@ -183,7 +183,8 @@ def get_day_plans(root_dir, date=None):
 
 def get_rst_files_list(root_dir, subdir):
     directory = os.path.join(root_dir, subdir)
-    files = [f for f in os.listdir(directory) if f.endswith('.rst')]
+    files = (f for f in os.listdir(directory) if f.endswith('.rst'))
+    files = (f if isinstance(f, unicode) else f.decode('utf-8') for f in files)
     return sorted(name for name, ext in (os.path.splitext(f) for f in files))
 
 
@@ -291,8 +292,8 @@ class ReStructuredTextFilesProvider(BaseDataProvider):
             srcmeta = item,
         )
 
-    def get_items(self, date):
-        plans = list(self.get_plans(date))
+    def get_items(self, date=None):
+        plans = list(self.get_plans(date or datetime.date.today()))
         # все задачи объединены под одной пустой целью
         return [
             Item(
@@ -311,6 +312,7 @@ class ReStructuredTextFilesProvider(BaseDataProvider):
         return get_rst_files_list_annotated(self.root_dir, category)
 
     def get_document(self, category, slug):
+        slug = slug if isinstance(slug, unicode) else slug.decode('utf-8')
         return render_rst_file(self.root_dir, category, slug)
 
 
