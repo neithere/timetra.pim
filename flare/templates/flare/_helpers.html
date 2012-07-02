@@ -104,7 +104,7 @@
 
     {% endif %}
 
-    {% if plan.status in ('done', 'cancelled') %}
+    {% if plan.status in ('done', 'cancelled') or (plan.closed and plan.status != 'done') %}
         <del>
     {% endif %}
 
@@ -118,7 +118,11 @@
         {{ plan.action|hashtagify|safe|urlize|capfirst }}
     {% endif %}
 
-    {% if plan.status in ('done', 'cancelled') %}
+    {% for tag in plan.context %}
+        <a href="{{ url_for('flow.context_detail', slug=tag) }}" class="label"><i class="icon icon-map-marker"></i> {{ tag }}</a>
+    {% endfor %}
+
+    {% if plan.status in ('done', 'cancelled') or (plan.closed and plan.status != 'done') %}
         </del>
     {% endif %}
 
@@ -130,8 +134,14 @@
         <i class="icon icon-ok"></i>
     {% elif item.closed %}
         <i class="icon icon-remove"></i>
+    {% elif item.frozen %}
+        <i class="icon icon-lock"></i>
     {% else %}
-        <i class="icon icon-pushpin"></i>
+        {% if item.important %}
+            <i class="icon icon-star"></i>
+        {% else %}
+            <i class="icon icon-star-empty"></i>
+        {% endif %}
     {% endif %}
 
 {% endmacro %}
