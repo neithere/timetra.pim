@@ -41,13 +41,16 @@ def get_agenda(category, slug):
 
         if category == 'contacts' and slug in item.stakeholders:
             filtered.append(item)
-            break
+            #break
+        if category == 'projects' and slug == item.project:
+            filtered.append(item)
+            #break
         if item.need and pattern in item.need:
             filtered.append(item)
-            break
+            #break
         if item.plan and any(pattern in x.action for x in item.plan):
             filtered.append(item)
-            break
+            #break
     # TODO: return whole items (needs fixing document templates)
     # XXX   ...OR NOT! see "FIXME" above.
     return itertools.chain(*(x.plan for x in filtered if x.plan))
