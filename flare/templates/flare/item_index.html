@@ -25,6 +25,13 @@
     table.items tr.cancelled td a {
         text-decoration: line-through;
     }
+    table.items tr.frozen td,
+    table.items tr.frozen td a {
+        color: Gray;
+    }
+    table.items tr.frozen td a {
+        font-size: .9em
+    }
 </style>
 {% endblock %}
 {% block content %}
@@ -58,9 +65,15 @@
                 {% if has_risk == (True if item.get('risk') else False) %}
                     <tr class="{% if item.solved %}solved{% elif item.closed %}cancelled{% else %}open{% endif %}
                                {% if item.important %}important{% endif %}
+                               {% if item.frozen %}frozen{% endif %}
                               ">
                         <td class="description">
                             {{ render_item_mode_label(item) }}
+
+                            {% if item.project %}
+                                <a href="{{ url_for('flow.project_detail', slug=item.project) }}"><i class="icon icon-folder-open"></i> {{ item.project }}</a>:
+                            {% endif %}
+
                             <a href="{{ url_for('flare.item_detail', text=(item.need or item.risk)) }}">
                                 {{ (item.risk or item.need)|capfirst }}
                             </a>
@@ -81,6 +94,7 @@
                                     {% endif %}
                                     {% if item.has_next_action() and item.has_completed_action() and not item.is_waiting() %}
                                         <i class="icon icon-cogs" title="в работе (часть задач выполнена)"></i> доделать
+                                        {{ '%.0f'|format(100 - item.completed_percentage) }}%
                                     {% endif %}
 
                                     {# TODO: display "stalled" warning if no plan was completed in the last N days #}
