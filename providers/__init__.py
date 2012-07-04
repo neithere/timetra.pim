@@ -103,6 +103,7 @@ class Item(Model):
             currency = unicode,
         ),
         stakeholders = [unicode],
+        project = unicode,
         important = False,
         opened = datetime.datetime,
         closed = datetime.datetime,
@@ -142,6 +143,22 @@ class Item(Model):
             if any(x.delegated for x in self.plan if not x.closed):
                 return True
         return self._check_has_plan(Plan.STATUS_WAITING)
+
+    def sorted_plans(self):
+        if not self.plan:
+            return []
+        return sorted(self.plan, key=lambda x: utils.to_datetime(x.closed or
+                                               datetime.datetime.now()))
+
+    @property
+    def completed_percentage(self):
+        if not self.plan:
+            return 0
+        total_cnt = len([x for x in self.plan])
+        if not total_cnt:
+            return 0
+        closed_cnt = len([x for x in self.plan if x.closed])
+        return (float(closed_cnt) / total_cnt) * 100
 
 
 class Document(Model):
