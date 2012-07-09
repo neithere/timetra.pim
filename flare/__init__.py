@@ -82,8 +82,9 @@ def item_detail(text):
 @flare.route('timeline/')
 def item_timeline():
     depth = 5
-    since = datetime.datetime.utcnow() - datetime.timedelta(days=depth)
-    rule = rrule.rrule(rrule.DAILY, dtstart=since, count=depth)
+    now = datetime.datetime.utcnow()
+    since = now - datetime.timedelta(days=depth)
+    rule = rrule.rrule(rrule.DAILY, dtstart=since, until=now)
     dates = (x.date() for x in rule)
     history = []
     for date in dates:
