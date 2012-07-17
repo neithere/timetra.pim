@@ -5,7 +5,12 @@
 {% block title %}Забота: {{ item.risk or item.need }}{% endblock %}
 {% block heading %}
     {% if item %}
-        {{ (item.risk or item.need)|capfirst|hashtagify|safe|urlize }}
+        {% if item.risk %}
+            <i class="icon icon-umbrella"></i>
+        {% else %}
+            <i class="icon icon-gift"></i>
+        {% endif %}
+        {{ (item.risk or item.need)|hashtagify|safe|urlize|capfirst }}
     {% else %}
         (Несуществующий элемент)
     {% endif %}
@@ -40,22 +45,27 @@
 
         {% if item.note %}
             <dt>Заметка</dt>
-            <dd>{{ item.note|capfirst|hashtagify|safe|urlize }}.</dd>
+            <dd>{{ item.note|hashtagify|safe|urlize|capfirst }}.</dd>
         {% endif %}
 
         {% if item.risk %}
             {% if item.need %}
                 <dt>Цель</dt>
-                <dd>{{ item.need|capfirst|hashtagify|safe|urlize }}.</dd>
+                <dd>{{ item.need|hashtagify|safe|urlize|capfirst }}.</dd>
             {% else %}
                 <dt>Цель</dt>
                 <dd>(Положительный результат не проработан.)</dd>
             {% endif %}
         {% endif %}
 
+        {% if item.date %}
+            <dt>Дата (дедлайн)</dt>
+            <dd>{{ item.date }}</dd>
+        {% endif %}
+
         {% if item.haze %}
             <dt>Неясности</dt>
-            <dd>{{ item.haze|capfirst|hashtagify|safe|urlize }}.</dd>
+            <dd>{{ item.haze|hashtagify|safe|urlize|capfirst }}.</dd>
         {% endif %}
 
         {% if item.stakeholders %}
@@ -72,21 +82,29 @@
 
         </dl>
 
-        <h2>Планы</h2>
+        <h2>Планы (закрыто {{ '%.0f'|format(item.completed_percentage) }}% из {{ item.plan|count }} шт)</h2>
 
         {% if not item.closed and not item.has_next_action() %}
             <p class="alert alert-warning">Нет дальнейших планов</p>
         {% endif %}
 
         {% set prev_plan = None %}
-        {% for plan in item.plan %}
-            {% if prev_plan and prev_plan.closed and plan.closed %}
+        {% for plan in item.sorted_plans() %}
+            {% if plan.closed and (item.opened or (prev_plan and prev_plan.closed)) %}
                 <p class="plan-gap">
-                    …{% if plan.delegated %}ждал{% else %}собирался{% endif %}
-                    {{ render_delta(prev_plan.closed, plan.closed) }}…
+                    …{% if plan.delegated %}ждал{% else %}прошло{% endif %}
+                    {{ render_delta((prev_plan and prev_plan.closed or item.opened), plan.closed) }}…
+                </p>
+            {% elif prev_plan and prev_plan.closed and not plan.closed %}
+                <p class="plan-gap">
+                    …прошло {{ render_delta(prev_plan.closed, now()) }}…
                 </p>
             {% endif %}
-            <p>{{ render_plan(plan) }}</p>
+            <p>
+                {#{ loop.index }#}
+                {{ render_plan(plan) }}
+                {% if plan.closed %}&nbsp;(закрыто {{ plan.closed }} UTC){% endif %}
+            </p>
             {% set prev_plan = plan %}
         {% endfor %}
 
