@@ -126,6 +126,10 @@
         </del>
     {% endif %}
 
+    {% if plan.result %}
+        <span style="color: Green;"> → {{ plan.result|hashtagify|safe|urlize }}</span>
+    {% endif %}
+
 {% endmacro %}
 
 {% macro render_item_mode_label(item) %}

@@ -77,6 +77,7 @@ class Plan(Model):
         log = [Log.structure],
         opened = datetime.datetime,
         closed = datetime.datetime,
+        result = unicode,  # комментарий о результате выполнения действия: грабли, особенности, ...
     )
 
     def __init__(self, **kwargs):
