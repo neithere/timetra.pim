@@ -25,7 +25,7 @@ def day_view(year=None, month=None, day=None, template=None, query=None, process
 
     if processor:
         items = processor(items)
-    items = list(sorted(items, key=itemgetter('important'), reverse=True))
+    items = list(sorted(items, key=itemgetter('acute'), reverse=True))
     prev = date - datetime.timedelta(days=1)
     next = date + datetime.timedelta(days=1)
     return render_template(template, items=items, date=date, prev=prev, next=next)

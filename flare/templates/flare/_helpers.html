@@ -93,7 +93,7 @@
 
         {% if plan.status != 'done' %}
             {% if plan.time.date() < (day or now().date()) %}
-                <span class="badge badge-{% if plan.status == "done" %}success{% else %}important{% endif %}" title="{{ plan.time }}">{{ now() - plan.time }} назад</span>
+                <span class="badge badge-{% if plan.status == "done" %}success{% else %}acute{% endif %}" title="{{ plan.time }}">{{ now() - plan.time }} назад</span>
             {% else %}
                 <span class="badge
                 {% if (plan.time - now()).total_seconds() < 60*60*24 %}badge-warning{% else %}badge-info{% endif %}
@@ -141,7 +141,7 @@
     {% elif item.frozen %}
         <i class="icon icon-lock"></i>
     {% else %}
-        {% if item.important %}
+        {% if item.acute %}
             <i class="icon icon-star"></i>
         {% else %}
             <i class="icon icon-star-empty"></i>
@@ -162,7 +162,7 @@
 
 {% macro render_item_importance_label(item) %}
 
-    {% if item.important %}
+    {% if item.acute %}
         <i class="icon icon-heart"></i>
     {% endif %}
 

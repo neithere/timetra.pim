@@ -9,7 +9,7 @@
 {% block heading %} Заботы {% endblock %}
 {% block head %}
 <style type="text/css">
-    table.items tr.important td.description {
+    table.items tr.acute td.description {
         font-size: 1.2em;
     }
     table.items tr.solved td,
@@ -64,7 +64,7 @@
             {% for item in items %}
                 {% if has_risk == (True if item.get('risk') else False) %}
                     <tr class="{% if item.solved %}solved{% elif item.closed %}cancelled{% else %}open{% endif %}
-                               {% if item.important %}important{% endif %}
+                               {% if item.acute %}acute{% endif %}
                                {% if item.frozen %}frozen{% endif %}
                               ">
                         <td class="description">

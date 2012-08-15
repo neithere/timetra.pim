@@ -13,11 +13,11 @@
             color: #aaa;
             line-height: 1.7em;
         }
-        dl.needs-and-plans dt.important {
+        dl.needs-and-plans dt.acute {
             font-size: 1.2em;
         }
-        dl.needs-and-plans dt.important,
-        dl.needs-and-plans dt.important em {
+        dl.needs-and-plans dt.acute,
+        dl.needs-and-plans dt.acute em {
             color: black;
         }
         dl.needs-and-plans dt em {
@@ -66,7 +66,7 @@
         <dl class="needs-and-plans">
         {% for item in items %}
             {% if item.plan %}
-                <dt class="{% if item.important %}important{% endif %}
+                <dt class="{% if item.acute %}acute{% endif %}
                            {% if item.solved %}solved{% endif %}
                           ">
 

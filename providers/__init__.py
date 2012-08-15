@@ -105,11 +105,13 @@ class Item(Model):
         ),
         stakeholders = [unicode],
         project = unicode,
-        important = False,
+        acute = False,
         opened = datetime.datetime,
         closed = datetime.datetime,
         solved = False,
         frozen = False,  # if True, it's someday/maybe
+        # TODO:
+        # * проблема/потребность со временем: не меняется / усугубляется / ослабевает
         log = [Log.structure]
     )
 
