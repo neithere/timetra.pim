@@ -70,15 +70,17 @@ def make_app(conf_path='conf.py'):
     app.config.NAV_ITEMS = (
         Item('flare.day_notes', u'Входящие', 'inbox'),
         Item('flare.item_index', u'Заботы', 'pushpin'),  # concerns
-        Item('flare.day_tasks', u'Планы', 'tasks'),
         divider,
         Item('flow.project_index', u'Проекты', 'folder-open'),
         Item('flow.asset_index', u'Имущество', 'briefcase'),
         Item('flow.contact_index', u'Контакты', 'user'),
         Item('flow.reference_index', u'Справка', 'book'),
-        Item('flow.context_index', u'Контексты', 'map-marker'),
         divider,
         Dropdown(u'More', (
+            Item('flare.day_tasks', u'Планы', 'tasks'),
+            #---
+            Item('flow.context_index', u'Контексты', 'map-marker'),
+            #---
             Item('flare.item_timeline', u'Лента', ''),
             Item('flare.day_full', u'Цепочки', ''),
             Item('flare.someday', u'Когда-нибудь', ''),

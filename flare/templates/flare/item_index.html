@@ -32,6 +32,11 @@
     table.items tr.frozen td a {
         font-size: .9em
     }
+    table.items tr td.labels,
+    table.items tr td.age {
+        width: 20ex;
+        font-size: .8em;
+    }
 </style>
 {% endblock %}
 {% block content %}
@@ -47,9 +52,9 @@
         </li>
     </ul>
 
-        <h2><i class="icon icon-umbrella"></i> Что меня беспокоит</h2>
+        <h2><!-- i class="icon icon-umbrella"></i --> Что меня беспокоит</h2>
         {{ render_items(items, has_risk=True) }}
-        <h2><i class="icon icon-gift"></i> К чему я стремлюсь</h2>
+        <h2><!-- i class="icon icon-gift"></i --> К чему я стремлюсь</h2>
         {{ render_items(items, has_risk=False) }}
     {% else %}
         <div class="alert alert-block">
@@ -73,9 +78,19 @@
         <tbody>
             {% for item in items %}
                 {% if has_risk == (True if item.get('risk') else False) %}
-                    <tr class="{% if item.solved %}solved{% elif item.closed %}cancelled{% else %}open{% endif %}
+                    <tr class="
                                {% if item.acute %}acute{% endif %}
-                               {% if item.frozen %}frozen{% endif %}
+                               {% if item.frozen %}frozen info{% endif %}
+                               {% if item.solved %}
+                                   solved success
+                               {% elif item.closed %}
+                                   cancelled info
+                               {% else %}
+                                   open
+                               {% endif %}
+                               {% if item.risk %}
+                                   error
+                               {% endif %}
                               ">
                         <td class="description">
                             {{ render_item_mode_label(item) }}

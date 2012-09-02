@@ -21,6 +21,7 @@
         <div class="navbar navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container">
+                    <a class="brand" href="/">PIM</a>
                     <ul class="nav">
                         {% for node in config.NAV_ITEMS %}
                             {% if node.endpoint %}
@@ -46,9 +47,6 @@
                             {% endif %}
                         {% endfor %}
                     </ul>
-                    <div class="pull-right">
-                        <a class="brand" href="/">PIM</a>
-                    </div>
                 </div>
             </div>
         </div>
