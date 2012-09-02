@@ -37,6 +37,16 @@
 {% block content %}
 
     {% if items %}
+
+    <ul class="nav nav-tabs">
+        <li class="{% if not request.values.get('acute') %}active{% endif %}">
+            <a href="?">Все</a>
+        </li>
+        <li class="{% if request.values.get('acute') %}active{% endif %}">
+            <a href="?acute=1">Острые</a>
+        </li>
+    </ul>
+
         <h2><i class="icon icon-umbrella"></i> Что меня беспокоит</h2>
         {{ render_items(items, has_risk=True) }}
         <h2><i class="icon icon-gift"></i> К чему я стремлюсь</h2>
@@ -93,8 +103,13 @@
                                         <i class="icon icon-phone" title="ожидание (делегировано)"></i> напомнить
                                     {% endif %}
                                     {% if item.has_next_action() and item.has_completed_action() and not item.is_waiting() %}
-                                        <i class="icon icon-cogs" title="в работе (часть задач выполнена)"></i> доделать
-                                        {{ '%.0f'|format(100 - item.completed_percentage) }}%
+                                        <div style="background: indianred; width: 100%; border-radius: .2em;"
+                                             title="доделать {{ '%.0f'|format(100 - item.completed_percentage) }}%">
+                                            <div style="background: yellowgreen; width: {{ '%.0f'|format(item.completed_percentage) }}%; border-radius: .2em;">
+                                                <!--i class="icon icon-cogs" title="в работе (часть задач выполнена)"></i-->
+                                                &nbsp;
+                                            </div>
+                                        </div>
                                     {% endif %}
 
                                     {# TODO: display "stalled" warning if no plan was completed in the last N days #}

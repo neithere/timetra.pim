@@ -3,6 +3,7 @@
 from collections import namedtuple
 import datetime
 from dateutil.relativedelta import relativedelta
+import docutils
 import re
 
 from flask import Flask
@@ -34,6 +35,28 @@ def replace_hashtags(text):
         text = re.sub(regex, template, text)
     return text
 
+def rst_to_html(text):
+    """ Returns a HTML representation of given ReST string.
+    """
+    if not '\n\n' in text:
+        # ignore single-line items (a better way would be to only parse inline
+        # markup in such cases but it needs some research)
+        return text
+
+    conf = dict(
+        initial_header_level=2,
+    )
+    doc = docutils.core.publish_parts(text, writer_name='html',
+                                      settings_overrides=conf)
+    # many documents start with a fieldlist; docutils treat it as
+    # document metadata and cuts out from the rest of the body.
+    # we don't need this and simply staple them together:
+    body = '\n'.join((doc['docinfo'], doc['body']))
+    # unescape some HTML entities used later on in hashtags
+    # (dunno how to do it in a cleaner way)
+    body = body.replace('&#64;', '@').replace('','')
+
+    return body
 
 def make_app(conf_path='conf.py'):
     app = Flask(__name__)
@@ -76,6 +99,8 @@ def make_app(conf_path='conf.py'):
     @app.template_filter('capfirst')
     def capfirst_filter(value):
         return value[0].upper() + value[1:] if value else value
+
+    app.template_filter('render_rst')(rst_to_html)
 
     app.jinja_env.globals['now'] = datetime.datetime.utcnow
     app.jinja_env.globals['relativedelta'] = relativedelta

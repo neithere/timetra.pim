@@ -89,7 +89,7 @@
     {% endif %}
 
     {% if plan.time %}
-        <span class="label label-info"><i class="icon-time icon-white"></i> {{ plan.time.strftime('%H:%M') }}</span>
+        <span class="label label-info"><i class="icon-time icon-white"></i> {{ plan.time.strftime('%H:%M') }} UTC</span>
 
         {% if plan.status != 'done' %}
             {% if plan.time.date() < (day or now().date()) %}
@@ -115,7 +115,7 @@
             ({{ render_delta(plan.opened, (plan.closed or now())) }} в ожидании)
         {% endif %}
     {% else %}
-        {{ plan.action|hashtagify|safe|urlize|capfirst }}
+        {{ plan.action|render_rst|hashtagify|safe|urlize|capfirst }}
     {% endif %}
 
     {% for tag in plan.context %}

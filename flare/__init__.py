@@ -4,8 +4,9 @@ import datetime
 import itertools
 from dateutil import rrule
 from operator import itemgetter
+from functools import partial
 
-from flask import Blueprint, current_app, render_template
+from flask import Blueprint, current_app, render_template, request
 
 
 flare = Blueprint('flare', __name__, template_folder='templates')
@@ -62,7 +63,12 @@ def someday(**kwargs):
 @flare.route('<int:year>/<int:month>/<int:day>/items/')
 def item_index(**kwargs):
     filter_items = lambda xs: (x for x in xs if x.need or x.risk)
-    return day_view(template='flare/item_index.html', processor=filter_items,
+    filter_acute = lambda xs: (x for x in xs if x.acute)
+    if request.values.get('acute'):
+        processor = lambda xs: filter_items(filter_acute(xs))
+    else:
+        processor = filter_items
+    return day_view(template='flare/item_index.html', processor=processor,
                     **kwargs)
 
 

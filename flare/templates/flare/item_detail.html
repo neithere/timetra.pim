@@ -45,7 +45,7 @@
 
         {% if item.note %}
             <dt>Заметка</dt>
-            <dd>{{ item.note|hashtagify|safe|urlize|capfirst }}.</dd>
+            <dd>{{ item.note|render_rst|hashtagify|safe|urlize|capfirst }}.</dd>
         {% endif %}
 
         {% if item.risk %}
@@ -65,7 +65,7 @@
 
         {% if item.haze %}
             <dt>Неясности</dt>
-            <dd>{{ item.haze|hashtagify|safe|urlize|capfirst }}.</dd>
+            <dd>{{ item.haze|render_rst|hashtagify|safe|urlize|capfirst }}.</dd>
         {% endif %}
 
         {% if item.stakeholders %}
