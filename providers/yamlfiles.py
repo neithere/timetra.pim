@@ -5,8 +5,11 @@ import itertools
 import os
 import yaml
 
-from . import BaseDataProvider, Item
+from . import BaseDataProvider, Item, Document
 from . import utils
+
+
+ARCHIVE_FILENAMES = ('archive.yaml',)
 
 
 def load_path(path):
@@ -30,11 +33,15 @@ def get_items_for_day(root_dir, date=None):
     return load_path(path) or []
 
 
-def get_current_items(root_dir):
+def get_current_items(root_dir, skip_archived=False):
     """ Возвращает записи из текущего набора.
     """
     names = (x for x in os.listdir(root_dir) if x.endswith('.yaml'))
-    paths = (os.path.join(root_dir, x) for x in names)
+    if skip_archived:
+        filtered = (x for x in names if x not in ARCHIVE_FILENAMES)
+    else:
+        filtered = names
+    paths = (os.path.join(root_dir, x) for x in filtered)
     return itertools.chain(*(load_path(x) for x in paths))
 
 
@@ -47,9 +54,9 @@ class YAMLFilesProvider(BaseDataProvider):
         item = {'note': item} if isinstance(item, unicode) else item
         return Item(**item)
 
-    def get_items(self, date=None):
+    def get_items(self, date=None, skip_archived=False):
         #items = get_items_for_day(self.root_dir, date)
-        items = get_current_items(self.root_dir) #, date)
+        items = get_current_items(self.root_dir, skip_archived=skip_archived) #, date)
         items = (self._transform_item(x) for x in items)
         if date:
             items = (x for x in items

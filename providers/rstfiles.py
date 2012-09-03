@@ -292,7 +292,10 @@ class ReStructuredTextFilesProvider(BaseDataProvider):
             srcmeta = item,
         )
 
-    def get_items(self, date=None):
+    def get_items(self, date=None, skip_archived=False):
+        if skip_archived:
+            import warnings
+            warnings.warn('ReStructuredTextFilesProvider does not support skip_archived')
         plans = list(self.get_plans(date or datetime.date.today()))
         # все задачи объединены под одной пустой целью
         return [

@@ -12,7 +12,8 @@ from flask import Blueprint, current_app, render_template, request
 flare = Blueprint('flare', __name__, template_folder='templates')
 
 
-def day_view(year=None, month=None, day=None, template=None, query=None, processor=None):
+def day_view(year=None, month=None, day=None, template=None, query=None,
+             processor=None, skip_archived=False):
     assert template
     if year and month and day:
         date = datetime.date(year, month, day)
@@ -22,7 +23,8 @@ def day_view(year=None, month=None, day=None, template=None, query=None, process
     if query:
         items = current_app.data_providers.filter_items(**query)
     else:
-        items = current_app.data_providers.get_items(date)
+        items = current_app.data_providers.get_items(date,
+                                                     skip_archived=skip_archived)
 
     if processor:
         items = processor(items)
@@ -69,7 +71,7 @@ def item_index(**kwargs):
     else:
         processor = filter_items
     return day_view(template='flare/item_index.html', processor=processor,
-                    **kwargs)
+                    skip_archived=True, **kwargs)
 
 
 @flare.route('items/<text>/')

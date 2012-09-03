@@ -177,7 +177,7 @@ class Document(Model):
 class BaseDataProvider(object):
     """ All data providers should implement this interface.
     """
-    def get_items(self, date=None):
+    def get_items(self, date=None, skip_archived=False):
         """ Returns a list of :class:`Item` objects for given date.
 
         :date: if not specified, current date is used.
@@ -229,14 +229,19 @@ class DataProvidersManager(object):
                     yield elem
 
     def _get_first(self, meth_name, args, kwargs):
+        #print 'available providers:', self.providers
         for provider in self.providers:
+            #print 'trying', provider
             try:
                 meth = getattr(provider, meth_name)
                 value = meth(*args, **kwargs)
             except NotImplementedError:
+                #print '  not implemented'
                 pass
             else:
+                #print '  got value', value
                 if value:
+                    #print '  value accepted'
                     return value
 
     def get_items(self, *args, **kwargs):
