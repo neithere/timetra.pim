@@ -68,13 +68,13 @@
 {% macro render_items(items, has_risk=True) %}
 
     <table class="table table-striped items">
-        <thead>
+        <!--thead>
             <tr>
                 <th>Description</th>
                 <th>What's Next</th>
                 <th>Age</th>
             </tr>
-        </thead>
+        </thead-->
         <tbody>
             {% for item in items %}
                 {% if has_risk == (True if item.get('risk') else False) %}
@@ -87,9 +87,9 @@
                                    cancelled info
                                {% else %}
                                    open
-                               {% endif %}
-                               {% if item.risk %}
-                                   error
+                                   {% if item.risk %}
+                                       error
+                                   {% endif %}
                                {% endif %}
                               ">
                         <td class="description">
@@ -133,7 +133,11 @@
                                     <i class="icon icon-beaker" title="нет планов"></i> запланировать
                                 {% endif %}
                             {% else %}
-                                <i class="icon icon-ok-sign"></i> решено!
+                                {% if item.solved %}
+                                    <i class="icon icon-ok-sign"></i> решено!
+                                {% else %}
+                                    <i class="icon icon-remove-sign"></i> отменено
+                                {% endif %}
                             {% endif %}
                         </td>
                         <td class="age">
