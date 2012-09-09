@@ -5,7 +5,8 @@ import itertools
 import os
 import yaml
 
-from . import BaseDataProvider, Item, Document
+from .base import BaseDataProvider
+from .base.models import Item, Document
 from . import utils
 
 

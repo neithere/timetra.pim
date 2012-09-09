@@ -2,7 +2,8 @@
 import os
 from rdflib import Graph, Namespace, RDF, RDFS, URIRef
 
-from . import BaseDataProvider, Document
+from .base import BaseDataProvider
+from .base.models import Document
 
 
 DATA_FILE = 'assets/books.ttl'

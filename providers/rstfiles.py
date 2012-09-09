@@ -7,7 +7,8 @@ import re
 import docutils.core
 import yaml
 
-from . import BaseDataProvider, Item, Plan
+from .base import BaseDataProvider
+from .base.models import Item, Plan
 
 
 __all__ = ['get_day_plans']
