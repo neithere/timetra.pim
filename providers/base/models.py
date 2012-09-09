@@ -2,6 +2,8 @@
 import datetime
 from monk import modeling
 
+from . import utils   # for Item.sorted_plans
+
 
 __all__ = ['Item']
 
@@ -169,4 +171,5 @@ class Document(Model):
         title = unicode,
         slug = unicode,
         body = unicode,
+        categories = [unicode],
     )

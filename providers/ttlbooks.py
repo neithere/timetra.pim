@@ -9,6 +9,7 @@ from .base.models import Document
 DATA_FILE = 'assets/books.ttl'
 DATA_FORMAT = 'n3'
 DOCUMENT_CATEGORY = 'assets'
+ASSET_CATEGORIES = [u'Книги']
 
 
 class TTLBooksProvider(BaseDataProvider):
@@ -67,7 +68,8 @@ class TTLBooksProvider(BaseDataProvider):
         html_pairs = (u'<dt>{0}</dt><dd>{1}</dd>'.format(k,v)
                       for k,v in plain_dict.items())
         body = u'<dl>{0}</dl>'.format('\n'.join(html_pairs))
-        return Document(title=plain_dict['title'], slug=slug, body=body)
+        return Document(title=plain_dict['title'], slug=slug, body=body,
+                        categories=ASSET_CATEGORIES)
 #        return list(self.g.triples((slug, None, None)))
 
 

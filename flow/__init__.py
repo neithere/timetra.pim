@@ -3,7 +3,7 @@
 import datetime
 import itertools
 
-from flask import Blueprint, current_app, render_template
+from flask import Blueprint, current_app, render_template, request
 #from timetra import storage as timetra_storage
 
 flow = Blueprint('flow', __name__, template_folder='templates')
@@ -91,6 +91,9 @@ def context_detail(slug):
 @flow.route('assets/')
 def asset_index():
     items = get_document_list('assets')
+    tag = request.values.get('item_category')
+    if tag:
+        items = (x for x in items if tag in x.categories)
     return render_template('flow/asset_index.html', items=items)
 
 

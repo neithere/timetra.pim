@@ -118,7 +118,7 @@
                     <td>
                         {% if item.categories %}
                             {% for category in item.categories %}
-                                <span class="label">{{ category }}</span>
+                                <a href="?item_category={{ category }}" class="label">{{ category }}</a>
                             {% endfor %}
                         {% endif %}
                     </td>

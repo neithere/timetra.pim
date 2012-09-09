@@ -8,7 +8,7 @@ import docutils.core
 import yaml
 
 from .base import BaseDataProvider
-from .base.models import Item, Plan
+from .base.models import Item, Plan, Document
 
 
 __all__ = ['get_day_plans']
@@ -215,7 +215,7 @@ def get_rst_files_list_annotated(root_dir, subdir):
     for name in names:
         meta, data = get_rst_file_parts(root_dir, subdir, name)
         if 'title' in meta:
-            yield meta
+            yield Document(**meta)
         else:
             # Quick and dirty: instead of fully rendering each document, just
             # snatch the title from the most probable location. This will fail
@@ -227,7 +227,7 @@ def get_rst_files_list_annotated(root_dir, subdir):
             else:
                 # ReST document heading is probably decorated only below
                 title = lines[0]
-            yield dict(meta, title=title)
+            yield Document(title=title, **meta)
 
 
 def read_rst_file(root_dir, subdir, slug):
