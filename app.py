@@ -8,7 +8,7 @@ import re
 
 from flask import Flask
 
-from providers import DataProvidersManager, rstfiles, yamlfiles
+from providers import DataProvidersManager, rstfiles, yamlfiles, ttlbooks
 from flow import flow
 from flare import flare
 import utils.formatdelta
@@ -92,7 +92,9 @@ def make_app(conf_path='conf.py'):
 
     yaml_provider = yamlfiles.configure_provider(app)
     rst_provider = rstfiles.configure_provider(app)
-    app.data_providers = DataProvidersManager([yaml_provider, rst_provider])
+    books_provider = ttlbooks.configure_provider(app)
+    app.data_providers = DataProvidersManager([yaml_provider, rst_provider,
+                                               books_provider])
 
     @app.template_filter('hashtagify')
     def hashtags_filter(s):

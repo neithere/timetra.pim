@@ -243,7 +243,7 @@ def render_rst_file(root_dir, subdir, slug):
     meta, raw_document = get_rst_file_parts(root_dir, subdir, slug)
     if raw_document is None:
         print 'NO FILE, NO RAW DOC'
-        return meta
+        return None  #meta
     conf = dict(
         initial_header_level=2,
     )
