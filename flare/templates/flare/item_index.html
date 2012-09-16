@@ -87,9 +87,9 @@
                                    cancelled info
                                {% else %}
                                    open
-                                   {% if item.risk %}
+                                   {#% if item.risk %}
                                        error
-                                   {% endif %}
+                                   {% endif %#}
                                {% endif %}
                               ">
                         <td class="description">
@@ -140,11 +140,13 @@
                                 {% endif %}
                             {% endif %}
                         </td>
+                        {#
                         <td class="age">
                             {% if item.opened %}
                                 {{ render_delta(item.opened, now()) }}
                             {% endif %}
                         </td>
+                        #}
                     </tr>
                 {% endif %}
             {% endfor %}
