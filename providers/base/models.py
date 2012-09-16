@@ -109,7 +109,7 @@ class Item(Model):
         opened = datetime.datetime,
         closed = datetime.datetime,
         solved = False,
-        frozen = False,  # if True, it's someday/maybe
+        frozen = datetime.datetime,  # if not None, it's someday/maybe
         # TODO:
         # * проблема/потребность со временем: не меняется / усугубляется / ослабевает
         log = [Log.structure]

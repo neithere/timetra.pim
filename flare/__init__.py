@@ -4,12 +4,37 @@ import datetime
 import itertools
 from dateutil import rrule
 from operator import itemgetter
-from functools import partial
 
 from flask import Blueprint, current_app, render_template, request
 
 
 flare = Blueprint('flare', __name__, template_folder='templates')
+
+
+def multikeysort(items, columns):
+    """ See http://stackoverflow.com/questions/1143671/python-sorting-list-of-dictionaries-by-multiple-keys
+    (author: hughdbrown)
+    """
+    comparers = [((itemgetter(col[1:].strip()), -1)
+                  if col.startswith('-') else
+                  (itemgetter(col.strip()), 1))
+                  for col in columns]
+    def comparer(left, right):
+        for fn, mult in comparers:
+            # `None` values are tolerated and treated as "less than any other"
+            null_matrix = {(True, True): 0,
+                           (True, False): -1,
+                           (False, True): 1}
+            values = fn(left) is None, fn(right) is None
+            if values in null_matrix:
+                return mult * null_matrix[values]
+            else:
+                result = cmp(fn(left), fn(right))
+                if result:
+                    return mult * result
+        else:
+            return 0
+    return sorted(items, cmp=comparer)
 
 
 def day_view(year=None, month=None, day=None, template=None, query=None,
@@ -28,7 +53,7 @@ def day_view(year=None, month=None, day=None, template=None, query=None,
 
     if processor:
         items = processor(items)
-    items = list(sorted(items, key=itemgetter('acute'), reverse=True))
+    items = list(multikeysort(items, ['-acute', 'frozen']))
     prev = date - datetime.timedelta(days=1)
     next = date + datetime.timedelta(days=1)
     return render_template(template, items=items, date=date, prev=prev, next=next)
