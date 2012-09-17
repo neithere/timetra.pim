@@ -131,7 +131,7 @@
 
 {% macro render_doc_meta(meta) %}
 
-    {% if meta|count > 3 %}  {# i.e. if not just the title, slug and body #}
+    {% if meta and meta|count > 3 %}  {# i.e. if not just the title, slug and body #}
         <div style="padding: 1em 0;">
             {% if meta.state %}
                 {% if meta.state == 'active' %}
