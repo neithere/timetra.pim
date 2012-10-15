@@ -91,8 +91,11 @@ def someday(**kwargs):
 def item_index(**kwargs):
     filter_items = lambda xs: (x for x in xs if x.need or x.risk)
     filter_acute = lambda xs: (x for x in xs if x.acute)
+    filter_warm = lambda xs: (x for x in xs if not x.frozen)
     if request.values.get('acute'):
         processor = lambda xs: filter_items(filter_acute(xs))
+    elif request.values.get('warm'):
+        processor = lambda xs: filter_items(filter_warm(xs))
     else:
         processor = filter_items
     return day_view(template='flare/item_index.html', processor=processor,

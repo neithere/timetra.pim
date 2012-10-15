@@ -10,7 +10,7 @@
 {% block head %}
 <style type="text/css">
     table.items tr.acute td.description {
-        font-size: 1.2em;
+        font-size: 1.4em;
     }
     table.items tr.solved td,
     table.items tr.solved td a
@@ -44,8 +44,11 @@
     {% if items %}
 
     <ul class="nav nav-tabs">
-        <li class="{% if not request.values.get('acute') %}active{% endif %}">
+        <li class="{% if not request.values.get('acute') and not request.values.get('warm') %}active{% endif %}">
             <a href="?">Все</a>
+        </li>
+        <li class="{% if request.values.get('warm') %}active{% endif %}">
+            <a href="?warm=1">Тёплые</a>
         </li>
         <li class="{% if request.values.get('acute') %}active{% endif %}">
             <a href="?acute=1">Острые</a>
@@ -80,11 +83,11 @@
                 {% if has_risk == (True if item.get('risk') else False) %}
                     <tr class="
                                {% if item.acute %}acute{% endif %}
-                               {% if item.frozen %}frozen info{% endif %}
+                               {% if item.frozen %}frozen {#info#}{% endif %}
                                {% if item.solved %}
                                    solved success
                                {% elif item.closed %}
-                                   cancelled info
+                                   cancelled {#info#}
                                {% else %}
                                    open
                                    {#% if item.risk %}
@@ -93,7 +96,7 @@
                                {% endif %}
                               ">
                         <td class="description">
-                            {{ render_item_mode_label(item) }}
+                            {#{ render_item_mode_label(item) }#}
 
                             {% if item.project %}
                                 <a href="{{ url_for('flow.project_detail', slug=item.project) }}"><i class="icon icon-folder-open"></i> {{ item.project }}</a>:
