@@ -1,3 +1,6 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+
 '''
 test
 Andy Mikhaylenko, 2012-07-01
