@@ -22,7 +22,7 @@ def curses_app(col_names, elems):
 
     legend = cols(col_names)
 
-    status = urwid.Text(u'Feeling fine')
+    #status = urwid.Text(u'Feeling fine')
 
     class Row(urwid.WidgetWrap):
         def __init__(self, values):
@@ -41,7 +41,7 @@ def curses_app(col_names, elems):
     rows = [Row(cells) for cells in elems]
 
     listbox = urwid.ListBox(urwid.SimpleListWalker(rows))
-    top = urwid.Frame(listbox, header=legend, footer=status)
+    top = urwid.Frame(listbox, header=legend)  #, footer=status)
 
     palette = [
         ('reversed', 'standout', '')
