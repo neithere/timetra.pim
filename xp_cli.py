@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
-from argh import command, dispatch_command
+from argh import command, dispatch_commands
 from blessings import Terminal
 
 from providers import DataProvidersManager
@@ -24,10 +24,7 @@ def indent(text):
     return prepend(text, ' ')
 
 
-@command
-def main(warm=False, acute=False):
-    """ Displays a list of active risks and needs.
-    """
+def get_needs():
     yaml_provider = yamlfiles.YAMLFilesProvider(conf.SOURCE_YAML_ROOT)
     rst_provider = rstfiles.ReStructuredTextFilesProvider(conf.SOURCE_RST_ROOT)
     data_providers = DataProvidersManager([yaml_provider, rst_provider])
@@ -35,6 +32,15 @@ def main(warm=False, acute=False):
     items = data_providers.get_items()
     items = (x for x in items if (x.risk or x.need) and not x.closed)
     items = list(multikeysort(items, ['-acute', '-risk', 'frozen']))
+
+    return items
+
+
+@command
+def needs(warm=False, acute=False):
+    """ Displays a list of active risks and needs.
+    """
+    items = get_needs()
     for item in items:
         if acute and not item.acute:
             continue
@@ -57,5 +63,21 @@ def main(warm=False, acute=False):
         #    yield indent(u'запланировать')
 
 
+@command
+def plans(need_mask):
+    """ Displays plans for the need that matches given mask.
+    """
+    items = get_needs()
+    mask = need_mask.decode('utf-8').lower()
+    for item in items:
+        if (item.risk and mask in item.risk.lower()) or (item.need and mask in item.need.lower()):
+            yield item.risk or item.need
+            for plan in item.plan:
+                yield u'[{0.status}] {0.action}'.format(plan)
+            return
+    else:
+        yield 'Nothing found.'
+
+
 if __name__ == '__main__':
-    dispatch_command(main)
+    dispatch_commands([needs, plans])
