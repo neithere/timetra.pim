@@ -127,7 +127,13 @@
     {% endif %}
 
     {% if plan.result %}
-        <span style="color: Green;"> → {{ plan.result|hashtagify|safe|urlize }}</span>
+        {% if '\n\n' in plan.result %}
+            <div style="margin-left: 3ex; border-left: 1px solid green; font-size: .9em; padding: 0 0 0 2ex; color: gray;">
+                {{ plan.result|render_rst|hashtagify|safe|urlize }}
+            </div>
+        {% else %}
+            <span style="color: Green;"> → {{ plan.result|hashtagify|safe|urlize }}</span>
+        {% endif %}
     {% endif %}
 
 {% endmacro %}
