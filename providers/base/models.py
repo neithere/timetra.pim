@@ -78,6 +78,7 @@ class Plan(Model):
         opened = datetime.datetime,
         closed = datetime.datetime,
         result = unicode,  # комментарий о результате выполнения действия: грабли, особенности, ...
+        reqs = unicode,    # требования (напр., какие документы нужно принести и т.д.)
     )
 
     def __init__(self, **kwargs):

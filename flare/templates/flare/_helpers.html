@@ -118,6 +118,10 @@
         {{ plan.action|render_rst|hashtagify|safe|urlize|capfirst }}
     {% endif %}
 
+    {% if plan.reqs %}
+        <span style="border: 1px solid yellow;">взять <strong>{{ plan.reqs }}</strong></span>
+    {% endif %}
+
     {% for tag in plan.context %}
         <a href="{{ url_for('flow.context_detail', slug=tag) }}" class="label"><i class="icon icon-map-marker"></i> {{ tag }}</a>
     {% endfor %}
