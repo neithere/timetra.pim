@@ -79,5 +79,12 @@ def plans(need_mask):
         yield 'Nothing found.'
 
 
+@command
+def serve(port=6061):
+    import web
+    app = web.make_app()
+    app.run(port=port)
+
+
 if __name__ == '__main__':
-    dispatch_commands([needs, plans])
+    dispatch_commands([needs, plans, serve])
