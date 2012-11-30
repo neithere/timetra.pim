@@ -51,6 +51,9 @@ def needs(warm=False, acute=False):
             text = t.bold(text)
         if item.risk:
             text = t.red(text)
+        if item.project:
+            project_label = t.blue(item.project)
+            text = prepend(project_label, text)
         yield prepend('*', text)
         #if item.plan:
         #    if not item.has_next_action():
