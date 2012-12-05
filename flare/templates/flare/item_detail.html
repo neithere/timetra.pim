@@ -33,6 +33,11 @@
 
         <dl class="dl-horizontal">
 
+        {% if item.project %}
+            <dt>Проект</dt>
+            <dd><a href="{{ url_for('flow.project_detail', slug=item.project) }}">{{ item.project }}</a></dd>
+        {% endif %}
+
         {% if item.opened %}
             <dt>Открыто</dt>
             <dd>{{ render_delta(item.opened, now()) }} назад</dd>
