@@ -109,6 +109,10 @@
                             <span class="badge badge-success">актуально</span>
                         {% elif item.state == 'closed' %}
                             <span class="badge">закрыто</span>
+                        {% elif item.state == 'stored' %}
+                            <span class="badge">на хранении</span>
+                        {% elif item.state == 'given-away' %}
+                            <span class="badge">отдано</span>
                         {% else %}
                             <span class="badge">{{ item.state or '?' }}</span>
                         {% endif %}
