@@ -119,7 +119,14 @@
     {% endif %}
 
     {% if plan.reqs %}
-        <span style="border: 1px solid yellow;">взять <strong>{{ plan.reqs }}</strong></span>
+        {% if '\n\n' in plan.reqs %}
+            <div style="margin-left: 3ex; border-left: 1px solid yellow; font-size: .9em; padding: 0 0 0 2ex; color: gray;">
+                взять:
+                {{ plan.reqs|render_rst|hashtagify|safe|urlize }}
+            </div>
+        {% else %}
+            <span style="border: 1px solid yellow;">взять <strong>{{ plan.reqs|hashtagify|safe|urlize }}</strong></span>
+        {% endif %}
     {% endif %}
 
     {% for tag in plan.context %}
