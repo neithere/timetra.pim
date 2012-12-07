@@ -10,6 +10,7 @@
         {% else %}
             <i class="icon icon-gift"></i>
         {% endif %}
+        &nbsp;
         {{ (item.risk or item.need)|hashtagify|safe|urlize|capfirst }}
     {% else %}
         (Несуществующий элемент)
@@ -87,7 +88,8 @@
 
         </dl>
 
-        <h2>Планы (закрыто {{ '%.0f'|format(item.completed_percentage) }}% из {{ item.plan|count }} шт)</h2>
+        {#<h2>Планы (закрыто {{ '%.0f'|format(item.completed_percentage) }}% из {{ item.plan|count }} шт)</h2>#}
+        <h2>Планы ({{ '%.0f'|format(item.completed_percentage) }}%)</h2>
 
         {% if not item.closed and not item.has_next_action() %}
             <p class="alert alert-warning">Нет дальнейших планов</p>
@@ -108,7 +110,6 @@
             <p>
                 {#{ loop.index }#}
                 {{ render_plan(plan) }}
-                {% if plan.closed %}&nbsp;(закрыто {{ plan.closed }} UTC){% endif %}
             </p>
             {% set prev_plan = plan %}
         {% endfor %}

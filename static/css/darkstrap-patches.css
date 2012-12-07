@@ -1,0 +1,81 @@
+/*
+ *
+ * Andy Mikhaylenko, 2012
+ *
+ */
+
+body {
+    font-family: Ubuntu, sans-serif;
+}
+
+a {
+    color: LightBlue;
+}
+a:hover {
+    color: LightCyan;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #c6c6c6;
+}
+h1 {
+    color: Khaki;
+    font-family: Lobster, sans-serif;
+}
+h2 {
+    color: PaleGoldenrod;
+    font-family: Lobster, sans-serif;
+}
+
+.nav {
+    background-color: #2f2f2f;
+    background-image: -webkit-linear-gradient(top,#2f2f2f,#353535);
+    background-image: linear-gradient(top,#2f2f2f,#353535);
+}
+.navbar .brand {
+    color: #c6c6c6;
+    text-shadow: black;
+}
+.navbar .nav > .active > a,
+.navbar .nav > .active > a:hover,
+.navbar .nav > .active > a:focus  {
+    background-color: #333;
+    color: #c6c6c6;
+}
+.navbar .nav > li > a {
+    color: Gray;
+    text-shadow: 0 1px 0 black;
+}
+.navbar .nav > li > a:hover {
+    color: white;
+}
+.navbar .divider-vertical {
+    border-right-color: #353535;
+    border-left-color: #2f2f2f;
+}
+.navbar-inner {
+    /*
+    background-color: #2f2f2f;
+    background-image: -webkit-linear-gradient(top,#2f2f2f,#444);
+    background-image: linear-gradient(top,#2f2f2f,#444);
+    */
+    background-color: #2f2f2f;
+    background-image: -webkit-linear-gradient(top,#2f2f2f,#353535);
+    background-image: linear-gradient(top,#2f2f2f,#353535);
+}
+
+.nav-tabs {
+  border-bottom-color: #444;
+}
+.nav-tabs > .active > a,
+.nav-tabs > .active > a:hover {
+  border-color: #444 #444 transparent #444;
+}
+
+.table td {
+  /*border-top-color: #444;*/
+  border-top: none;
+}
+.table-striped tbody tr:nth-child(2n+1) td, .table-striped tbody tr:nth-child(2n+1) th {
+  background-color: #353535;
+}
