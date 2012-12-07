@@ -30,6 +30,7 @@ h2 {
 .nav {
     background-color: #2f2f2f;
     background-image: -webkit-linear-gradient(top,#2f2f2f,#353535);
+    background-image: -moz-linear-gradient(top,#2f2f2f,#353535);
     background-image: linear-gradient(top,#2f2f2f,#353535);
 }
 .navbar .brand {
@@ -54,13 +55,9 @@ h2 {
     border-left-color: #2f2f2f;
 }
 .navbar-inner {
-    /*
-    background-color: #2f2f2f;
-    background-image: -webkit-linear-gradient(top,#2f2f2f,#444);
-    background-image: linear-gradient(top,#2f2f2f,#444);
-    */
     background-color: #2f2f2f;
     background-image: -webkit-linear-gradient(top,#2f2f2f,#353535);
+    background-image: -moz-linear-gradient(top,#2f2f2f,#353535);
     background-image: linear-gradient(top,#2f2f2f,#353535);
 }
 
