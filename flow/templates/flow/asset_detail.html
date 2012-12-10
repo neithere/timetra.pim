@@ -1,15 +1,13 @@
 {% extends 'flow/base.html' %}
 
-{% from "flow/_helpers.html" import render_tasks, render_doc_meta %}
+{% from "flow/_helpers.html" import render_agenda, render_doc_meta %}
 
 {% block title %}%{{ item.slug }} — {{ super() }}{% endblock %}
 {% block heading %} Имущество: {{ item.title }} {% endblock %}
 {% block content %}
     {{ render_doc_meta(item) }}
 
-    {% if agenda %}
-        {{ render_tasks(agenda) }}
-    {% endif %}
+    {{ render_agenda(agenda) }}
 
     {% if item.body %}
         {{ item.body|hashtagify|safe }}

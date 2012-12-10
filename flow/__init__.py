@@ -39,18 +39,20 @@ def get_agenda(category, slug):
         # есть.
         # Значит, нужны два списка: риски/потребности и планы, т.е., "цели" и "действия".
 
+        append = False
+
         if category == 'contacts' and slug in item.stakeholders:
-            filtered.append(item)
-            #break
+            append = True
         if category == 'projects' and slug == item.project:
-            filtered.append(item)
-            #break
+            append = True
         if item.need and pattern in item.need:
-            filtered.append(item)
-            #break
+            append = True
         if item.plan and any(pattern in x.action for x in item.plan):
+            append = True
+
+        if append:
             filtered.append(item)
-            #break
+
     # TODO: return whole items (needs fixing document templates)
     # XXX   ...OR NOT! see "FIXME" above.
     return itertools.chain(*(x.plan for x in filtered if x.plan))

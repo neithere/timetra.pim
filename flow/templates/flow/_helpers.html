@@ -180,3 +180,11 @@
     {% endif %}
 
 {% endmacro %}
+
+{% macro render_agenda(agenda) %}
+
+    {% if agenda %}
+        {{ render_tasks(agenda) }}
+    {% endif %}
+
+{% endmacro %}
