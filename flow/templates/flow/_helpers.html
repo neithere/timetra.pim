@@ -184,7 +184,47 @@
 {% macro render_agenda(agenda) %}
 
     {% if agenda %}
-        {{ render_tasks(agenda) }}
+
+        <table class="table table-striped table-condensed">
+            <thead>
+                <th>забота</th>
+                <th>актуальные планы</th>
+            </thead>
+            <tbody>
+                {% for concern in agenda.concerns %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('flare.item_detail', text=(concern.risk or concern.need)) }}">
+                                {{ (concern.risk or concern.need)|capfirst }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if concern.frozen %}
+                                Заморожено.
+                            {% elif concern.closed %}
+                                {% if concern.solved %}
+                                    Решено.
+                                {% else %}
+                                    Отменено.
+                                {% endif %}
+                            {% else %}
+                                <ul>
+                                {% for task in concern.plan %}
+                                    {% if task.status not in ('done', 'cancelled') %}
+                                        <li>{{ task.action }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {#% if agenda.plans %}
+            {{ render_tasks(agenda.plans) }}
+        {% endif %#}
     {% endif %}
 
 {% endmacro %}

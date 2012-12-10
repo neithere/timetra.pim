@@ -30,7 +30,7 @@ def get_agenda(category, slug):
     items = current_app.data_providers.get_items(date)
     filtered = []
     for item in items:
-        # FIXME тут мы добавляем сразу весь item, но, скажем, в agenda по
+        # NOTE: тут мы добавляем сразу весь item, но, скажем, в agenda по
         # водопроводчику не надо запихивать весь список задач по ремонту дома,
         # достаточно именно одной задачи, в которой упомянут этот
         # водопроводчик.
@@ -44,18 +44,27 @@ def get_agenda(category, slug):
         if category == 'contacts' and slug in item.stakeholders:
             append = True
         if category == 'projects' and slug == item.project:
+            #print 'INCLUDE project explicit'
+            #print '  ', (item.need or item.risk)
             append = True
         if item.need and pattern in item.need:
+            #print 'INCLUDE pattern in item.need'
             append = True
         if item.plan and any(pattern in x.action for x in item.plan):
+            #print 'INCLUDE pattern in item.plan.*.action'
+            #print '  ', '|'.join(x.action for x in item.plan)
             append = True
 
         if append:
             filtered.append(item)
 
-    # TODO: return whole items (needs fixing document templates)
-    # XXX   ...OR NOT! see "FIXME" above.
-    return itertools.chain(*(x.plan for x in filtered if x.plan))
+    if filtered:
+        return {
+            'concerns': itertools.chain(x for x in filtered),
+            'plans': itertools.chain(*(x.plan for x in filtered if x.plan)),
+        }
+    else:
+        return None
 
 
 @flow.route('/')
