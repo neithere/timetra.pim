@@ -89,5 +89,9 @@ def serve(port=6061):
     app.run(port=port)
 
 
-if __name__ == '__main__':
+def main():
     dispatch_commands([needs, plans, serve])
+
+
+if __name__ == '__main__':
+    main()
