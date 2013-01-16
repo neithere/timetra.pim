@@ -55,6 +55,10 @@ def get_agenda(category, slug):
             #print '  ', '|'.join(x.action for x in item.plan)
             append = True
 
+        if not (item.risk or item.need):
+            # skip notes (and such stuff, if any possible)
+            append = False
+
         if append:
             filtered.append(item)
 
