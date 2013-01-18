@@ -1,7 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
+# PYTHON_ARGCOMPLETE_OK
 
-from argh import command, dispatch_commands
+from argh import dispatch_commands
 from blessings import Terminal
 
 from providers import DataProvidersManager
@@ -36,7 +37,6 @@ def get_needs():
     return items
 
 
-@command
 def needs(warm=False, acute=False):
     """ Displays a list of active risks and needs.
     """
@@ -66,7 +66,6 @@ def needs(warm=False, acute=False):
         #    yield indent(u'запланировать')
 
 
-@command
 def plans(need_mask):
     """ Displays plans for the need that matches given mask.
     """
@@ -82,7 +81,6 @@ def plans(need_mask):
         yield 'Nothing found.'
 
 
-@command
 def serve(port=6061):
     import web
     app = web.make_app()
