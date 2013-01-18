@@ -2,7 +2,7 @@
 
 {% from "flow/_helpers.html" import render_agenda, render_doc_meta %}
 
-{% block title %}%{{ item.slug }} — {{ super() }}{% endblock %}
+{% block title %}{% if item.slug %}%{{ item.slug }}{% else %}{{ super() }}{% endif %}{% endblock %}
 {% block heading %} Имущество: {{ item.title }} {% endblock %}
 {% block content %}
     {{ render_doc_meta(item) }}
