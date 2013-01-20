@@ -1,38 +1,11 @@
 # -*- coding: utf-8 -*-
 import datetime
-from monk import modeling
+from monk import manipulation, modeling
 
 from . import utils   # for Item.sorted_plans
 
 
 __all__ = ['Item']
-
-
-def _unfold_list_of_dicts(value, default_key):
-    """
-    [{...}] → [{...}]
-     {...}  → [{...}]
-    u'xyz'  → [{default_key: u'xyz'}]
-    """
-    if value is None:
-        return []
-    if isinstance(value, dict):
-        return [value]
-    if isinstance(value, unicode):
-        return [{default_key: value}]
-    if isinstance(value, list):
-        if not all(isinstance(x, dict) for x in value):
-            def _fix(x):
-                return {default_key: x} if isinstance(x, unicode) else x
-            return [_fix(x) for x in value]
-    return value
-
-
-def _unfold_to_list(value):
-    if value and not isinstance(value, list):
-        return [value]
-    else:
-        return value
 
 
 class Model(modeling.TypedDictReprMixin,
@@ -85,7 +58,7 @@ class Plan(Model):
         data = kwargs.copy()
 
         if 'context' in data:
-            data['context'] = _unfold_to_list(data['context'])
+            data['context'] = manipulation.unfold_to_list(data['context'])
 
         super(Plan, self).__init__(**data)
 
@@ -120,7 +93,7 @@ class Item(Model):
         data = kwargs.copy()
 
         # разворачиваем строку или словарь в список словарей
-        data['plan'] = _unfold_list_of_dicts(data.get('plan'), 'action')
+        data['plan'] = manipulation.unfold_list_of_dicts(data.get('plan'), 'action')
 
         # заворачиваем строку в список
         data['plan'] = [Plan(**x) for x in data['plan']]
