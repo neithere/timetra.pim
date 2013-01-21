@@ -1,15 +1,18 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
+# PYTHON_ARGCOMPLETE_OK
 import argh
 from blessings import Terminal
-import datetime
 from monk.modeling import DotExpandedDict
-from monk.validation import validate_structure, optional, ValidationError
+from monk.validation import validate_structure, ValidationError
+from monk import manipulation
 import os
 import subprocess
 import textwrap
 import yaml
 import xdg.BaseDirectory
+
+import models
 
 
 APP_NAME = 'pim'
@@ -33,11 +36,13 @@ def get_app_conf():
         'index': '~/pim',
         #'configs': {},
         'x_ignore': list,   # TODO: remove this as soon as all is YAML?
+        'contacts': 'contacts.yaml',
     }
 
     with open(path) as f:
         conf = yaml.load(f)
 
+    conf = manipulation.merged(defaults, conf)
     try:
         validate_structure(defaults, conf)
     except ValidationError as e:
@@ -108,28 +113,22 @@ def examine():
 
 @argh.wrap_errors([ValidationError], processor=lambda m: t.red(unicode(m)))
 def contacts(count=False, *labels):
+    for line in _show_items('contacts.yaml', models.CARD, '@', labels, count):
+        yield line
+
+
+def assets(count=False, *labels):
+    for line in _show_items('assets.yaml', models.ASSET, '%', labels, count):
+        yield line
+
+
+def _show_items(file_name, model, sigil, labels, count=False):
     conf = get_app_conf()
 
     labels = _fix_str_to_unicode(labels)
 
-    index_path = os.path.join(conf.index, 'contacts.yaml')
-    #cards_path = os.path.join(conf.index, 'contacts')
+    index_path = os.path.join(conf.index, file_name)
 
-    card_struct = {
-        'name': unicode,
-        'full_name': optional(unicode),
-        'urls': optional([unicode]),
-        'addr': optional(unicode),
-        'tels': optional([unicode]),
-        'mail': optional([unicode]),
-        'note': optional(unicode),
-        'nick': optional(unicode),
-        'born': optional(datetime.date),
-        'related': optional([unicode]),    # hashtags
-        'first_contact': optional(datetime.date),
-        'org': optional(unicode),
-        'timetable': optional(unicode),
-    }
     with open(index_path) as f:
         cards = yaml.load(f)  #, unicode=True)
 
@@ -145,22 +144,42 @@ def contacts(count=False, *labels):
         card = _fix_str_to_unicode(card)
 
         try:
-            validate_structure(card_struct, card)
+            validate_structure(model, card)
         except (ValidationError, TypeError) as e:
-            raise ValidationError(u'{label}: {e}'.format(label=label, e=e))
+            raise type(e)(u'{label}: {e}'.format(label=label, e=e))
 
         yield ''
-        yield t.bold(u'@{0}'.format(label))
+        yield t.bold(u'{sigil}{label}'.format(sigil=sigil, label=label))
         for k,v in card.iteritems():
-            yield textwrap.fill(u'{k}: {v}'.format(k=k, v=v),
-                                initial_indent='    ',
-                                subsequent_indent='          ')
+            if isinstance(v, dict):
+                yield _wrap_pair(k, '')
+                for kk, vv in v.iteritems():
+                    yield _wrap_pair(kk, vv, indent='    ')
+            elif isinstance(v, list) and v: #and len(v) > 1:
+                yield _wrap_pair(k, v[0])
+                for x in v[1:]:
+                    yield _wrap_pair('', x, indent='    ')
+            else:
+                yield _wrap_pair(k, v)
     if count:
         yield 'Found {0} items'.format(total_cnt)
+
+def _wrap_pair(k, v, indent=''):
+    v = t.yellow(unicode(v))
+    return textwrap.fill(u'{k}: {v}'.format(k=k, v=v),
+                         initial_indent='    '+indent,
+                         subsequent_indent='          '+indent)
+
+
+def showconfig():
+    for k,v in get_app_conf().iteritems():
+        yield u'{k}: {v}'.format(k=k, v=t.bold(unicode(v)))
 
 
 if __name__ == '__main__':
     argh.dispatch_commands([
+        showconfig,
         examine,
-        contacts
+        assets,
+        contacts,
     ])
