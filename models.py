@@ -24,18 +24,20 @@ ASSET = {
     'name': unicode,
     'state': unicode,
     'urls': optional([unicode]),
-    'maker': optional(unicode),
-    'model': unicode,
     'price': optional(unicode),  # may include currency
     'note': optional(unicode),
     'type': optional(unicode),
-    'manufactured': optional(unicode),  # free-form date
     'physical': optional({
+        'maker': optional(unicode),
+        'model': optional(unicode),
         'size': optional(unicode),
         'weight': optional(unicode),
         'colour': optional(unicode),
         'location': optional(unicode),  # maybe hashtag
         'quantity': optional(int),
+        'manufactured': optional(unicode),  # free-form date
+        'volume': optional(unicode),    # storage volume, be it litres or bytes
+        'connectivity': optional(unicode),
     }),
     'owning': optional(dict),
     'stakeholders': optional(list),  # hashtags
@@ -48,6 +50,14 @@ ASSET = {
     }),
     'device': optional({
         'serial_number': unicode,
+        'product_name': optional(unicode),
+        'product_number': optional(unicode),
+        'mac_address': optional(unicode),
+        'imei': optional(unicode),
+    }),
+    'domain_name': optional({
+        'registrar': unicode,
+        'username': optional(unicode),
     }),
     'account': optional(dict),
     'furniture': optional(dict),
