@@ -122,6 +122,18 @@ def assets(count=False, *labels):
         yield line
 
 
+def _check_label_matches(label, patterns):
+    if not patterns:
+        return True
+
+    for pattern in patterns:
+        if label == pattern:
+            return True
+        if pattern.endswith('/') and label.startswith(pattern):
+            # e.g. pattern="device/" and label="device/phone/nokia"
+            return True
+
+
 def _show_items(file_name, model, sigil, labels, count=False):
     conf = get_app_conf()
 
@@ -134,7 +146,7 @@ def _show_items(file_name, model, sigil, labels, count=False):
 
     total_cnt = 0
     for label, card in cards.iteritems():
-        if labels and not label in labels:
+        if not _check_label_matches(label, labels):
             continue
 
         if count:
@@ -166,9 +178,14 @@ def _show_items(file_name, model, sigil, labels, count=False):
 
 def _wrap_pair(k, v, indent=''):
     v = t.yellow(unicode(v))
+    # for reference:
+    # >>> import textwrap
+    # >>> help(textwrap.TextWrapper)
     return textwrap.fill(u'{k}: {v}'.format(k=k, v=v),
                          initial_indent='    '+indent,
-                         subsequent_indent='          '+indent)
+                         subsequent_indent='          '+indent,
+                         break_long_words=False,
+                         fix_sentence_endings=True)
 
 
 def showconfig():
