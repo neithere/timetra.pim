@@ -88,3 +88,13 @@ ASSET = {
     # Услуги
     'service': optional(dict),
 }
+
+
+PROJECT = {
+    'name': unicode,
+    'state': unicode,
+    'urls': optional([unicode]),
+    'note': optional(unicode),
+    'mail_label': optional([unicode]),
+    'concerns': list,
+}
