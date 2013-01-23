@@ -112,13 +112,15 @@ def examine():
 
 
 @argh.wrap_errors([ValidationError], processor=lambda m: t.red(unicode(m)))
-def contacts(count=False, *labels):
-    for line in _show_items('contacts.yaml', models.CARD, '@', labels, count):
+def contacts(count=False, detailed=False, *labels):
+    for line in _show_items('contacts.yaml', models.CARD, '@', labels,
+                            count=count, detailed=detailed):
         yield line
 
 
-def assets(count=False, *labels):
-    for line in _show_items('assets.yaml', models.ASSET, '%', labels, count):
+def assets(count=False, detailed=False, *labels):
+    for line in _show_items('assets.yaml', models.ASSET, '%', labels,
+                            count=count, detailed=detailed):
         yield line
 
 
@@ -134,7 +136,7 @@ def _check_label_matches(label, patterns):
             return True
 
 
-def _show_items(file_name, model, sigil, labels, count=False):
+def _show_items(file_name, model, sigil, labels, count=False, detailed=False):
     conf = get_app_conf()
 
     labels = _fix_str_to_unicode(labels)
@@ -145,7 +147,8 @@ def _show_items(file_name, model, sigil, labels, count=False):
         cards = yaml.load(f)  #, unicode=True)
 
     total_cnt = 0
-    for label, card in cards.iteritems():
+    for label in sorted(cards):
+
         if not _check_label_matches(label, labels):
             continue
 
@@ -153,15 +156,24 @@ def _show_items(file_name, model, sigil, labels, count=False):
             total_cnt += 1
             continue
 
-        card = _fix_str_to_unicode(card)
+        if '/' in label:
+            parts = label.split('/')
+            label_repr = '/'.join(parts[:-1] + [t.bold(parts[-1])] )
+        else:
+            label_repr = t.bold(label)
+        yield u'{sigil}{label}'.format(sigil=sigil, label=label_repr)
+
+        if not detailed:
+            continue
+
+        raw_card = cards[label]
+        card = _fix_str_to_unicode(raw_card)
 
         try:
             validate_structure(model, card)
         except (ValidationError, TypeError) as e:
             raise type(e)(u'{label}: {e}'.format(label=label, e=e))
 
-        yield ''
-        yield t.bold(u'{sigil}{label}'.format(sigil=sigil, label=label))
         for k,v in card.iteritems():
             if isinstance(v, dict):
                 yield _wrap_pair(k, '')
@@ -173,6 +185,7 @@ def _show_items(file_name, model, sigil, labels, count=False):
                     yield _wrap_pair('', x, indent='    ')
             else:
                 yield _wrap_pair(k, v)
+        yield ''
     if count:
         yield 'Found {0} items'.format(total_cnt)
 
