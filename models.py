@@ -44,24 +44,47 @@ ASSET = {
     # meta
     'mail_label': optional(unicode),    # gmail integration
     'categories': optional([unicode]),
-    # by class:
+    # Недвижимость
     'flat': optional({
         'addr': unicode,
+        'cadastre_zone': optional(unicode),
+        'title_deed': optional(int),
+        'unit': optional(unicode),
+        'overall_area': optional(unicode),         # общая площадь
+        'living_space': optional(unicode),         # жилая площадь
+        'residents_num': optional(int),            # количество проживающих
+        'ownership_form': optional(unicode),       # форма собственности
     }),
+    # Устройства/техника
     'device': optional({
-        'serial_number': unicode,
+        # device model
+        'product_code': optional(unicode),
         'product_name': optional(unicode),
         'product_number': optional(unicode),
-        'mac_address': optional(unicode),
-        'imei': optional(unicode),
+        'article': optional(unicode),           # артикул
+        'standard': optional(unicode),          # IEEE, ГОСТ, ...
+        # this device
+        'serial_number': optional(unicode),
+        'mac_address_eth': optional(unicode),
+        'mac_address_wlan': optional(unicode),
+        'mac_address_bluetooth': optional(unicode),
+        'imei': optional(int),  # XXX вот тут бы проверить кол-во знаков!
+        'hardware_version': optional(unicode),
+        'software_version': optional(unicode),
     }),
+    # Доменные имена
     'domain_name': optional({
         'registrar': unicode,
         'username': optional(unicode),
     }),
+    # Счета
     'account': optional(dict),
+    # Мебель
     'furniture': optional(dict),
+    # Одежда, обувь
     'clothes': optional(dict),
+    # Музыкальные инструменты
     'music': optional(dict),
+    # Услуги
     'service': optional(dict),
 }
