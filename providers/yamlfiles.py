@@ -11,6 +11,7 @@ from . import utils
 
 
 ARCHIVE_FILENAMES = ('archive.yaml',)
+IGNORED_FILENAMES = ('contacts.yaml', 'assets.yaml')    # future pim-view stuff
 
 
 def load_path(path):
@@ -37,7 +38,8 @@ def get_items_for_day(root_dir, date=None):
 def get_current_items(root_dir, skip_archived=False):
     """ Возвращает записи из текущего набора.
     """
-    names = (x for x in os.listdir(root_dir) if x.endswith('.yaml'))
+    all_names = (x for x in os.listdir(root_dir) if x.endswith('.yaml'))
+    names = (x for x in all_names if x not in IGNORED_FILENAMES)
     if skip_archived:
         filtered = (x for x in names if x not in ARCHIVE_FILENAMES)
     else:
