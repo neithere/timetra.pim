@@ -111,6 +111,7 @@ class Item(Model):
         closed = datetime.datetime,
         solved = False,
         frozen = datetime.datetime,  # if not None, it's someday/maybe
+        reqs = [unicode],            # list of items that block this one
         # TODO:
         # * проблема/потребность со временем: не меняется / усугубляется / ослабевает
         log = [Log.structure]
