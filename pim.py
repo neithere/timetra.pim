@@ -2,19 +2,15 @@
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
 import argh
-from blessings import Terminal
 from monk.validation import validate_structure, ValidationError
 import os
 import subprocess
-import textwrap
 import yaml
 
 from settings import get_app_conf, ConfigurationError
 import cli
 import models
-
-
-t = Terminal()
+import formatting
 
 
 def _fix_str_to_unicode(data):
@@ -36,7 +32,7 @@ def _fix_str_to_unicode(data):
     return data
 
 
-@argh.wrap_errors([ConfigurationError], processor=lambda m: t.red(unicode(m)))
+@argh.wrap_errors([ConfigurationError], processor=formatting.format_error)
 def examine():
     conf = get_app_conf()
 
@@ -73,7 +69,7 @@ def examine():
 
 
 
-@argh.wrap_errors([ValidationError], processor=lambda m: t.red(unicode(m)))
+@argh.wrap_errors([ValidationError], processor=formatting.format_error)
 def contacts(count=False, detailed=False, *labels):
     for line in _show_items('contacts.yaml', models.CARD, '@', labels,
                             count=count, detailed=detailed):
@@ -126,9 +122,9 @@ def _show_items(file_name, model, sigil, patterns, count=False, detailed=False):
 
         if '/' in label:
             parts = label.split('/')
-            label_repr = '/'.join(parts[:-1] + [t.bold(parts[-1])] )
+            label_repr = '/'.join(parts[:-1] + [formatting.t.bold(parts[-1])] )
         else:
-            label_repr = t.bold(label)
+            label_repr = formatting.t.bold(label)
         yield u'{sigil}{label}'.format(sigil=sigil, label=label_repr)
 
         if detailed:
@@ -151,41 +147,14 @@ def format_card(label, raw_card, model):
     except (ValidationError, TypeError) as e:
         raise type(e)(u'{label}: {e}'.format(label=label, e=e))
 
-    for line in _format_struct(card):
+    for line in formatting.format_struct(card):
         yield line
     yield ''
 
 
-def _format_struct(data):
-    for k in sorted(data):
-        v = data[k]
-        if isinstance(v, dict):
-            yield _wrap_pair(k, '')
-            for kk in sorted(v):
-                yield _wrap_pair(kk, v[kk], indent='    ')
-        elif isinstance(v, list) and v: #and len(v) > 1:
-            yield _wrap_pair(k, v[0])
-            for x in v[1:]:
-                yield _wrap_pair('', x, indent='    ')
-        else:
-            yield _wrap_pair(k, v)
-
-
-def _wrap_pair(k, v, indent=''):
-    v = t.yellow(unicode(v))
-    # for reference:
-    # >>> import textwrap
-    # >>> help(textwrap.TextWrapper)
-    return textwrap.fill(u'{k}: {v}'.format(k=k, v=v),
-                         initial_indent='    '+indent,
-                         subsequent_indent='          '+indent,
-                         break_long_words=False,
-                         fix_sentence_endings=True)
-
-
 def showconfig():
     conf = get_app_conf()
-    for line in _format_struct(conf):
+    for line in formatting.format_struct(conf):
         yield line
 
 
