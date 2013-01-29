@@ -80,7 +80,7 @@ def contacts(count=False, detailed=False, *labels):
 
 
 def assets(count=False, detailed=False, *labels):
-    for line in _show_items('assets.yaml', models.ASSET, '%', labels,
+    for line in _show_items('assets.yaml', models.ASSET, '$', labels,
                             count=count, detailed=detailed):
         yield line
 
@@ -97,10 +97,10 @@ def _check_label_matches(label, patterns):
             return True
 
 
-def _show_items(file_name, model, sigil, labels, count=False, detailed=False):
+def _show_items(file_name, model, sigil, patterns, count=False, detailed=False):
     conf = get_app_conf()
 
-    labels = _fix_str_to_unicode(labels)
+    patterns = _fix_str_to_unicode(patterns)
 
     index_path = os.path.join(conf.index, file_name)
 
@@ -110,7 +110,7 @@ def _show_items(file_name, model, sigil, labels, count=False, detailed=False):
     total_cnt = 0
     for label in sorted(cards):
 
-        if not _check_label_matches(label, labels):
+        if not _check_label_matches(label, patterns):
             continue
 
         if count:
@@ -124,31 +124,45 @@ def _show_items(file_name, model, sigil, labels, count=False, detailed=False):
             label_repr = t.bold(label)
         yield u'{sigil}{label}'.format(sigil=sigil, label=label_repr)
 
-        if not detailed:
-            continue
+        if detailed:
+            for line in format_card(label, cards[label], model):
+                yield line
 
-        raw_card = cards[label]
-        card = _fix_str_to_unicode(raw_card)
-
-        try:
-            validate_structure(model, card)
-        except (ValidationError, TypeError) as e:
-            raise type(e)(u'{label}: {e}'.format(label=label, e=e))
-
-        for k,v in card.iteritems():
-            if isinstance(v, dict):
-                yield _wrap_pair(k, '')
-                for kk, vv in v.iteritems():
-                    yield _wrap_pair(kk, vv, indent='    ')
-            elif isinstance(v, list) and v: #and len(v) > 1:
-                yield _wrap_pair(k, v[0])
-                for x in v[1:]:
-                    yield _wrap_pair('', x, indent='    ')
-            else:
-                yield _wrap_pair(k, v)
-        yield ''
     if count:
         yield 'Found {0} items'.format(total_cnt)
+
+
+def format_card(label, raw_card, model):
+    card = _fix_str_to_unicode(raw_card)
+
+    if not card:
+        yield '    EMPTY'
+        return
+
+    try:
+        validate_structure(model, card)
+    except (ValidationError, TypeError) as e:
+        raise type(e)(u'{label}: {e}'.format(label=label, e=e))
+
+    for line in _format_struct(card):
+        yield line
+    yield ''
+
+
+def _format_struct(data):
+    for k in sorted(data):
+        v = data[k]
+        if isinstance(v, dict):
+            yield _wrap_pair(k, '')
+            for kk in sorted(v):
+                yield _wrap_pair(kk, v[kk], indent='    ')
+        elif isinstance(v, list) and v: #and len(v) > 1:
+            yield _wrap_pair(k, v[0])
+            for x in v[1:]:
+                yield _wrap_pair('', x, indent='    ')
+        else:
+            yield _wrap_pair(k, v)
+
 
 def _wrap_pair(k, v, indent=''):
     v = t.yellow(unicode(v))
@@ -163,8 +177,9 @@ def _wrap_pair(k, v, indent=''):
 
 
 def showconfig():
-    for k,v in get_app_conf().iteritems():
-        yield u'{k}: {v}'.format(k=k, v=t.bold(unicode(v)))
+    conf = get_app_conf()
+    for line in _format_struct(conf):
+        yield line
 
 
 if __name__ == '__main__':
