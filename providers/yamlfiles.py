@@ -9,9 +9,14 @@ from .base import BaseDataProvider
 from .base.models import Item, Document
 from . import utils
 
+from settings import get_app_conf
+
 
 ARCHIVE_FILENAMES = ('archive.yaml',)
-IGNORED_FILENAMES = ('contacts.yaml', 'assets.yaml')    # future pim-view stuff
+
+# future pim-view stuff
+IGNORED_FILENAMES = ('contacts.yaml', 'assets.yaml', 'projects.yaml',
+                     'schema.yaml')
 
 
 def load_path(path):
@@ -80,7 +85,7 @@ class YAMLFilesProvider(BaseDataProvider):
                 if x.closed and utils.to_date(closed) == utils.to_date(x.closed)
             )
         if frozen is not None:
-            print 'filtering', bool(frozen)
+            print('filtering', bool(frozen))
             items = (x for x in items
                 if bool(frozen) == bool(x.frozen)
             )
@@ -96,6 +101,7 @@ class YAMLFilesProvider(BaseDataProvider):
 #        return [Document(title='Foo', slug='foo')]
 
 
-def configure_provider(app):
-    root_dir = app.config['SOURCE_YAML_ROOT']
+def configure_provider():
+    conf = get_app_conf()
+    root_dir = conf.x_flow.SOURCE_YAML_ROOT
     return YAMLFilesProvider(root_dir)

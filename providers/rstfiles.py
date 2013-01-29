@@ -10,6 +10,8 @@ import yaml
 from .base import BaseDataProvider
 from .base.models import Item, Plan, Document
 
+from settings import get_app_conf
+
 
 __all__ = ['get_day_plans']
 
@@ -320,6 +322,7 @@ class ReStructuredTextFilesProvider(BaseDataProvider):
         return render_rst_file(self.root_dir, category, slug)
 
 
-def configure_provider(app):
-    root_dir = app.config['SOURCE_RST_ROOT']
+def configure_provider():
+    conf = get_app_conf()
+    root_dir = conf.x_flow.SOURCE_RST_ROOT
     return ReStructuredTextFilesProvider(root_dir)

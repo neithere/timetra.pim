@@ -5,6 +5,8 @@ from rdflib import Graph, Namespace, RDF, RDFS, URIRef
 from .base import BaseDataProvider
 from .base.models import Document
 
+from settings import get_app_conf
+
 
 DATA_FILE = 'assets/books.ttl'
 DATA_FORMAT = 'n3'
@@ -73,6 +75,7 @@ class TTLBooksProvider(BaseDataProvider):
 #        return list(self.g.triples((slug, None, None)))
 
 
-def configure_provider(app):
-    root_dir = app.config['SOURCE_TTLBOOKS_ROOT']
+def configure_provider():
+    conf = get_app_conf()
+    root_dir = conf.x_flow.SOURCE_TTLBOOKS_ROOT
     return TTLBooksProvider(root_dir)

@@ -13,6 +13,8 @@ from flow import flow
 from flare import flare
 import utils.formatdelta
 
+from settings import get_app_conf
+
 
 # hashtag-related stuff should be done via template filters
 hashtags = (
@@ -58,10 +60,12 @@ def rst_to_html(text):
 
     return body
 
-def make_app(conf_path='conf.py'):
+def make_app():
     app = Flask(__name__)
 
-    app.config.from_pyfile(conf_path)
+    pim_conf = get_app_conf()
+    conf = pim_conf.x_flask
+    app.config.update(conf)
 
     Item = namedtuple('Item', 'endpoint label icon')
     Dropdown = namedtuple('Dropdown', 'label items')
@@ -90,9 +94,9 @@ def make_app(conf_path='conf.py'):
     app.register_blueprint(flow, url_prefix='/')
     app.register_blueprint(flare, url_prefix='/flare/')
 
-    yaml_provider = yamlfiles.configure_provider(app)
-    rst_provider = rstfiles.configure_provider(app)
-    books_provider = ttlbooks.configure_provider(app)
+    yaml_provider = yamlfiles.configure_provider()
+    rst_provider = rstfiles.configure_provider()
+    books_provider = ttlbooks.configure_provider()
     app.data_providers = DataProvidersManager([yaml_provider, rst_provider,
                                                books_provider])
 
