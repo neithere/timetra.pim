@@ -11,7 +11,7 @@ from providers import rstfiles
 
 from flare import multikeysort
 
-import conf
+from settings import get_app_conf
 
 
 t = Terminal()
@@ -26,8 +26,9 @@ def indent(text):
 
 
 def get_needs():
-    yaml_provider = yamlfiles.YAMLFilesProvider(conf.SOURCE_YAML_ROOT)
-    rst_provider = rstfiles.ReStructuredTextFilesProvider(conf.SOURCE_RST_ROOT)
+    conf = get_app_conf()
+    yaml_provider = yamlfiles.YAMLFilesProvider(conf.x_flow.SOURCE_YAML_ROOT)
+    rst_provider = rstfiles.ReStructuredTextFilesProvider(conf.x_flow.SOURCE_RST_ROOT)
     data_providers = DataProvidersManager([yaml_provider, rst_provider])
 
     items = data_providers.get_items()

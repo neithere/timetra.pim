@@ -10,6 +10,7 @@ import textwrap
 import yaml
 
 from settings import get_app_conf, ConfigurationError
+import cli
 import models
 
 
@@ -195,4 +196,8 @@ if __name__ == '__main__':
         assets,
         contacts,
         projects,
+        # these should be reorganized:
+        cli.needs,
+        cli.plans,
+        cli.serve,
     ])
