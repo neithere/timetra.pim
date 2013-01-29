@@ -85,6 +85,12 @@ def assets(count=False, detailed=False, *labels):
         yield line
 
 
+def projects(count=False, detailed=False, *labels):
+    for line in _show_items('projects.yaml', models.ASSET, '#', labels,
+                            count=count, detailed=detailed):
+        yield line
+
+
 def _check_label_matches(label, patterns):
     if not patterns:
         return True
@@ -188,4 +194,5 @@ if __name__ == '__main__':
         examine,
         assets,
         contacts,
+        projects,
     ])
