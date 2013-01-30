@@ -6,7 +6,7 @@ t = Terminal()
 
 
 def format_error(err):
-    return t.red(unicode(m))
+    return t.red(u'{0.__class__.__name__}: {0}'.format(err))
 
 
 def format_struct(data):

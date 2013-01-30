@@ -4,7 +4,6 @@
 import argh
 from monk.validation import validate_structure, ValidationError
 import os
-import subprocess
 import yaml
 
 from settings import get_app_conf, ConfigurationError
@@ -68,71 +67,86 @@ def examine():
                 yield '    {0}'.format(f)
 
 
+class PathDoesNotExist(ValueError):
+    pass
 
-@argh.wrap_errors([ValidationError], processor=formatting.format_error)
-def contacts(count=False, detailed=False, *labels):
-    for line in _show_items('contacts.yaml', models.CARD, '@', labels,
+
+CATEGORIES = {
+    'contacts': dict(model=models.CARD, sigil='@'),
+    'assets': dict(model=models.ASSET, sigil='$'),
+    'projects': dict(model=models.PROJECT, sigil='#'),
+    'reference': dict(model={}, sigil='?'),
+}
+
+@argh.arg('pattern', nargs='?', default='')
+@argh.arg('category', choices=list(CATEGORIES))
+@argh.wrap_errors([ValidationError, PathDoesNotExist],
+                  processor=formatting.format_error)
+def view(category, pattern, count=False, detailed=False):
+    if category not in CATEGORIES:
+        raise ValueError('expected category from {0}'
+                         .format(', '.join(CATEGORIES)))
+    model = CATEGORIES[category]['model']
+    sigil = CATEGORIES[category]['sigil']
+    for line in _show_items(category, model, sigil, pattern,
                             count=count, detailed=detailed):
         yield line
 
 
-def assets(count=False, detailed=False, *labels):
-    for line in _show_items('assets.yaml', models.ASSET, '$', labels,
-                            count=count, detailed=detailed):
-        yield line
 
+def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
+    assert '..' not in pattern, 'look at you, hacker!'
+    assert not pattern.startswith('/'), 'look at you, hacker!'
 
-def projects(count=False, detailed=False, *labels):
-    for line in _show_items('projects.yaml', models.ASSET, '#', labels,
-                            count=count, detailed=detailed):
-        yield line
-
-
-def _check_label_matches(label, patterns):
-    if not patterns:
-        return True
-
-    for pattern in patterns:
-        if label == pattern:
-            return True
-        if pattern.endswith('/') and label.startswith(pattern):
-            # e.g. pattern="device/" and label="device/phone/nokia"
-            return True
-
-
-def _show_items(file_name, model, sigil, patterns, count=False, detailed=False):
     conf = get_app_conf()
 
-    patterns = _fix_str_to_unicode(patterns)
+    pattern = _fix_str_to_unicode(pattern)
 
-    index_path = os.path.join(conf.index, file_name)
+    index_path = os.path.join(conf.index, root_dir)
+    if not os.path.exists(index_path):
+        raise PathDoesNotExist(os.path.abspath(index_path))
 
-    with open(index_path) as f:
-        cards = yaml.load(f)  #, unicode=True)
+    path = os.path.join(index_path, pattern)
 
-    total_cnt = 0
-    for label in sorted(cards):
+    dir_exists = os.path.isdir(path)
+    file_exists = os.path.isfile(path+'.yaml')
 
-        if not _check_label_matches(label, patterns):
-            continue
+    if not any([dir_exists, file_exists]):
+        raise PathDoesNotExist(path)
+
+    if file_exists:
+        with open(path + '.yaml') as f:
+            card = yaml.load(f)
+        for line in format_card(path, card, model):
+            yield line
+
+    if dir_exists:
+        files = collect_files(path)
 
         if count:
-            total_cnt += 1
-            continue
+            yield 'Found {0} documents'.format(len(list(files)))
+            return
 
-        if '/' in label:
-            parts = label.split('/')
-            label_repr = '/'.join(parts[:-1] + [formatting.t.bold(parts[-1])] )
-        else:
-            label_repr = formatting.t.bold(label)
-        yield u'{sigil}{label}'.format(sigil=sigil, label=label_repr)
+        for file_path in files:
+            # display relative path without extension and with bold slug
+            directory, filename = os.path.split(file_path)
+            slug, _ = os.path.splitext(filename)
+            yield os.path.join(os.path.relpath(directory, index_path),
+                               formatting.t.bold(slug))
 
-        if detailed:
-            for line in format_card(label, cards[label], model):
-                yield line
+            if detailed:
+                with open(file_path) as f:
+                    card = yaml.load(f)
+                for line in format_card(slug, card, model):
+                    yield line
 
-    if count:
-        yield 'Found {0} items'.format(total_cnt)
+
+def collect_files(path):
+    for root, dirs, files in os.walk(path):
+        for f in sorted(files):
+            if f.endswith('.yaml'):
+                yield os.path.join(root, f)
+
 
 
 def format_card(label, raw_card, model):
@@ -162,9 +176,7 @@ if __name__ == '__main__':
     argh.dispatch_commands([
         showconfig,
         examine,
-        assets,
-        contacts,
-        projects,
+        view,
         # these should be reorganized:
         cli.needs,
         cli.plans,

@@ -64,8 +64,7 @@ def make_app():
     app = Flask(__name__)
 
     pim_conf = get_app_conf()
-    conf = pim_conf.x_flask
-    app.config.update(conf)
+    app.config.update(pim_conf.x_flask)
 
     Item = namedtuple('Item', 'endpoint label icon')
     Dropdown = namedtuple('Dropdown', 'label items')
