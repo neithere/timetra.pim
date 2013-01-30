@@ -131,8 +131,11 @@ def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
             # display relative path without extension and with bold slug
             directory, filename = os.path.split(file_path)
             slug, _ = os.path.splitext(filename)
-            yield os.path.join(os.path.relpath(directory, index_path),
-                               formatting.t.bold(slug))
+            if directory == index_path:
+                path_repr = ''
+            else:
+                path_repr = os.path.relpath(directory, index_path)
+            yield os.path.join(path_repr, formatting.t.bold(slug))
 
             if detailed:
                 with open(file_path) as f:
