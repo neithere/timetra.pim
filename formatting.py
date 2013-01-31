@@ -19,7 +19,7 @@ def format_struct(data):
         elif isinstance(v, list) and v: #and len(v) > 1:
             yield _wrap_pair(k, v[0])
             for x in v[1:]:
-                yield _wrap_pair('', x, indent='    ')
+                yield _wrap_pair('', x, indent=' '*len(k))
         else:
             yield _wrap_pair(k, v)
 
