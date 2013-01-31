@@ -18,9 +18,13 @@ class ConfigurationError(RuntimeError):
     pass
 
 
-def get_app_conf():
+def get_conf_path():
     filename = APP_NAME + '.yaml'
-    path = os.path.join(xdg.BaseDirectory.xdg_config_home, filename)
+    return os.path.join(xdg.BaseDirectory.xdg_config_home, filename)
+
+
+def get_app_conf():
+    path = get_conf_path()
 
     if not os.path.exists(path):
         raise ConfigurationError('File {0} not found'.format(path))
@@ -29,7 +33,6 @@ def get_app_conf():
         'index': '~/pim',
         #'configs': {},
         'x_ignore': list,   # TODO: remove this as soon as all is YAML?
-        'contacts': 'contacts.yaml',
         # from older cli.py
         'x_flask': dict,
         'x_flow': optional({

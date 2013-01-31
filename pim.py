@@ -1,12 +1,15 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
+import subprocess
+
 import argh
 from monk.validation import validate_structure, ValidationError
 import os
 import yaml
 
 from settings import get_app_conf, ConfigurationError
+import settings
 import cli
 import models
 import formatting
@@ -71,6 +74,11 @@ class PathDoesNotExist(ValueError):
     pass
 
 
+nice_errors = argh.wrap_errors(
+    [ValidationError, TypeError, PathDoesNotExist],
+    processor=formatting.format_error)
+
+
 CATEGORIES = {
     'contacts': dict(model=models.CARD, sigil='@'),
     'assets': dict(model=models.ASSET, sigil='$'),
@@ -78,11 +86,9 @@ CATEGORIES = {
     'reference': dict(model={}, sigil='?'),
 }
 
+@argh.arg('category', choices=list(CATEGORIES) + ['config'])
 @argh.arg('pattern', nargs='?', default='')
-@argh.arg('category', choices=list(CATEGORIES))
-@argh.wrap_errors([ValidationError, PathDoesNotExist],
-                  processor=formatting.format_error)
-def view(category, pattern, count=False, detailed=False):
+@nice_errors
 def show(category, pattern, count=False, detailed=False):
     if category == 'config':
         for line in showconfig():
@@ -229,10 +235,39 @@ def showconfig():
         yield line
 
 
+@argh.arg('category', choices=list(CATEGORIES) + ['config'])
+@argh.arg('pattern', nargs='?', default='')
+@nice_errors
+def edit(category, pattern):
+    editor = os.getenv('EDITOR')
+    assert editor, 'env variable $EDITOR must be set'
+
+    if category == 'config':
+        path = settings.get_conf_path()
+    else:
+        conf = get_app_conf()
+        category_path = os.path.join(conf.index, category)
+        path = os.path.join(category_path, pattern)
+        if not os.path.exists(path):
+            if os.path.exists(path + '.yaml'):
+                path = path + '.yaml'
+            else:
+                guessed = _guess_file_path(category_path, pattern)
+                if guessed:
+                    path = guessed
+
+    if not os.path.exists(path):
+        raise PathDoesNotExist(path)
+
+    yield 'Editing {0}'.format(path)
+    subprocess.Popen([editor, path]).wait()
+
+
 if __name__ == '__main__':
     argh.dispatch_commands([
         examine,
         show,
+        edit,
         # these should be reorganized:
         cli.needs,
         cli.plans,
