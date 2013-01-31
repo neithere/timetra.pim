@@ -97,4 +97,6 @@ PROJECT = {
     'note': optional(unicode),
     'mail_label': optional([unicode]),
     'concerns': list,
+    'stakeholders': optional(list),  # hashtags
+    'categories': optional([unicode]),
 }

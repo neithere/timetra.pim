@@ -83,6 +83,12 @@ CATEGORIES = {
 @argh.wrap_errors([ValidationError, PathDoesNotExist],
                   processor=formatting.format_error)
 def view(category, pattern, count=False, detailed=False):
+def show(category, pattern, count=False, detailed=False):
+    if category == 'config':
+        for line in showconfig():
+            yield line
+        return
+
     if category not in CATEGORIES:
         raise ValueError('expected category from {0}'
                          .format(', '.join(CATEGORIES)))
@@ -92,6 +98,43 @@ def view(category, pattern, count=False, detailed=False):
                             count=count, detailed=detailed):
         yield line
 
+
+
+def _guess_file_path(index_path, pattern):
+    "Expects a slug, returns the first file path that matches the slug"
+    files = collect_files(index_path)
+
+    first_dir_startswith = None
+    first_startswith = None
+    first_endswith = None
+
+    # all tests below are case-insensitive
+    pattern = pattern.lower()
+
+    for file_path in files:
+        directory, file_name = os.path.split(file_path)
+        slug, _ = os.path.splitext(file_name)
+        slug = _fix_str_to_unicode(slug).lower()
+
+        if slug == pattern:
+            return file_path
+
+        # `/foo/bar` matches `/foo/bar-123.yaml`
+        # (precise path chunk; may yield directories though)
+        relative_path = os.path.relpath(file_path, index_path)
+        if not first_dir_startswith and relative_path.lower().startswith(pattern):
+            first_dir_startswith = file_path
+
+        # `bar` matches `/foo/bar-123.yaml`
+        # (like above but prone to picking stuff from unexpected branches)
+        if not first_startswith and slug.startswith(pattern):
+            first_startswith = file_path
+
+        # `quux` matches `/foo/bar-quux.yaml`
+        if not first_endswith and slug.endswith(pattern):
+            first_endswith = file_path
+
+    return first_dir_startswith or first_startswith or first_endswith or None
 
 
 def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
@@ -107,17 +150,26 @@ def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
         raise PathDoesNotExist(os.path.abspath(index_path))
 
     path = os.path.join(index_path, pattern)
+    file_path = path + '.yaml'
 
     dir_exists = os.path.isdir(path)
-    file_exists = os.path.isfile(path+'.yaml')
+    file_exists = os.path.isfile(file_path)
 
     if not any([dir_exists, file_exists]):
-        raise PathDoesNotExist(path)
+        file_path = _guess_file_path(index_path, pattern)
+        if file_path:
+            file_exists = True
+
+            # guessing may be confusing so we tell user what we've picked
+            yield formatting.t.blue(u'guessed: {0}'.format(file_path))
+            yield ''
+        else:
+            raise PathDoesNotExist(file_path)
 
     if file_exists:
-        with open(path + '.yaml') as f:
+        with open(file_path) as f:
             card = yaml.load(f)
-        for line in format_card(path, card, model):
+        for line in format_card(file_path, card, model):
             yield line
 
     if dir_exists:
@@ -129,9 +181,9 @@ def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
 
         for file_path in files:
             # display relative path without extension and with bold slug
-            directory, filename = os.path.split(file_path)
-            slug, _ = os.path.splitext(filename)
-            if directory == index_path:
+            directory, file_name = os.path.split(file_path)
+            slug, _ = os.path.splitext(file_name)
+            if not directory or directory == index_path:
                 path_repr = ''
             else:
                 path_repr = os.path.relpath(directory, index_path)
@@ -145,11 +197,12 @@ def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
 
 
 def collect_files(path):
-    for root, dirs, files in os.walk(path):
-        for f in sorted(files):
-            if f.endswith('.yaml'):
-                yield os.path.join(root, f)
-
+    def _walk():
+        for root, dirs, files in os.walk(path):
+            for f in sorted(files):
+                if f.endswith('.yaml'):
+                    yield _fix_str_to_unicode(os.path.join(root, f))
+    return sorted(_walk())
 
 
 def format_card(label, raw_card, model):
@@ -162,6 +215,7 @@ def format_card(label, raw_card, model):
     try:
         validate_structure(model, card)
     except (ValidationError, TypeError) as e:
+        label = _fix_str_to_unicode(label)
         raise type(e)(u'{label}: {e}'.format(label=label, e=e))
 
     for line in formatting.format_struct(card):
@@ -177,9 +231,8 @@ def showconfig():
 
 if __name__ == '__main__':
     argh.dispatch_commands([
-        showconfig,
         examine,
-        view,
+        show,
         # these should be reorganized:
         cli.needs,
         cli.plans,
