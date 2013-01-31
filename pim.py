@@ -224,9 +224,31 @@ def format_card(label, raw_card, model):
         label = _fix_str_to_unicode(label)
         raise type(e)(u'{label}: {e}'.format(label=label, e=e))
 
+    # XXX HACK
+    if 'concerns' in card:
+        concerns = card.pop('concerns')
+    else:
+        concerns = None
+
     for line in formatting.format_struct(card):
         yield line
     yield ''
+
+    # XXX HACK
+    if concerns:
+        yield 'concerns: ----------------------'
+        yield ''
+        for concern in concerns:
+            state = 'x' if concern.get('closed') else ' '
+            name = concern.get('risk', concern.get('need', concern.get('note')))
+            wrapper = formatting.t.green if state == 'x' else formatting.t.yellow
+            yield wrapper(u'[{0}] {1}'.format(state, formatting.t.bold(name)))
+            plans = concern.get('plan', [])
+            for plan in plans:
+                pstate = 'x' if plan.get('closed') else ' '
+                pwrapper = formatting.t.green if pstate == 'x' else formatting.t.yellow
+                pname = plan.get('action', '?')
+                yield pwrapper(u'    [{0}] {1}'.format(pstate, pname))
 
 
 def showconfig():
