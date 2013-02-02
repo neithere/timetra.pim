@@ -175,8 +175,11 @@ def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
     if file_exists:
         with open(file_path) as f:
             card = yaml.load(f)
-        for line in format_card(file_path, card, model):
-            yield line
+        try:
+            for line in format_card(file_path, card, model):
+                yield line
+        except Exception as e:
+            raise type(e)(u'{0}: {1}'.format(file_path, e))
 
     if dir_exists:
         files = collect_files(path)
@@ -198,8 +201,11 @@ def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
             if detailed:
                 with open(file_path) as f:
                     card = yaml.load(f)
-                for line in format_card(slug, card, model):
-                    yield line
+                try:
+                    for line in format_card(slug, card, model):
+                        yield line
+                except Exception as e:
+                    raise type(e)(u'{0}: {1}'.format(file_path, e))
 
 
 def collect_files(path):
@@ -236,19 +242,42 @@ def format_card(label, raw_card, model):
 
     # XXX HACK
     if concerns:
-        yield 'concerns: ----------------------'
         yield ''
         for concern in concerns:
-            state = 'x' if concern.get('closed') else ' '
             name = concern.get('risk', concern.get('need', concern.get('note')))
-            wrapper = formatting.t.green if state == 'x' else formatting.t.yellow
-            yield wrapper(u'[{0}] {1}'.format(state, formatting.t.bold(name)))
+
+            if concern.get('closed'):
+                state = '+'
+            elif concern.get('frozen'):
+                state = '*'
+            elif concern.get('acute'):
+                state = '!'
+            else:
+                state = ' '
+
+            colors = {
+                ' ': formatting.t.yellow,
+                '+': formatting.t.green,
+                '!': formatting.t.red,
+                '*': formatting.t.blue,
+            }
+            wrapper = colors[state]
+            yield wrapper(u'    [{0}] {1}'.format(state, formatting.t.bold(name)))
             plans = concern.get('plan', [])
             for plan in plans:
-                pstate = 'x' if plan.get('closed') else ' '
-                pwrapper = formatting.t.green if pstate == 'x' else formatting.t.yellow
+                # the logic here should be more complex, involving status field
+                # concern itself also may not have "closed" but solved=True
+                # here we just make sure 80% of cases work fine
+                pstate = '+' if plan.get('closed') else ' '
+                pwrapper = colors['+' if pstate == '+' else state]
+                #pwrapper = formatting.t.green if pstate == 'x' else formatting.t.yellow
                 pname = plan.get('action', '?')
-                yield pwrapper(u'    [{0}] {1}'.format(pstate, pname))
+                if '\n' in pname:
+                    pname = pname.strip().partition('\n')[0] + u' [...]'
+                if plan.get('delegated'):
+                    pname = u'@{0}: {1}'.format(plan['delegated'], pname)
+                yield pwrapper(u'        [{0}] {1}'.format(pstate, pname))
+        yield ''
 
 
 def showconfig():

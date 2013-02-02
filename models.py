@@ -87,6 +87,7 @@ ASSET = {
     'music': optional(dict),
     # Услуги
     'service': optional(dict),
+    'concerns': list,
 }
 
 
