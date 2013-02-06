@@ -243,14 +243,15 @@ def format_card(label, raw_card, model):
     # XXX HACK
     if concerns:
         yield ''
-        for concern in concerns:
-            name = concern.get('risk', concern.get('need', concern.get('note')))
+        for concern_dict in concerns:
+            concern = models.Concern(**concern_dict)
+            name = concern.risk or concern.need or concern.note
 
-            if concern.get('closed'):
+            if concern.closed:
                 state = '+'
-            elif concern.get('frozen'):
+            elif concern.frozen:
                 state = '*'
-            elif concern.get('acute'):
+            elif concern.acute:
                 state = '!'
             else:
                 state = ' '
@@ -263,17 +264,18 @@ def format_card(label, raw_card, model):
             }
             wrapper = colors[state]
             yield wrapper(u'    [{0}] {1}'.format(state, formatting.t.bold(name)))
-            plans = concern.get('plan', [])
-            for plan in plans:
+            for plan in concern.plan:
                 # the logic here should be more complex, involving status field
                 # concern itself also may not have "closed" but solved=True
                 # here we just make sure 80% of cases work fine
-                pstate = '+' if plan.get('closed') else ' '
+                pstate = '+' if plan.closed else ' '
                 pwrapper = colors['+' if pstate == '+' else state]
                 #pwrapper = formatting.t.green if pstate == 'x' else formatting.t.yellow
-                pname = plan.get('action', '?')
+                pname = plan.action or '?'
                 if '\n' in pname:
                     pname = pname.strip().partition('\n')[0] + u' [...]'
+                pname = '\n'.join(formatting.textwrap.wrap(
+                    pname, initial_indent='', subsequent_indent=12*' '))
                 if plan.get('delegated'):
                     pname = u'@{0}: {1}'.format(plan['delegated'], pname)
                 yield pwrapper(u'        [{0}] {1}'.format(pstate, pname))

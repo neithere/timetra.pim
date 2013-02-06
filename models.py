@@ -2,6 +2,8 @@
 import datetime
 from monk.validation import optional
 
+from providers.base.models import Item as Concern
+
 
 CARD = {
     'name': unicode,
