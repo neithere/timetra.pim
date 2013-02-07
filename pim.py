@@ -141,13 +141,66 @@ def edit(category, pattern):
     subprocess.Popen([editor, path]).wait()
 
 
+def prepend(char, text):
+    return u'{0} {1}'.format(char, text)
+
+
+def indent(text):
+    return prepend(text, ' ')
+
+
+def concerns(warm=False, acute=False):
+    """ Displays a list of active risks and needs.
+    """
+    items = finder.get_concerns()
+    for item in items:
+        if acute and not item.acute:
+            continue
+        if warm and item.frozen:
+            continue
+        text = item.risk or item.need
+        if item.acute:
+            text = formatting.t.bold(text)
+        if item.risk:
+            text = formatting.t.red(text)
+        if item.project:
+            project_label = formatting.t.blue(item.project)
+            text = prepend(project_label, text)
+        yield prepend('*', text)
+        #if item.plan:
+        #    if not item.has_next_action():
+        #        yield indent(u'запланировать')
+        #    if not item.has_completed_action():
+        #        yield indent(u'приступить')
+        #    if item.is_waiting():
+        #        yield indent(u'напомнить')
+        #else:
+        #    yield indent(u'запланировать')
+
+
+def plans(need_mask):
+    """ Displays plans for the need that matches given mask.
+    """
+    items = finder.get_concerns()
+    mask = need_mask.decode('utf-8').lower()
+    for item in items:
+        if (item.risk and mask in item.risk.lower()) or (item.need and mask in item.need.lower()):
+            yield item.risk or item.need
+            for plan in item.plan:
+                yield u'[{0.status}] {0.action}'.format(plan)
+            return
+    else:
+        yield 'Nothing found.'
+
+
 if __name__ == '__main__':
     argh.dispatch_commands([
         examine,
         show,
         edit,
+        # these should be nested (?):
+        concerns,
+        plans,
         # these should be reorganized:
-        cli.needs,
-        cli.plans,
         cli.serve,
     ])

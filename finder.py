@@ -9,6 +9,8 @@ from monk.modeling import DotExpandedDict
 
 import models
 import settings
+import formatting
+from flare import multikeysort
 
 
 CATEGORIES = {
@@ -158,3 +160,25 @@ def collect_files(path):
                     yield fix_str_to_unicode(os.path.join(root, f))
     return sorted(_walk())
 
+
+def collect_concerns():
+    for category in CATEGORIES:
+        model = CATEGORIES[category]['model']
+        detail, index, _ = find_items(category, model, pattern='')
+        combined = ([detail] if detail else []) + (index or [])
+        for path, loader in combined:
+            card = loader()
+            concerns = card.get('concerns', [])
+            for concern in concerns:
+                # HACK
+                if category == 'projects':
+                    concern.project = formatting.format_slug(category, path)
+
+                yield concern
+
+
+def get_concerns():
+    items = collect_concerns()
+    items = (x for x in items if (x.risk or x.need) and not x.closed)
+    items = list(multikeysort(items, ['-acute', '-risk', 'frozen']))
+    return items
