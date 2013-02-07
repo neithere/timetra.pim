@@ -53,7 +53,7 @@ def format_slug(root_dir, file_path, nocolour=False):
         path_repr = ''
     else:
         path_repr = os.path.relpath(directory, index_path)
-    colour = lambda x:x if nocolour else t.bold
+    colour = (lambda x:x) if nocolour else t.bold
     return os.path.join(path_repr, colour(slug))
 
 
