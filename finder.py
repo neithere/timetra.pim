@@ -181,5 +181,7 @@ def collect_concerns():
 def get_concerns():
     items = collect_concerns()
     items = (x for x in items if (x.risk or x.need) and not x.closed)
-    items = list(multikeysort(items, ['-acute', '-risk', 'frozen']))
+    #items = list(multikeysort(items, ['-acute', '-risk', 'frozen']))
+    # XXX based on HACK in collect_concerns
+    items = list(sorted(items, key=lambda x: x.context))
     return items
