@@ -3,18 +3,18 @@
 # PYTHON_ARGCOMPLETE_OK
 
 from argh import dispatch_commands
-from blessings import Terminal
 
-from providers import DataProvidersManager
-from providers import yamlfiles
-from providers import rstfiles
+#from providers import DataProvidersManager
+#from providers import yamlfiles
+#from providers import rstfiles
 
 from flare import multikeysort
 
-from settings import get_app_conf
+import finder
+import formatting
 
 
-t = Terminal()
+t = formatting.t
 
 
 def prepend(char, text):
@@ -25,13 +25,29 @@ def indent(text):
     return prepend(text, ' ')
 
 
-def get_needs():
-    conf = get_app_conf()
-    yaml_provider = yamlfiles.YAMLFilesProvider(conf.x_flow.SOURCE_YAML_ROOT)
-    rst_provider = rstfiles.ReStructuredTextFilesProvider(conf.x_flow.SOURCE_RST_ROOT)
-    data_providers = DataProvidersManager([yaml_provider, rst_provider])
+def collect_concerns():
+    for category in finder.CATEGORIES:
+        model = finder.CATEGORIES[category]['model']
+        detail, index, _ = finder.find_items(category, model, pattern='')
+        combined = ([detail] if detail else []) + (index or [])
+        for path, loader in combined:
+            print(path)
+            card = loader()
+            concerns = card.get('concerns', [])
+            for concern in concerns:
+                if category == 'projects':
+                    concern.project = formatting.format_slug(category, path)
+                yield concern
 
-    items = data_providers.get_items()
+
+def get_needs():
+    items = collect_concerns()
+
+    #yaml_provider = yamlfiles.YAMLFilesProvider(conf.x_flow.SOURCE_YAML_ROOT)
+    #rst_provider = rstfiles.ReStructuredTextFilesProvider(conf.x_flow.SOURCE_RST_ROOT)
+    #data_providers = DataProvidersManager([yaml_provider, rst_provider])
+    #items = data_providers.get_items()
+
     items = (x for x in items if (x.risk or x.need) and not x.closed)
     items = list(multikeysort(items, ['-acute', '-risk', 'frozen']))
 

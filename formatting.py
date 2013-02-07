@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
+import os
 import textwrap
+
 from blessings import Terminal
+
+from settings import get_app_conf
+
 
 t = Terminal()
 
@@ -34,3 +39,65 @@ def _wrap_pair(k, v, indent=''):
                          subsequent_indent='          '+indent,
                          break_long_words=False,
                          fix_sentence_endings=True)
+
+
+def format_slug(root_dir, file_path):
+    conf = get_app_conf()
+    index_path = os.path.join(conf.index, root_dir)
+    # display relative path without extension and with bold slug
+    directory, file_name = os.path.split(file_path)
+    slug, _ = os.path.splitext(file_name)
+    if not directory or directory == index_path:
+        path_repr = ''
+    else:
+        path_repr = os.path.relpath(directory, index_path)
+    return os.path.join(path_repr, t.bold(slug))
+
+
+def format_card(label, card, model):
+    for line in format_struct(card):
+        yield line
+    yield ''
+
+    # XXX HACK
+    concerns = card.get('concerns')
+    if concerns:
+        yield ''
+        for concern in concerns:
+            name = concern.risk or concern.need or concern.note
+
+            if concern.closed:
+                state = '+'
+            elif concern.frozen:
+                state = '*'
+            elif concern.acute:
+                state = '!'
+            else:
+                state = ' '
+
+            colors = {
+                ' ': t.yellow,
+                '+': t.green,
+                '!': t.red,
+                '*': t.blue,
+            }
+            wrapper = colors[state]
+            yield wrapper(u'    [{0}] {1}'.format(state, t.bold(name)))
+            for plan in concern.plan:
+                # the logic here should be more complex, involving status field
+                # concern itself also may not have "closed" but solved=True
+                # here we just make sure 80% of cases work fine
+                pstate = '+' if plan.closed else ' '
+                pwrapper = colors['+' if pstate == '+' else state]
+                #pwrapper = formatting.t.green if pstate == 'x' else formatting.t.yellow
+                pname = plan.action or '?'
+                if '\n' in pname:
+                    pname = pname.strip().partition('\n')[0] + u' [...]'
+                pname = '\n'.join(textwrap.wrap(
+                    pname, initial_indent='', subsequent_indent=12*' '))
+                if plan.get('delegated'):
+                    pname = u'@{0}: {1}'.format(plan['delegated'], pname)
+                yield pwrapper(u'        [{0}] {1}'.format(pstate, pname))
+        yield ''
+
+

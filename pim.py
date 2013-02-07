@@ -1,37 +1,17 @@
 #!/usr/bin/env python2
-# -*- coding: utf-8 -*-
+# coding: utf-8
 # PYTHON_ARGCOMPLETE_OK
 import subprocess
 
 import argh
-from monk.validation import validate_structure, ValidationError
 import os
-import yaml
 
 from settings import get_app_conf, ConfigurationError
 import settings
 import cli
-import models
+from finder import CATEGORIES
+import finder
 import formatting
-
-
-def _fix_str_to_unicode(data):
-    """ Converts all `str` items to `unicode` within given dict.
-    Motivation: PyYAML for Python 2.x interprets ASCII-only strings as bytes.
-    """
-    if isinstance(data, str):
-        return data.decode('utf-8')
-
-    if isinstance(data, (list, tuple)):
-        return [_fix_str_to_unicode(x) for x in data]
-
-    if isinstance(data, dict):
-        new_data = {}
-        for k,v in data.items():
-            new_data[k] = _fix_str_to_unicode(v)
-        data = new_data
-
-    return data
 
 
 @argh.wrap_errors([ConfigurationError], processor=formatting.format_error)
@@ -70,21 +50,10 @@ def examine():
                 yield '    {0}'.format(f)
 
 
-class PathDoesNotExist(ValueError):
-    pass
-
-
 nice_errors = argh.wrap_errors(
-    [ValidationError, TypeError, PathDoesNotExist],
+    [finder.ValidationError, TypeError, finder.PathDoesNotExist],
     processor=formatting.format_error)
 
-
-CATEGORIES = {
-    'contacts': dict(model=models.CARD, sigil='@'),
-    'assets': dict(model=models.ASSET, sigil='$'),
-    'projects': dict(model=models.PROJECT, sigil='#'),
-    'reference': dict(model={}, sigil='?'),
-}
 
 @argh.arg('category', choices=list(CATEGORIES) + ['config'])
 @argh.arg('pattern', nargs='?', default='')
@@ -106,49 +75,12 @@ def show(category, pattern, count=False, detailed=False):
 
 
 
-def _guess_file_path(index_path, pattern):
-    "Expects a slug, returns the first file path that matches the slug"
-    files = collect_files(index_path)
-
-    first_dir_startswith = None
-    first_startswith = None
-    first_endswith = None
-
-    # all tests below are case-insensitive
-    pattern = pattern.lower()
-
-    for file_path in files:
-        directory, file_name = os.path.split(file_path)
-        slug, _ = os.path.splitext(file_name)
-        slug = _fix_str_to_unicode(slug).lower()
-
-        if slug == pattern:
-            return file_path
-
-        # `/foo/bar` matches `/foo/bar-123.yaml`
-        # (precise path chunk; may yield directories though)
-        relative_path = os.path.relpath(file_path, index_path)
-        if not first_dir_startswith and relative_path.lower().startswith(pattern):
-            first_dir_startswith = file_path
-
-        # `bar` matches `/foo/bar-123.yaml`
-        # (like above but prone to picking stuff from unexpected branches)
-        if not first_startswith and slug.startswith(pattern):
-            first_startswith = file_path
-
-        # `quux` matches `/foo/bar-quux.yaml`
-        if not first_endswith and slug.endswith(pattern):
-            first_endswith = file_path
-
-    return first_dir_startswith or first_startswith or first_endswith or None
-
-
 def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
     assert '..' not in pattern, 'look at you, hacker!'
     assert not pattern.startswith('/'), 'look at you, hacker!'
 
 
-    detail, index, guessed_path = find_items(root_dir, model, pattern)
+    detail, index, guessed_path = finder.find_items(root_dir, model, pattern)
 
     if guessed_path:
         # guessing may be confusing so we tell user what we've picked
@@ -159,165 +91,21 @@ def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
         file_path, card_loader = detail
         try:
             card = card_loader()
-            for line in format_card(file_path, card, model):
+            for line in formatting.format_card(file_path, card, model):
                 yield line
         except Exception as e:
             raise type(e)(u'{0}: {1}'.format(file_path, e))
 
-    index = index or []
     for file_path, card_loader in index:
-        slug = format_slug(root_dir, file_path)
+        slug = formatting.format_slug(root_dir, file_path)
         yield slug
         if detailed:
             try:
                 card = card_loader()
-                for line in format_card(slug, card, model):
+                for line in formatting.format_card(slug, card, model):
                     yield line
             except Exception as e:
                 raise type(e)(u'{0}: {1}'.format(file_path, e))
-
-
-def make_card_loader(fpath):
-    def _card_loader():
-        with open(fpath) as f:
-            return yaml.load(f)
-    return _card_loader
-
-
-def find_items(root_dir, model, pattern):
-    # init return vars
-    detail = index = guessed_path = None
-
-    conf = get_app_conf()
-
-    pattern = _fix_str_to_unicode(pattern)
-
-    index_path = os.path.join(conf.index, root_dir)
-    if not os.path.exists(index_path):
-        raise PathDoesNotExist(os.path.abspath(index_path))
-
-    path = os.path.join(index_path, pattern)
-    file_path = path + '.yaml'
-
-    dir_exists = os.path.isdir(path)
-    file_exists = os.path.isfile(file_path)
-
-    if not any([dir_exists, file_exists]):
-        file_path = _guess_file_path(index_path, pattern)
-        if file_path:
-            file_exists = True
-            guessed_path = file_path
-        else:
-            raise PathDoesNotExist(file_path)
-
-
-    if file_exists:
-        detail = file_path, make_card_loader(file_path)
-    else:
-        detail = None
-
-
-    if dir_exists:
-        files = collect_files(path)
-
-        #if count:
-        #    yield 'Found {0} documents'.format(len(list(files)))
-        #    return
-
-        loader = make_card_loader(file_path)
-        for file_path in files:
-            index.append((file_path, loader))
-
-
-    return detail, index, guessed_path
-
-
-def collect_files(path):
-    def _walk():
-        for root, dirs, files in os.walk(path):
-            for f in sorted(files):
-                if f.endswith('.yaml'):
-                    yield _fix_str_to_unicode(os.path.join(root, f))
-    return sorted(_walk())
-
-
-def format_slug(root_dir, file_path):
-    conf = get_app_conf()
-    index_path = os.path.join(conf.index, root_dir)
-    # display relative path without extension and with bold slug
-    directory, file_name = os.path.split(file_path)
-    slug, _ = os.path.splitext(file_name)
-    if not directory or directory == index_path:
-        path_repr = ''
-    else:
-        path_repr = os.path.relpath(directory, index_path)
-    return os.path.join(path_repr, formatting.t.bold(slug))
-
-
-def format_card(label, raw_card, model):
-    card = _fix_str_to_unicode(raw_card)
-
-    if not card:
-        yield '    EMPTY'
-        return
-
-    try:
-        validate_structure(model, card)
-    except (ValidationError, TypeError) as e:
-        label = _fix_str_to_unicode(label)
-        raise type(e)(u'{label}: {e}'.format(label=label, e=e))
-
-    # XXX HACK
-    if 'concerns' in card:
-        concerns = card.pop('concerns')
-    else:
-        concerns = None
-
-    for line in formatting.format_struct(card):
-        yield line
-    yield ''
-
-    # XXX HACK
-    if concerns:
-        yield ''
-        for concern_dict in concerns:
-            concern = models.Concern(**concern_dict)
-            name = concern.risk or concern.need or concern.note
-
-            if concern.closed:
-                state = '+'
-            elif concern.frozen:
-                state = '*'
-            elif concern.acute:
-                state = '!'
-            else:
-                state = ' '
-
-            colors = {
-                ' ': formatting.t.yellow,
-                '+': formatting.t.green,
-                '!': formatting.t.red,
-                '*': formatting.t.blue,
-            }
-            wrapper = colors[state]
-            yield wrapper(u'    [{0}] {1}'.format(state, formatting.t.bold(name)))
-            for plan in concern.plan:
-                # the logic here should be more complex, involving status field
-                # concern itself also may not have "closed" but solved=True
-                # here we just make sure 80% of cases work fine
-                pstate = '+' if plan.closed else ' '
-                pwrapper = colors['+' if pstate == '+' else state]
-                #pwrapper = formatting.t.green if pstate == 'x' else formatting.t.yellow
-                pname = plan.action or '?'
-                if '\n' in pname:
-                    pname = pname.strip().partition('\n')[0] + u' [...]'
-                pname = '\n'.join(formatting.textwrap.wrap(
-                    pname, initial_indent='', subsequent_indent=12*' '))
-                if plan.get('delegated'):
-                    pname = u'@{0}: {1}'.format(plan['delegated'], pname)
-                yield pwrapper(u'        [{0}] {1}'.format(pstate, pname))
-        yield ''
-
 
 def showconfig():
     conf = get_app_conf()
@@ -342,12 +130,12 @@ def edit(category, pattern):
             if os.path.exists(path + '.yaml'):
                 path = path + '.yaml'
             else:
-                guessed = _guess_file_path(category_path, pattern)
+                guessed = finder.guess_file_path(category_path, pattern)
                 if guessed:
                     path = guessed
 
     if not os.path.exists(path):
-        raise PathDoesNotExist(path)
+        raise finder.PathDoesNotExist(path)
 
     yield 'Editing {0}'.format(path)
     subprocess.Popen([editor, path]).wait()

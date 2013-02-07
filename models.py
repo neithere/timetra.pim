@@ -5,7 +5,7 @@ from monk.validation import optional
 from providers.base.models import Item as Concern
 
 
-CARD = {
+CONTACT = {
     'name': unicode,
     'full_name': optional(unicode),
     'urls': optional([unicode]),
@@ -19,6 +19,7 @@ CARD = {
     'first_contact': optional(datetime.date),
     'org': optional(unicode),
     'timetable': optional(unicode),
+    'concerns': optional(list),
 }
 
 
@@ -89,7 +90,7 @@ ASSET = {
     'music': optional(dict),
     # Услуги
     'service': optional(dict),
-    'concerns': list,
+    'concerns': optional(list),
 }
 
 
@@ -99,7 +100,7 @@ PROJECT = {
     'urls': optional([unicode]),
     'note': optional(unicode),
     'mail_label': optional([unicode]),
-    'concerns': list,
+    'concerns': optional(list),
     'stakeholders': optional(list),  # hashtags
     'categories': optional([unicode]),
 }
