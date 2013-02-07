@@ -147,6 +147,47 @@ def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
     assert '..' not in pattern, 'look at you, hacker!'
     assert not pattern.startswith('/'), 'look at you, hacker!'
 
+
+    detail, index, guessed_path = find_items(root_dir, model, pattern)
+
+    if guessed_path:
+        # guessing may be confusing so we tell user what we've picked
+        yield formatting.t.blue(u'guessed: {0}'.format(guessed_path))
+        yield ''
+
+    if detail:
+        file_path, card_loader = detail
+        try:
+            card = card_loader()
+            for line in format_card(file_path, card, model):
+                yield line
+        except Exception as e:
+            raise type(e)(u'{0}: {1}'.format(file_path, e))
+
+    index = index or []
+    for file_path, card_loader in index:
+        slug = format_slug(root_dir, file_path)
+        yield slug
+        if detailed:
+            try:
+                card = card_loader()
+                for line in format_card(slug, card, model):
+                    yield line
+            except Exception as e:
+                raise type(e)(u'{0}: {1}'.format(file_path, e))
+
+
+def make_card_loader(fpath):
+    def _card_loader():
+        with open(fpath) as f:
+            return yaml.load(f)
+    return _card_loader
+
+
+def find_items(root_dir, model, pattern):
+    # init return vars
+    detail = index = guessed_path = None
+
     conf = get_app_conf()
 
     pattern = _fix_str_to_unicode(pattern)
@@ -165,47 +206,30 @@ def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
         file_path = _guess_file_path(index_path, pattern)
         if file_path:
             file_exists = True
-
-            # guessing may be confusing so we tell user what we've picked
-            yield formatting.t.blue(u'guessed: {0}'.format(file_path))
-            yield ''
+            guessed_path = file_path
         else:
             raise PathDoesNotExist(file_path)
 
+
     if file_exists:
-        with open(file_path) as f:
-            card = yaml.load(f)
-        try:
-            for line in format_card(file_path, card, model):
-                yield line
-        except Exception as e:
-            raise type(e)(u'{0}: {1}'.format(file_path, e))
+        detail = file_path, make_card_loader(file_path)
+    else:
+        detail = None
+
 
     if dir_exists:
         files = collect_files(path)
 
-        if count:
-            yield 'Found {0} documents'.format(len(list(files)))
-            return
+        #if count:
+        #    yield 'Found {0} documents'.format(len(list(files)))
+        #    return
 
+        loader = make_card_loader(file_path)
         for file_path in files:
-            # display relative path without extension and with bold slug
-            directory, file_name = os.path.split(file_path)
-            slug, _ = os.path.splitext(file_name)
-            if not directory or directory == index_path:
-                path_repr = ''
-            else:
-                path_repr = os.path.relpath(directory, index_path)
-            yield os.path.join(path_repr, formatting.t.bold(slug))
+            index.append((file_path, loader))
 
-            if detailed:
-                with open(file_path) as f:
-                    card = yaml.load(f)
-                try:
-                    for line in format_card(slug, card, model):
-                        yield line
-                except Exception as e:
-                    raise type(e)(u'{0}: {1}'.format(file_path, e))
+
+    return detail, index, guessed_path
 
 
 def collect_files(path):
@@ -215,6 +239,19 @@ def collect_files(path):
                 if f.endswith('.yaml'):
                     yield _fix_str_to_unicode(os.path.join(root, f))
     return sorted(_walk())
+
+
+def format_slug(root_dir, file_path):
+    conf = get_app_conf()
+    index_path = os.path.join(conf.index, root_dir)
+    # display relative path without extension and with bold slug
+    directory, file_name = os.path.split(file_path)
+    slug, _ = os.path.splitext(file_name)
+    if not directory or directory == index_path:
+        path_repr = ''
+    else:
+        path_repr = os.path.relpath(directory, index_path)
+    return os.path.join(path_repr, formatting.t.bold(slug))
 
 
 def format_card(label, raw_card, model):
