@@ -14,8 +14,10 @@ def format_error(err):
     return t.red(u'{0.__class__.__name__}: {0}'.format(err))
 
 
-def format_struct(data):
+def format_struct(data, skip=[]):
     for k in sorted(data):
+        if k in skip:
+            continue
         v = data[k]
         if isinstance(v, dict):
             yield _wrap_pair(k, '')
@@ -56,7 +58,7 @@ def format_slug(root_dir, file_path, nocolour=False):
 
 
 def format_card(label, card, model):
-    for line in format_struct(card):
+    for line in format_struct(card, skip=['concerns', 'note']):
         yield line
     yield ''
 
