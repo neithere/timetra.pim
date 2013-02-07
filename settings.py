@@ -13,6 +13,8 @@ from monk.validation import optional, validate_structure, ValidationError
 
 APP_NAME = 'pim'
 
+__CACHE = {}
+
 
 class ConfigurationError(RuntimeError):
     pass
@@ -24,6 +26,9 @@ def get_conf_path():
 
 
 def get_app_conf():
+    if __CACHE.get('app_conf'):
+        return __CACHE['app_conf']
+
     path = get_conf_path()
 
     if not os.path.exists(path):
@@ -56,5 +61,7 @@ def get_app_conf():
     for k in expandable:
         conf[k] = os.path.expanduser(conf[k])
 
-    return DotExpandedDict(conf)
+    result = DotExpandedDict(conf)
+    __CACHE['app_conf'] = result
+    return result
 
