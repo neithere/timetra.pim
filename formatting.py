@@ -41,7 +41,7 @@ def _wrap_pair(k, v, indent=''):
                          fix_sentence_endings=True)
 
 
-def format_slug(root_dir, file_path):
+def format_slug(root_dir, file_path, nocolour=False):
     conf = get_app_conf()
     index_path = os.path.join(conf.index, root_dir)
     # display relative path without extension and with bold slug
@@ -51,7 +51,8 @@ def format_slug(root_dir, file_path):
         path_repr = ''
     else:
         path_repr = os.path.relpath(directory, index_path)
-    return os.path.join(path_repr, t.bold(slug))
+    colour = lambda x:x if nocolour else t.bold
+    return os.path.join(path_repr, colour(slug))
 
 
 def format_card(label, card, model):

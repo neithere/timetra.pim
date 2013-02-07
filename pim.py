@@ -1,10 +1,11 @@
 #!/usr/bin/env python2
 # coding: utf-8
 # PYTHON_ARGCOMPLETE_OK
+import os
 import subprocess
 
 import argh
-import os
+from prettytable import PrettyTable
 
 from settings import get_app_conf, ConfigurationError
 import settings
@@ -149,9 +150,18 @@ def indent(text):
     return prepend(text, ' ')
 
 
-def concerns(warm=False, acute=False):
+def concerns(warm=False, acute=False, listing=False):
     """ Displays a list of active risks and needs.
     """
+    table = PrettyTable()
+
+    table.field_names = ['context', 'subject', 'plans', 'next action']
+
+    table.align['context'] = 'l'
+    table.align['subject'] = 'l'
+    table.align['plans'] = 'r'
+    table.align['next action'] = 'l'
+
     items = finder.get_concerns()
     for item in items:
         if acute and not item.acute:
@@ -159,14 +169,45 @@ def concerns(warm=False, acute=False):
         if warm and item.frozen:
             continue
         text = item.risk or item.need
-        if item.acute:
-            text = formatting.t.bold(text)
-        if item.risk:
-            text = formatting.t.red(text)
-        if item.project:
-            project_label = formatting.t.blue(item.project)
-            text = prepend(project_label, text)
-        yield prepend('*', text)
+#        if item.acute:
+#            text = formatting.t.bold(text)
+#        if item.risk:
+#            text = formatting.t.red(text)
+        #if item.project:
+        #    project_label = formatting.t.blue(item.project)
+        #    text = prepend(project_label, text)
+
+        def crop(string, width=40):
+            if len(string) > width*2:
+                string = u'{0}…'.format(string[:width*2-1])
+            return formatting.textwrap.fill(string, width=width)
+
+        if listing:
+            ctx = formatting.t.blue(item.context)
+            text = prepend(ctx, text)
+
+            crop = lambda x: x
+
+        text = crop(text)
+
+        # FIXME based on a HACK in finder.collect_concerns
+        plans_cnt = len(item.plan)
+        plans_open_cnt = len([1 for p in item.plan if not p.closed])
+        plans_repr = u'{0} ({1})'.format(plans_cnt, plans_open_cnt)
+
+        next_action = None
+        for plan in item.plan:
+            if not plan.closed:
+                next_action = crop(plan.action)
+                break
+
+        if listing:
+            yield prepend('*', text)
+            yield prepend('    [ ]', next_action)
+        else:
+            table.add_row([item.context or '-', text, plans_repr,
+                           next_action or '—'])
+
         #if item.plan:
         #    if not item.has_next_action():
         #        yield indent(u'запланировать')
@@ -176,6 +217,9 @@ def concerns(warm=False, acute=False):
         #        yield indent(u'напомнить')
         #else:
         #    yield indent(u'запланировать')
+
+    if not listing:
+        yield table
 
 
 def plans(need_mask):

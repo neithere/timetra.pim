@@ -171,8 +171,9 @@ def collect_concerns():
             concerns = card.get('concerns', [])
             for concern in concerns:
                 # HACK
-                if category == 'projects':
-                    concern.project = formatting.format_slug(category, path)
+                sigil = CATEGORIES[category]['sigil']
+                concern.context = sigil + formatting.format_slug(category, path,
+                                                                 nocolour=True)
 
                 yield concern
 
