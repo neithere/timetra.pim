@@ -1,16 +1,28 @@
 # coding: utf-8
 
 from __future__ import print_function
+import functools
 import os
+import shelve
 
-import yaml
 from monk.validation import validate_structure, ValidationError
 from monk.modeling import DotExpandedDict
+import yaml
+import xdg.BaseDirectory
 
 import models
 import settings
 import formatting
-from flare import multikeysort
+#from flare import multikeysort
+
+
+cache_dir = xdg.BaseDirectory.save_cache_path(settings.APP_NAME)
+cache_path = cache_dir + '/cards.db'
+try:
+    cache = shelve.open(cache_path)
+except:
+    os.remove(cache_path)
+    cache = shelve.open(cache_path)
 
 
 CATEGORIES = {
@@ -82,29 +94,46 @@ def guess_file_path(index_path, pattern):
 
 
 
+def load_card(path, model):
+    with open(path) as f:
+        raw_card = yaml.load(f)
+
+    card = fix_str_to_unicode(raw_card)
+
+    if not card:
+        return
+
+    try:
+        validate_structure(model, card)
+    except (ValidationError, TypeError) as e:
+        raise type(e)(u'{path}: {e}'.format(path=path, e=e))
+
+    card = DotExpandedDict(card)
+    # XXX HACK
+    if 'concerns' in card:
+        card.concerns = [models.Concern(**x) for x in card.concerns]
+
+    return card
+
+
+def get_card(path, model):
+    #results = tmpl_cache.get(key=search_param, createfunc=load_card)
+    time_key = u'changed:{0}'.format(path).encode('utf-8')
+    data_key = u'content:{0}'.format(path).encode('utf-8')
+    mtime_cache = cache.get(time_key)
+    mtime_file = os.stat(path).st_mtime
+    if mtime_cache == mtime_file:
+        data = cache[data_key]
+    else:
+        data = load_card(path, model)
+        cache[data_key] = data
+        cache[time_key] = mtime_file
+    #cache.close()
+    return data
+
+
 def make_card_loader(fpath, model):
-    def _card_loader():
-        with open(fpath) as f:
-            raw_card = yaml.load(f)
-
-        card = fix_str_to_unicode(raw_card)
-
-        if not card:
-            return
-
-        try:
-            validate_structure(model, card)
-        except (ValidationError, TypeError) as e:
-            raise type(e)(u'{path}: {e}'.format(path=fpath, e=e))
-
-        card = DotExpandedDict(card)
-        # XXX HACK
-        if 'concerns' in card:
-            card.concerns = [models.Concern(**x) for x in card.concerns]
-
-        return card
-
-    return _card_loader
+    return functools.partial(get_card, fpath, model)
 
 
 def find_items(root_dir, model, pattern):
