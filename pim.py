@@ -5,6 +5,7 @@ import os
 import subprocess
 
 import argh
+import monk.validation
 from prettytable import PrettyTable
 
 from settings import get_app_conf, ConfigurationError
@@ -52,7 +53,7 @@ def examine():
 
 
 nice_errors = argh.wrap_errors(
-    [finder.ValidationError, TypeError, finder.PathDoesNotExist],
+    [monk.validation.ValidationError, TypeError, finder.PathDoesNotExist],
     processor=formatting.format_error)
 
 
