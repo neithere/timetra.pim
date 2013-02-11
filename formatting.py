@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+import datetime
 import os
 import textwrap
 
 from blessings import Terminal
 
 from settings import get_app_conf
+import utils.formatdelta
 
 
 t = Terminal()
@@ -99,7 +101,10 @@ def format_card(label, card, model):
                 pname = '\n'.join(textwrap.wrap(
                     pname, initial_indent='', subsequent_indent=12*' '))
                 if plan.get('delegated'):
-                    pname = u'@{0}: {1}'.format(plan['delegated'], pname)
+                    waiting = utils.formatdelta.render_delta(
+                        plan['opened'],
+                        plan['closed'] or datetime.datetime.utcnow())
+                    pname = u'@{0}: {1} (ожидание {2})'.format(plan['delegated'], pname, waiting)
                 yield pwrapper(u'        [{0}] {1}'.format(pstate, pname))
         yield ''
 
