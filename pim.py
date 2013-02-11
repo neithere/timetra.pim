@@ -81,6 +81,10 @@ def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
     assert '..' not in pattern, 'look at you, hacker!'
     assert not pattern.startswith('/'), 'look at you, hacker!'
 
+    if pattern == '.':
+        # use current directory as the pattern
+        _, pattern = os.path.split(os.getcwdu())
+        yield formatting.t.blue(u'from current directory: {0}'.format(pattern))
 
     detail, index, guessed_path = finder.find_items(root_dir, model, pattern)
 
