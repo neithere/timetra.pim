@@ -42,7 +42,12 @@ ASSET = {
         'volume': optional(unicode),    # storage volume, be it litres or bytes
         'connectivity': optional(unicode),
     }),
-    'owning': optional(dict),
+    'owning': optional({
+        'owner': optional(unicode),
+        'vendor': optional(unicode),
+        'bought': optional(datetime.date),
+        'delivered': optional(datetime.date), # free-form date
+    }),
     'stakeholders': optional(list),  # hashtags
     # meta
     'mail_label': optional(unicode),    # gmail integration
