@@ -69,43 +69,54 @@ def format_card(label, card, model):
     if concerns:
         yield ''
         for concern in concerns:
-            name = concern.risk or concern.need or concern.note
-
-            if concern.closed:
-                state = '+'
-            elif concern.frozen:
-                state = '*'
-            elif concern.acute:
-                state = '!'
-            else:
-                state = ' '
-
-            colors = {
-                ' ': t.yellow,
-                '+': t.green,
-                '!': t.red,
-                '*': t.blue,
-            }
-            wrapper = colors[state]
-            yield wrapper(u'    [{0}] {1}'.format(state, t.bold(name)))
-            for plan in concern.plan:
-                # the logic here should be more complex, involving status field
-                # concern itself also may not have "closed" but solved=True
-                # here we just make sure 80% of cases work fine
-                pstate = '+' if plan.closed else ' '
-                pwrapper = colors['+' if pstate == '+' else state]
-                #pwrapper = formatting.t.green if pstate == 'x' else formatting.t.yellow
-                pname = plan.action or '?'
-                if '\n' in pname:
-                    pname = pname.strip().partition('\n')[0] + u' [...]'
-                pname = '\n'.join(textwrap.wrap(
-                    pname, initial_indent='', subsequent_indent=12*' '))
-                if plan.get('delegated'):
-                    waiting = utils.formatdelta.render_delta(
-                        plan['opened'],
-                        plan['closed'] or datetime.datetime.utcnow())
-                    pname = u'@{0}: {1} (ожидание {2})'.format(plan['delegated'], pname, waiting)
-                yield pwrapper(u'        [{0}] {1}'.format(pstate, pname))
-        yield ''
+            for line in format_concern(concern):
+                yield line
+            yield ''
 
 
+colors = {
+    ' ': t.yellow,
+    '+': t.green,
+    '!': t.red,
+    '*': t.blue,
+}
+
+def format_concern(concern):
+    name = concern.risk or concern.need or concern.note
+
+    if concern.closed:
+        state = '+'
+    elif concern.frozen:
+        state = '*'
+    elif concern.acute:
+        state = '!'
+    else:
+        state = ' '
+
+    wrapper = colors[state]
+    yield wrapper(u'    [{0}] {1}'.format(state, t.bold(name)))
+    if concern.reqs:
+        for req in concern.reqs:
+            yield wrapper(u'    ---> сначала: {0}'.format(req))
+    for plan in concern.plan:
+        yield format_plan(plan, indent=8*' ')
+
+
+def format_plan(plan, concern_state=' ', indent=''):
+    # the logic here should be more complex, involving status field
+    # concern itself also may not have "closed" but solved=True
+    # here we just make sure 80% of cases work fine
+    state = '+' if plan.closed else ' '
+    wrapper = colors['+' if state == '+' else concern_state]
+    #pwrapper = formatting.t.green if pstate == 'x' else formatting.t.yellow
+    name = plan.action or '?'
+    if '\n' in name:
+        name = name.strip().partition('\n')[0] + u' [...]'
+    name = '\n'.join(textwrap.wrap(
+        name, initial_indent='', subsequent_indent=indent+'    '))
+    if plan.get('delegated'):
+        waiting = utils.formatdelta.render_delta(
+            plan['opened'],
+            plan['closed'] or datetime.datetime.utcnow())
+        name = u'@{0}: {1} (ожидание {2})'.format(plan['delegated'], name, waiting)
+    return wrapper(u'{0}[{1}] {2}'.format(indent, state, name))

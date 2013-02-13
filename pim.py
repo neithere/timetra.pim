@@ -227,19 +227,20 @@ def concerns(warm=False, acute=False, listing=False):
         yield table
 
 
-def plans(need_mask):
+def plans(need_mask):  #, plan_mask=None):
     """ Displays plans for the need that matches given mask.
     """
     items = finder.get_concerns()
     mask = need_mask.decode('utf-8').lower()
     for item in items:
-        if (item.risk and mask in item.risk.lower()) or (item.need and mask in item.need.lower()):
-            yield item.risk or item.need
-            for plan in item.plan:
-                yield u'[{0.status}] {0.action}'.format(plan)
-            return
-    else:
-        yield 'Nothing found.'
+        risk_matches = item.risk and mask in item.risk.lower()
+        need_matches = item.need and mask in item.need.lower()
+
+        if risk_matches or need_matches:
+            yield item.context
+            for line in formatting.format_concern(item):
+                yield line
+            yield ''
 
 
 if __name__ == '__main__':
