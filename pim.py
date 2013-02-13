@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 # coding: utf-8
 # PYTHON_ARGCOMPLETE_OK
+import datetime
 import os
 import subprocess
 
@@ -14,6 +15,7 @@ import cli
 from finder import CATEGORIES
 import finder
 import formatting
+import utils
 
 
 @argh.wrap_errors([ConfigurationError], processor=formatting.format_error)
@@ -246,13 +248,20 @@ def plans(need_mask):  #, plan_mask=None):
 def show_waiting():
     """ Displays open delegated actions.
     """
+    table = PrettyTable()
+    table.field_names = ['context', 'contact', 'action', 'pending duration']
+    table.align = 'l'
     items = finder.get_concerns()
     for item in items:
+        if item.closed or item.frozen:
+            continue
         for plan in item.plan:
             if plan.delegated and not plan.closed:
-                yield item.context
-                yield formatting.format_plan(plan)
-                yield ''
+                delta = utils.formatdelta.render_delta(
+                    plan.opened,
+                    plan.closed or datetime.datetime.utcnow())
+                table.add_row([item.risk or item.need, plan.delegated, plan.action, delta])
+    return table
 
 
 if __name__ == '__main__':
