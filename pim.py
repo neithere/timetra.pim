@@ -243,6 +243,18 @@ def plans(need_mask):  #, plan_mask=None):
             yield ''
 
 
+def show_waiting():
+    """ Displays open delegated actions.
+    """
+    items = finder.get_concerns()
+    for item in items:
+        for plan in item.plan:
+            if plan.delegated and not plan.closed:
+                yield item.context
+                yield formatting.format_plan(plan)
+                yield ''
+
+
 if __name__ == '__main__':
     argh.dispatch_commands([
         examine,
@@ -251,6 +263,7 @@ if __name__ == '__main__':
         # these should be nested (?):
         concerns,
         plans,
+        show_waiting,
         # these should be reorganized:
         cli.serve,
     ])
