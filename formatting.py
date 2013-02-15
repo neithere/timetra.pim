@@ -74,24 +74,31 @@ def format_card(label, card, model):
             yield ''
 
 
+STATE_OPEN = ' '
+STATE_SOLVED = '+'
+STATE_ACUTE = '!'
+STATE_FROZEN = '*'
+STATE_CANCELLED = '-'
+
 colors = {
-    ' ': t.yellow,
-    '+': t.green,
-    '!': t.red,
-    '*': t.blue,
+    STATE_OPEN: t.yellow,
+    STATE_SOLVED: t.green,
+    STATE_ACUTE: t.red,
+    STATE_FROZEN: t.blue,
+    STATE_CANCELLED: t.blue,
 }
 
 def format_concern(concern):
     name = concern.risk or concern.need or concern.note
 
     if concern.closed:
-        state = '+'
+        state = STATE_SOLVED
     elif concern.frozen:
-        state = '*'
+        state = STATE_FROZEN
     elif concern.acute:
-        state = '!'
+        state = STATE_ACUTE
     else:
-        state = ' '
+        state = STATE_OPEN
 
     wrapper = colors[state]
     yield wrapper(u'    [{0}] {1}'.format(state, t.bold(name)))
@@ -99,15 +106,22 @@ def format_concern(concern):
         for req in concern.reqs:
             yield wrapper(u'    ---> сначала: {0}'.format(req))
     for plan in concern.plan:
-        yield format_plan(plan, indent=8*' ')
+        yield format_plan(plan, indent=8*' ', concern_state=state)
 
 
 def format_plan(plan, concern_state=' ', indent=''):
     # the logic here should be more complex, involving status field
     # concern itself also may not have "closed" but solved=True
     # here we just make sure 80% of cases work fine
-    state = '+' if plan.closed else ' '
-    wrapper = colors['+' if state == '+' else concern_state]
+    if plan.closed:
+        if plan.status == 'cancelled':
+            state = STATE_CANCELLED
+        else:
+            state = STATE_SOLVED
+    else:
+        state = STATE_OPEN
+
+    wrapper = colors[STATE_SOLVED if concern_state == STATE_SOLVED else state]
     #pwrapper = formatting.t.green if pstate == 'x' else formatting.t.yellow
     name = plan.action or '?'
     if '\n' in name:
