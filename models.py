@@ -41,6 +41,7 @@ ASSET = {
         'manufactured': optional(unicode),  # free-form date
         'volume': optional(unicode),    # storage volume, be it litres or bytes
         'connectivity': optional(unicode),
+        'material': optional(unicode),
     }),
     'owning': optional({
         'owner': optional(unicode),
