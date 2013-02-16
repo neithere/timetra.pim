@@ -139,9 +139,10 @@ def collect_concerns():
                 yield concern
 
 
-def get_concerns():
+def get_concerns(include_closed=False):
     items = collect_concerns()
-    items = (x for x in items if (x.risk or x.need) and not x.closed)
+    items = (x for x in items if (x.risk or x.need)
+                             and (include_closed or not x.closed))
     #items = list(multikeysort(items, ['-acute', '-risk', 'frozen']))
     # XXX based on HACK in collect_concerns
     items = list(sorted(items, key=lambda x: x.context))
