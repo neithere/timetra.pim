@@ -56,10 +56,10 @@ def addressed(days=7):
 
     concerns = finder.get_concerns(include_closed=True)
 
-    for c in sorted(_collect(), key=lambda x:x.opened):
+    for c in sorted(_collect(), key=lambda x: utils.to_datetime(x.opened) if x.opened else datetime.datetime(1900,1,1)):
         table.add_row([
             c.context,
-            c.risk or c.need,
+            formatting.textwrap.fill(c.risk or c.need, width=60),
             '+' if c._is_new else '',
             'x' if c._is_newly_closed else '',
             ('+'*c._new_todo),
@@ -80,16 +80,16 @@ def solved(days=7):
 
     def _collect():
         for c in concerns:
-            if c.closed and min_date <= c.closed:
+            if c.closed and min_date <= utils.to_datetime(c.closed):
                 yield c
 
     concerns = finder.get_concerns(include_closed=True)
 
-    for c in sorted(_collect(), key=lambda x:x.closed):
-        action_cnt = len([1 for p in c.plan if p.closed and min_date <= p.closed])
+    for c in sorted(_collect(), key=lambda x: utils.to_datetime(x.closed) if x.closed else datetime.datetime.now()):
+        action_cnt = len([1 for p in c.plan if p.closed and min_date <= utils.to_datetime(p.closed)])
         table.add_row([
-            c.closed.date(),
-            c.risk or c.need,
+            utils.to_date(c.closed),
+            formatting.textwrap.fill(c.risk or c.need, width=60),
             c.solved,
             ('+'*action_cnt),
             c.context
@@ -110,15 +110,15 @@ def done(days=7):
     def _collect():
         for c in concerns:
             for p in c.plan:
-                if not p.delegated and p.closed and min_date <= p.closed:
+                if not p.delegated and p.closed and min_date <= utils.to_datetime(p.closed):
                     p.context = c.context
                     yield p
 
     concerns = finder.get_concerns(include_closed=True)
 
-    for c in sorted(_collect(), key=lambda x:x.closed):
+    for c in sorted(_collect(), key=lambda x: utils.to_datetime(x.closed) if x.closed else datetime.datetime.now()):
         table.add_row([
-            c.closed.date(),
+            utils.to_date(c.closed),
             formatting.textwrap.fill(c.action.strip()),
             c.status,
             c.context])
