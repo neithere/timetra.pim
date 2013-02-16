@@ -245,7 +245,7 @@ def plans(need_mask):  #, plan_mask=None):
             yield ''
 
 
-def show_waiting():
+def report_waiting():
     """ Displays open delegated actions.
     """
     table = PrettyTable()
@@ -264,10 +264,10 @@ def show_waiting():
     return table
 
 
-def show_addressed():
+def report_addressed(days=7):
     """ Displays problems addressed last week.
     """
-    min_date = (datetime.datetime.now() - datetime.timedelta(days=7)).replace(hour=0, minute=0, second=0)
+    min_date = (datetime.datetime.now() - datetime.timedelta(days=days)).replace(hour=0, minute=0, second=0)
 
     table = PrettyTable()
     table.field_names = ['context', 'subject', 'new', 'solved', 'todo', 'done']
@@ -306,10 +306,10 @@ def show_addressed():
     return table
 
 
-def show_solved():
+def report_solved(days=7):
     """ Displays problems solved last week.
     """
-    min_date = (datetime.datetime.now() - datetime.timedelta(days=7)).replace(hour=0, minute=0, second=0)
+    min_date = (datetime.datetime.now() - datetime.timedelta(days=days)).replace(hour=0, minute=0, second=0)
 
     table = PrettyTable()
     table.field_names = ['date', 'subject', 'solved', 'actions', 'context']
@@ -335,10 +335,10 @@ def show_solved():
     return table
 
 
-def show_done():
+def report_done(days=7):
     """ Displays actions done last week.
     """
-    min_date = (datetime.datetime.now() - datetime.timedelta(days=7)).replace(hour=0, minute=0, second=0)
+    min_date = (datetime.datetime.now() - datetime.timedelta(days=days)).replace(hour=0, minute=0, second=0)
 
     table = PrettyTable()
     table.field_names = ['date', 'action', 'status', 'context']
@@ -371,10 +371,10 @@ if __name__ == '__main__':
         # these should be nested (?):
         concerns,
         plans,
-        show_waiting,
-        show_addressed,
-        show_solved,
-        show_done,
+        report_waiting,
+        report_addressed,
+        report_solved,
+        report_done,
         # these should be reorganized:
         cli.serve,
     ])
