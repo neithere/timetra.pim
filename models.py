@@ -67,6 +67,8 @@ ASSET = {
     # Устройства/техника
     'device': optional({
         # device model
+        'model_number': optional(unicode),
+        'model_code': optional(unicode),
         'product_code': optional(unicode),
         'product_name': optional(unicode),
         'product_number': optional(unicode),
