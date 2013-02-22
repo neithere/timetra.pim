@@ -22,25 +22,38 @@ def format_struct(data, skip=[]):
             continue
         v = data[k]
         if isinstance(v, dict):
-            yield _wrap_pair(k, '')
+            yield _wrap_pair(k, None)
             for kk in sorted(v):
-                yield _wrap_pair(kk, v[kk], indent='    ')
+                yield _wrap_pair(kk, v[kk], indent='  ')
         elif isinstance(v, list) and v: #and len(v) > 1:
             yield _wrap_pair(k, v[0])
             for x in v[1:]:
-                yield _wrap_pair('', x, indent=' '*len(k))
+                yield _wrap_pair(' '*len(k), x, indent='')
         else:
             yield _wrap_pair(k, v)
 
 
 def _wrap_pair(k, v, indent=''):
-    v = t.yellow(unicode(v))
+    if v is None:
+        return t.yellow(u'{indent}{k} ↴'.format(indent=indent, k=k))
+    else:
+        prefix = t.yellow(u'{indent}{k}:'.format(indent=indent, k=k))
+        value = unicode(_safe_wrap(v))
+        return u'{prefix} {value}'.format(prefix=prefix, value=value)
+
+
+def _safe_wrap(value, indent=''):
+    "Wraps text unless it's an URL"
+
+    if value.startswith('http://'):
+        return u'{indent}{value}'.format(indent=indent, value=value)
+
     # for reference:
     # >>> import textwrap
     # >>> help(textwrap.TextWrapper)
-    return textwrap.fill(u'{k}: {v}'.format(k=k, v=v),
-                         initial_indent='    '+indent,
-                         subsequent_indent='          '+indent,
+    return textwrap.fill(value,
+                         initial_indent=indent,
+                         subsequent_indent=indent,
                          break_long_words=False,
                          fix_sentence_endings=True)
 
