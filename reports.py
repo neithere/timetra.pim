@@ -33,8 +33,13 @@ def addressed(days=7):
     min_date = (datetime.datetime.now() - datetime.timedelta(days=days)).replace(hour=0, minute=0, second=0)
 
     table = PrettyTable()
-    table.field_names = ['context', 'subject', 'new', 'solved', 'todo', 'done']
+    table.field_names = ['context', 'subject', 'new', 'clsd', 'todo', 'clsd']
     table.align = 'l'
+
+    MARK_NEED_OPEN   = '▵'
+    MARK_NEED_CLOSED = '▴'
+    MARK_PLAN_OPEN   = '▫'
+    MARK_PLAN_CLOSED = '▪'
 
     def _collect():
         for c in concerns:
@@ -60,10 +65,10 @@ def addressed(days=7):
         table.add_row([
             c.context,
             formatting.textwrap.fill(c.risk or c.need, width=60),
-            '+' if c._is_new else '',
-            'x' if c._is_newly_closed else '',
-            ('+'*c._new_todo),
-            ('x'*c._new_done),
+            MARK_NEED_OPEN if c._is_new else '',
+            MARK_NEED_CLOSED if c._is_newly_closed else '',
+            (MARK_PLAN_OPEN*c._new_todo),
+            (MARK_PLAN_CLOSED*c._new_done),
         ])
 
     return table
