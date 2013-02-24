@@ -98,7 +98,8 @@ def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
         file_path, card_loader = detail
         try:
             card = card_loader()
-            for line in formatting.format_card(file_path, card, model):
+            for line in formatting.format_card(file_path, card, model,
+                                               hide_long_fields = not detailed):
                 yield line
         except Exception as e:
             raise type(e)(u'{0}: {1}'.format(file_path, e))

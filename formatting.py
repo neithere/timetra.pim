@@ -9,6 +9,9 @@ from settings import get_app_conf
 import utils.formatdelta
 
 
+POSSIBLY_TOO_LONG_FIELDS = ['concerns', 'note']
+
+
 t = Terminal()
 
 
@@ -38,11 +41,13 @@ def _wrap_pair(k, v, indent=''):
         return t.yellow(u'{indent}{k} ↴'.format(indent=indent, k=k))
     else:
         prefix = t.yellow(u'{indent}{k}:'.format(indent=indent, k=k))
-        value = unicode(_safe_wrap(v))
+        subsequent_indent = indent + ' '*len(k) + '  '
+        #                                         ^^^^ for the ": " part
+        value = unicode(_safe_wrap(v, subsequent_indent=subsequent_indent))
         return u'{prefix} {value}'.format(prefix=prefix, value=value)
 
 
-def _safe_wrap(value, indent=''):
+def _safe_wrap(value, indent='', subsequent_indent=''):
     "Wraps text unless it's an URL"
 
     if value.startswith('http://'):
@@ -53,7 +58,7 @@ def _safe_wrap(value, indent=''):
     # >>> help(textwrap.TextWrapper)
     return textwrap.fill(value,
                          initial_indent=indent,
-                         subsequent_indent=indent,
+                         subsequent_indent=subsequent_indent,
                          break_long_words=False,
                          fix_sentence_endings=True)
 
@@ -72,8 +77,9 @@ def format_slug(root_dir, file_path, nocolour=False):
     return os.path.join(path_repr, colour(slug))
 
 
-def format_card(label, card, model):
-    for line in format_struct(card, skip=['concerns', 'note']):
+def format_card(label, card, model, hide_long_fields=True):
+    skip = POSSIBLY_TOO_LONG_FIELDS if hide_long_fields else []
+    for line in format_struct(card, skip=skip):
         yield line
     yield ''
 
