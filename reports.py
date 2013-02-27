@@ -54,7 +54,7 @@ def addressed(days=7):
             for p in c.plan:
                 if p.opened and min_date <= utils.to_datetime(p.opened):
                     c._new_todo += 1
-                if c.closed and min_date <= utils.to_datetime(c.closed):
+                if p.closed and min_date <= utils.to_datetime(p.closed):
                     c._new_done += 1
             if c._is_new or c._is_newly_closed or c._new_todo or c._new_done:
                 yield c
