@@ -19,7 +19,7 @@ CONTACT = {
     'first_contact': optional(datetime.date),
     'org': optional(unicode),
     'timetable': optional(unicode),
-    'concerns': optional(list),
+    'concerns': optional([Concern.structure]),
 }
 
 
@@ -98,7 +98,7 @@ ASSET = {
     'music': optional(dict),
     # Услуги
     'service': optional(dict),
-    'concerns': optional(list),
+    'concerns': optional([Concern.structure]),
 }
 
 
@@ -108,7 +108,7 @@ PROJECT = {
     'urls': optional([unicode]),
     'note': optional(unicode),
     'mail_label': optional([unicode]),
-    'concerns': optional(list),
+    'concerns': optional([Concern.structure]),
     'stakeholders': optional(list),  # hashtags
     'categories': optional([unicode]),
 }

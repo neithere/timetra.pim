@@ -50,6 +50,8 @@ def _wrap_pair(k, v, indent=''):
 def _safe_wrap(value, indent='', subsequent_indent=''):
     "Wraps text unless it's an URL"
 
+    value = unicode(value)
+
     if value.startswith('http://'):
         return u'{indent}{value}'.format(indent=indent, value=value)
 

@@ -14,6 +14,7 @@ import cli
 from finder import CATEGORIES
 import finder
 import formatting
+import processing
 import reports
 
 
@@ -258,5 +259,6 @@ if __name__ == '__main__':
         # these should be reorganized:
         cli.serve,
     ])
+    parser.add_commands(processing.commands, namespace='process')
     parser.add_commands(reports.commands, namespace='report')
     parser.dispatch()
