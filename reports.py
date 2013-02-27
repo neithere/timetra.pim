@@ -33,8 +33,10 @@ def addressed(days=7):
     min_date = (datetime.datetime.now() - datetime.timedelta(days=days)).replace(hour=0, minute=0, second=0)
 
     table = PrettyTable()
-    table.field_names = ['context', 'subject', 'new', 'clsd', 'todo', 'clsd']
+    table.field_names = ['context', 'subject', 'c:new', 'c:clsd', 'p:new', 'p:clsd']
     table.align = 'l'
+    table.align['c:new'] = 'r'
+    table.align['p:new'] = 'r'
 
     MARK_NEED_OPEN   = '▵'
     MARK_NEED_CLOSED = '▴'
