@@ -35,14 +35,14 @@ def load_card(path, model):
     if not card:
         return
 
-    try:
-        validate_structure(model, card)
-    except (ValidationError, TypeError) as e:
-        raise type(e)(u'{path}: {e}'.format(path=path, e=e))
-
     card = DotExpandedDict(card)
     # XXX HACK
     if 'concerns' in card:
         card.concerns = [models.Concern(**x) for x in card.concerns]
+
+    try:
+        validate_structure(model, card)
+    except (ValidationError, TypeError) as e:
+        raise type(e)(u'{path}: {e}'.format(path=path, e=e))
 
     return card
