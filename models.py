@@ -2,7 +2,7 @@
 import datetime
 from monk.validation import optional
 
-from providers.base.models import Item as Concern
+from providers.base.models import Concern
 
 
 CONTACT = {

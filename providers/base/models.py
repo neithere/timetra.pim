@@ -2,10 +2,10 @@
 import datetime
 from monk import manipulation, modeling
 
-from . import utils   # for Item.sorted_plans
+from . import utils   # for Concern.sorted_plans
 
 
-__all__ = ['Item']
+__all__ = ['Concern']
 
 
 class Model(modeling.TypedDictReprMixin,
@@ -51,7 +51,8 @@ class Plan(Model):
         opened = datetime.datetime,
         closed = datetime.datetime,
         result = unicode,  # комментарий о результате выполнения действия: грабли, особенности, ...
-        reqs = unicode,    # требования (напр., какие документы нужно принести и т.д.)
+        reqs = [unicode],    # требования (напр., какие документы нужно принести и т.д.)
+        time = datetime.datetime,
     )
 
     def __init__(self, **kwargs):
@@ -60,10 +61,15 @@ class Plan(Model):
         if 'context' in data:
             data['context'] = manipulation.unfold_to_list(data['context'])
 
+        # convert date to datetime
+        for key in ('opened', 'closed'):
+            if key in data and isinstance(data[key], datetime.date):
+                data[key] = utils.to_datetime(data[key])
+
         super(Plan, self).__init__(**data)
 
 
-class Item(Model):
+class Concern(Model):
     """ An item containing observation, problem definition, goal and plan.
     """
     structure = dict(
@@ -93,13 +99,18 @@ class Item(Model):
     def __init__(self, **kwargs):
         data = kwargs.copy()
 
+        # convert date to datetime
+        for key in ('opened', 'closed'):
+            if key in data and isinstance(data[key], datetime.date):
+                data[key] = utils.to_datetime(data[key])
+
         # разворачиваем строку или словарь в список словарей
         data['plan'] = manipulation.unfold_list_of_dicts(data.get('plan'), 'action')
 
         # заворачиваем строку в список
         data['plan'] = [Plan(**x) for x in data['plan']]
 
-        super(Item, self).__init__(**data)
+        super(Concern, self).__init__(**data)
 
     def _check_has_plan(self, status):
         status_list = (status,) if isinstance(status, unicode) else status
@@ -137,6 +148,10 @@ class Item(Model):
             return 0
         closed_cnt = len([x for x in self.plan if x.closed])
         return (float(closed_cnt) / total_cnt) * 100
+
+
+# pending deprecation
+Item = Concern
 
 
 class Document(Model):
