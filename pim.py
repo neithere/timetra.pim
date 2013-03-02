@@ -129,6 +129,8 @@ def edit(category, pattern):
     editor = os.getenv('EDITOR')
     assert editor, 'env variable $EDITOR must be set'
 
+    pattern = pattern.decode('utf-8')
+
     if category == 'config':
         path = settings.get_conf_path()
     else:
@@ -146,7 +148,7 @@ def edit(category, pattern):
     if not os.path.exists(path):
         raise finder.PathDoesNotExist(path)
 
-    yield 'Editing {0}'.format(path)
+    yield u'Editing {0}'.format(path)
     subprocess.Popen([editor, path]).wait()
 
 

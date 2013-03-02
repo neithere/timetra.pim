@@ -43,6 +43,6 @@ def load_card(path, model):
     try:
         validate_structure(model, card)
     except (ValidationError, TypeError) as e:
-        raise type(e)(u'{path}: {e}'.format(path=path, e=e))
+        raise type(e)('{path}: {e}'.format(path=path.decode('utf-8'), e=e))
 
     return card
