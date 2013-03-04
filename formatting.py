@@ -123,6 +123,10 @@ def format_concern(concern):
 
     wrapper = colors[state]
     yield wrapper(u'    [{0}] {1}'.format(state, t.bold(name)))
+
+    if concern.closed:
+        return
+
     if concern.reqs:
         for req in concern.reqs:
             yield wrapper(u'    ---> сначала: {0}'.format(req))
