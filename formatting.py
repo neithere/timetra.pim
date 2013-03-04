@@ -154,4 +154,6 @@ def format_plan(plan, concern_state=' ', indent=''):
             plan['opened'],
             plan['closed'] or datetime.datetime.utcnow())
         name = u'@{0}: {1} (ожидание {2})'.format(plan['delegated'], name, waiting)
+    if plan.get('reqs'):
+        name = u'{0}\n{1}    ! иметь: {2}'.format(name, indent, ', '.join(plan['reqs']))
     return wrapper(u'{0}[{1}] {2}'.format(indent, state, name))
