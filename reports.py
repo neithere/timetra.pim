@@ -8,6 +8,112 @@ import formatting
 import utils
 
 
+def prepend(char, text):
+    return u'{0} {1}'.format(char, text)
+
+
+def indent(text):
+    return prepend(text, ' ')
+
+
+def concerns(warm=False, acute=False, listing=False):
+    """ Displays a list of active risks and needs.
+    """
+    table = PrettyTable()
+
+    table.field_names = ['context', 'subject', 'plans', 'next action']
+
+    table.align['context'] = 'l'
+    table.align['subject'] = 'l'
+    table.align['plans'] = 'r'
+    table.align['next action'] = 'l'
+
+    COLUMN_WIDTH_NEED = 45
+    COLUMN_WIDTH_PLAN = 60
+
+    items = finder.get_concerns()
+    for item in items:
+        if acute and not item.acute:
+            continue
+        if warm and item.frozen:
+            continue
+        text = item.risk or item.need
+#        if item.acute:
+#            text = formatting.t.bold(text)
+#        if item.risk:
+#            text = formatting.t.red(text)
+        #if item.project:
+        #    project_label = formatting.t.blue(item.project)
+        #    text = prepend(project_label, text)
+
+        def crop(string, width=40):
+            if len(string) > width*2:
+                string = u'{0}…'.format(string[:width*2-1])
+            return formatting.textwrap.fill(string, width=width)
+
+        if listing:
+            ctx = formatting.t.blue(item.context)
+            text = prepend(ctx, text)
+
+            crop = lambda x: x
+
+        text = crop(text, width=COLUMN_WIDTH_NEED)
+
+        # FIXME based on a HACK in finder.collect_concerns
+        plans_cnt = len(item.plan)
+        plans_open_cnt = len([1 for p in item.plan if not p.closed])
+        MARK_PLAN_OPEN   = u'▫'
+        MARK_PLAN_CLOSED = u'▪'
+        plans_repr = u'{0}{1}'.format(MARK_PLAN_CLOSED * (plans_cnt - plans_open_cnt),
+                                      MARK_PLAN_OPEN * plans_open_cnt)
+
+        next_action = None
+        for plan in item.plan:
+            if not plan.closed:
+                if plan.delegated:
+                    _text = u'@{0}: {1}'.format(plan.delegated, plan.action)
+                else:
+                    _text = plan.action
+                next_action = crop(_text, width=COLUMN_WIDTH_PLAN)
+                break
+
+        if listing:
+            yield prepend('*', text)
+            yield prepend('    [ ]', next_action)
+        else:
+            table.add_row([item.context or '-', text, plans_repr,
+                           next_action or '—'])
+
+        #if item.plan:
+        #    if not item.has_next_action():
+        #        yield indent(u'запланировать')
+        #    if not item.has_completed_action():
+        #        yield indent(u'приступить')
+        #    if item.is_waiting():
+        #        yield indent(u'напомнить')
+        #else:
+        #    yield indent(u'запланировать')
+
+    if not listing:
+        yield table
+
+
+def plans(need_mask):  #, plan_mask=None):
+    """ Displays plans for the need that matches given mask.
+    """
+    items = finder.get_concerns()
+    mask = need_mask.decode('utf-8').lower()
+    for item in items:
+        risk_matches = item.risk and mask in item.risk.lower()
+        need_matches = item.need and mask in item.need.lower()
+
+        if risk_matches or need_matches:
+            yield item.context
+            for line in formatting.format_concern(item):
+                yield line
+            yield ''
+
+
 def waiting():
     """ Displays open delegated actions.
     """
@@ -134,6 +240,8 @@ def done(days=7):
 
 
 commands = [
+    concerns,
+    plans,
     waiting,
     addressed,
     solved,
