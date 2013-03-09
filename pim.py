@@ -209,10 +209,10 @@ def concerns(warm=False, acute=False, listing=False):
         for plan in item.plan:
             if not plan.closed:
                 if plan.delegated:
-                    text = u'@{0}: {1}'.format(plan.delegated, plan.action)
+                    _text = u'@{0}: {1}'.format(plan.delegated, plan.action)
                 else:
-                    text = plan.action
-                next_action = crop(text)
+                    _text = plan.action
+                next_action = crop(_text)
                 break
 
         if listing:
