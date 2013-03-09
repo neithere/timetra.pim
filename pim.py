@@ -172,6 +172,9 @@ def concerns(warm=False, acute=False, listing=False):
     table.align['plans'] = 'r'
     table.align['next action'] = 'l'
 
+    COLUMN_WIDTH_NEED = 45
+    COLUMN_WIDTH_PLAN = 60
+
     items = finder.get_concerns()
     for item in items:
         if acute and not item.acute:
@@ -198,12 +201,15 @@ def concerns(warm=False, acute=False, listing=False):
 
             crop = lambda x: x
 
-        text = crop(text)
+        text = crop(text, width=COLUMN_WIDTH_NEED)
 
         # FIXME based on a HACK in finder.collect_concerns
         plans_cnt = len(item.plan)
         plans_open_cnt = len([1 for p in item.plan if not p.closed])
-        plans_repr = u'{0} ({1})'.format(plans_cnt, plans_open_cnt)
+        MARK_PLAN_OPEN   = u'▫'
+        MARK_PLAN_CLOSED = u'▪'
+        plans_repr = u'{0}{1}'.format(MARK_PLAN_CLOSED * (plans_cnt - plans_open_cnt),
+                                      MARK_PLAN_OPEN * plans_open_cnt)
 
         next_action = None
         for plan in item.plan:
@@ -212,7 +218,7 @@ def concerns(warm=False, acute=False, listing=False):
                     _text = u'@{0}: {1}'.format(plan.delegated, plan.action)
                 else:
                     _text = plan.action
-                next_action = crop(_text)
+                next_action = crop(_text, width=COLUMN_WIDTH_PLAN)
                 break
 
         if listing:
