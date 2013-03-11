@@ -139,7 +139,7 @@ def addressed(days=7):
     min_date = (datetime.datetime.now() - datetime.timedelta(days=days)).replace(hour=0, minute=0, second=0)
 
     table = PrettyTable()
-    table.field_names = ['context', 'subject', 'c:new', 'c:clsd', 'p:new', 'p:clsd']
+    table.field_names = ['context', 'subject', 'concern', 'p:new', 'p:clsd']
     table.align = 'l'
     table.align['c:new'] = 'r'
     table.align['p:new'] = 'r'
@@ -173,8 +173,10 @@ def addressed(days=7):
         table.add_row([
             c.context,
             formatting.textwrap.fill(c.risk or c.need, width=60),
-            MARK_NEED_OPEN if c._is_new else '',
-            MARK_NEED_CLOSED if c._is_newly_closed else '',
+            ''.join([
+                MARK_NEED_OPEN if c._is_new else '',
+                MARK_NEED_CLOSED if c._is_newly_closed else '',
+            ]),
             (MARK_PLAN_OPEN*c._new_todo),
             (MARK_PLAN_CLOSED*c._new_done),
         ])
