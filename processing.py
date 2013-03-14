@@ -42,12 +42,12 @@ def overview(warm=False, acute=False):
     """
     prev_picked = get_prev_picked()
     if prev_picked:
-        yield 'Show previously picked concerns?'
+        yield 'Show previously picked concerns? (enter = yes)'
         if getch() == '\r':
             for concern in prev_picked:
                 yield '\n'.join(formatting.format_concern(concern))
 
-        yield 'Keep previously picked concerns?'
+        yield 'Keep previously picked concerns? (enter = yes)'
         if getch() == '\r':
             return
 
