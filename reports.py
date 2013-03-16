@@ -144,8 +144,9 @@ def addressed(days=7):
     table.align['c:new'] = 'r'
     table.align['p:new'] = 'r'
 
-    MARK_NEED_OPEN   = '▵'
-    MARK_NEED_CLOSED = '▴'
+    MARK_CONCERN_OPEN   = '○'
+    MARK_CONCERN_CLOSED = '●'
+    MARK_CONCERN_OPEN_THEN_CLOSED = '◉'
     MARK_PLAN_OPEN   = '▫'
     MARK_PLAN_CLOSED = '▪'
 
@@ -170,13 +171,18 @@ def addressed(days=7):
     concerns = finder.get_concerns(include_closed=True)
 
     for c in sorted(_collect(), key=lambda x: utils.to_datetime(x.opened) if x.opened else datetime.datetime(1900,1,1)):
+        marks = {
+            (True, True):  MARK_CONCERN_OPEN_THEN_CLOSED,
+            (True, False): MARK_CONCERN_OPEN,
+            (False, True): MARK_CONCERN_CLOSED,
+            (False, False): '',
+        }
+        mark = marks[(c._is_new, c._is_newly_closed)]
+
         table.add_row([
             c.context,
             formatting.textwrap.fill(c.risk or c.need, width=60),
-            ''.join([
-                MARK_NEED_OPEN if c._is_new else '',
-                MARK_NEED_CLOSED if c._is_newly_closed else '',
-            ]),
+            mark,
             (MARK_PLAN_OPEN*c._new_todo),
             (MARK_PLAN_CLOSED*c._new_done),
         ])
