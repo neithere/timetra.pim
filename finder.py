@@ -132,6 +132,7 @@ def collect_concerns():
             concerns = card.get('concerns', [])
             for concern in concerns:
                 # HACK
+                concern.context_card = card
                 sigil = CATEGORIES[category]['sigil']
                 concern.context = sigil + formatting.format_slug(category, path,
                                                                  nocolour=True)

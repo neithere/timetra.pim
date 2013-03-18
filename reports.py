@@ -16,7 +16,7 @@ def indent(text):
     return prepend(text, ' ')
 
 
-def concerns(warm=False, acute=False, listing=False):
+def concerns(warm=False, acute=False, listing=False, fullnames=False):
     """ Displays a list of active risks and needs.
     """
     table = PrettyTable()
@@ -81,7 +81,8 @@ def concerns(warm=False, acute=False, listing=False):
             yield prepend('*', text)
             yield prepend('    [ ]', next_action)
         else:
-            table.add_row([item.context or '-', text, plans_repr,
+            context = item.context_card.name if fullnames else item.context
+            table.add_row([context or '-', text, plans_repr,
                            next_action or '—'])
 
         #if item.plan:
@@ -133,7 +134,7 @@ def waiting():
     return table
 
 
-def addressed(days=7):
+def addressed(days=7, fullnames=False):
     """ Displays problems addressed last week.
     """
     min_date = (datetime.datetime.now() - datetime.timedelta(days=days)).replace(hour=0, minute=0, second=0)
@@ -180,7 +181,7 @@ def addressed(days=7):
         mark = marks[(c._is_new, c._is_newly_closed)]
 
         table.add_row([
-            c.context,
+            c.context_card.name if fullnames else c.context,
             formatting.textwrap.fill(c.risk or c.need, width=60),
             mark,
             (MARK_PLAN_OPEN*c._new_todo),
@@ -190,7 +191,7 @@ def addressed(days=7):
     return table
 
 
-def solved(days=7):
+def solved(days=7, fullnames=False):
     """ Displays problems solved last week.
     """
     min_date = (datetime.datetime.now() - datetime.timedelta(days=days)).replace(hour=0, minute=0, second=0)
@@ -213,13 +214,13 @@ def solved(days=7):
             formatting.textwrap.fill(c.risk or c.need, width=60),
             c.solved,
             ('+'*action_cnt),
-            c.context
+            c.context_card.name if fullnames else c.context
         ])
 
     return table
 
 
-def done(days=7):
+def done(days=7, fullnames=False):
     """ Displays actions done last week.
     """
     min_date = (datetime.datetime.now() - datetime.timedelta(days=days)).replace(hour=0, minute=0, second=0)
@@ -228,14 +229,14 @@ def done(days=7):
     table.field_names = ['date', 'action', 'status', 'context']
     table.align = 'l'
 
+    concerns = finder.get_concerns(include_closed=True)
+
     def _collect():
         for c in concerns:
             for p in c.plan:
                 if not p.delegated and p.closed and min_date <= utils.to_datetime(p.closed):
-                    p.context = c.context
+                    p.context = c.context_card.name if fullnames else c.context
                     yield p
-
-    concerns = finder.get_concerns(include_closed=True)
 
     for c in sorted(_collect(), key=lambda x: utils.to_datetime(x.closed) if x.closed else datetime.datetime.now()):
         table.add_row([
