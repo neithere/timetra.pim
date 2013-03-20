@@ -115,7 +115,7 @@ def plans(need_mask):  #, plan_mask=None):
             yield ''
 
 
-def waiting():
+def waiting(contact=None):
     """ Displays open delegated actions.
     """
     table = PrettyTable()
@@ -128,6 +128,8 @@ def waiting():
             continue
         for plan in item.plan:
             if plan.delegated and not plan.closed:
+                if contact and contact != plan.delegated:
+                    continue
                 plans.append((item, plan))
     for item, plan in sorted(plans, key=lambda pair: pair[1].opened):
         delta = utils.formatdelta.render_delta(
