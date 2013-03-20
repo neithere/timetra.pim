@@ -119,18 +119,21 @@ def waiting():
     """ Displays open delegated actions.
     """
     table = PrettyTable()
-    table.field_names = ['context', 'contact', 'action', 'pending duration']
+    table.field_names = ['pending duration', 'contact', 'action', 'concern']
     table.align = 'l'
     items = finder.get_concerns()
+    plans = []
     for item in items:
         if item.closed or item.frozen:
             continue
         for plan in item.plan:
             if plan.delegated and not plan.closed:
-                delta = utils.formatdelta.render_delta(
-                    plan.opened,
-                    plan.closed or datetime.datetime.utcnow())
-                table.add_row([item.risk or item.need, plan.delegated, plan.action, delta])
+                plans.append((item, plan))
+    for item, plan in sorted(plans, key=lambda pair: pair[1].opened):
+        delta = utils.formatdelta.render_delta(
+            plan.opened,
+            plan.closed or datetime.datetime.utcnow())
+        table.add_row([delta, plan.delegated, plan.action, item.risk or item.need])
     return table
 
 
