@@ -8,6 +8,21 @@ import formatting
 import utils
 
 
+def _crop(string, width=40):
+    if len(string) > width * 2:
+        string = u'{0}…'.format(string[:width * 2 - 1])
+    return formatting.textwrap.fill(string, width=width)
+
+def _get_plans_repr(concern):
+    # FIXME based on a HACK in finder.collect_concerns
+    plans_cnt = len(concern.plan)
+    plans_open_cnt = len([1 for p in concern.plan if not p.closed])
+    MARK_PLAN_OPEN   = u'▫'
+    MARK_PLAN_CLOSED = u'▪'
+    return u'{0}{1}'.format(MARK_PLAN_CLOSED * (plans_cnt - plans_open_cnt),
+                            MARK_PLAN_OPEN * plans_open_cnt)
+
+
 def prepend(char, text):
     return u'{0} {1}'.format(char, text)
 
@@ -46,26 +61,13 @@ def concerns(warm=False, acute=False, listing=False, fullnames=False):
         #    project_label = formatting.t.blue(item.project)
         #    text = prepend(project_label, text)
 
-        def crop(string, width=40):
-            if len(string) > width*2:
-                string = u'{0}…'.format(string[:width*2-1])
-            return formatting.textwrap.fill(string, width=width)
-
         if listing:
             ctx = formatting.t.blue(item.context)
             text = prepend(ctx, text)
+        else:
+            text = _crop(text, width=COLUMN_WIDTH_NEED)
 
-            crop = lambda x: x
-
-        text = crop(text, width=COLUMN_WIDTH_NEED)
-
-        # FIXME based on a HACK in finder.collect_concerns
-        plans_cnt = len(item.plan)
-        plans_open_cnt = len([1 for p in item.plan if not p.closed])
-        MARK_PLAN_OPEN   = u'▫'
-        MARK_PLAN_CLOSED = u'▪'
-        plans_repr = u'{0}{1}'.format(MARK_PLAN_CLOSED * (plans_cnt - plans_open_cnt),
-                                      MARK_PLAN_OPEN * plans_open_cnt)
+        plans_repr = _get_plans_repr(item)
 
         next_action = None
         for plan in item.plan:
@@ -74,14 +76,19 @@ def concerns(warm=False, acute=False, listing=False, fullnames=False):
                     _text = u'@{0}: {1}'.format(plan.delegated, plan.action)
                 else:
                     _text = plan.action
-                next_action = crop(_text, width=COLUMN_WIDTH_PLAN)
+                if listing:
+                    next_action = _text
+                else:
+                    next_action = _crop(_text, width=COLUMN_WIDTH_PLAN)
                 break
 
         if listing:
             yield prepend('*', text)
             yield prepend('    [ ]', next_action)
         else:
+            # based on HACK in finder
             context = item.context_card.name if fullnames else item.context
+
             table.add_row([context or '-', text, plans_repr,
                            next_action or '—'])
 
@@ -97,6 +104,35 @@ def concerns(warm=False, acute=False, listing=False, fullnames=False):
 
     if not listing:
         yield table
+
+
+def someday(fullnames=False):
+    """ Displays a list of frozen concerns.
+    """
+    # NOTE: this is based on concerns() and probably awaits refactoring
+
+    table = PrettyTable()
+    table.field_names = ['context', 'subject', 'plans']
+    table.align = 'l'
+
+    COLUMN_WIDTH_CONCERN = 80
+
+    concerns = finder.get_concerns()
+    for concern in concerns:
+        if concern.closed or not concern.frozen:
+            continue
+
+        text = concern.risk or concern.need
+        text = _crop(text, width=COLUMN_WIDTH_CONCERN)
+
+        plans_repr = _get_plans_repr(concern)
+
+        # based on HACK in finder
+        context = concern.context_card.name if fullnames else concern.context
+
+        table.add_row([context or '-', text, plans_repr])
+
+    return table
 
 
 def plans(need_mask):  #, plan_mask=None):
@@ -255,6 +291,7 @@ def done(days=7, fullnames=False):
 
 commands = [
     concerns,
+    someday,
     plans,
     waiting,
     addressed,
