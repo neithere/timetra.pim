@@ -10,6 +10,7 @@ from prettytable import PrettyTable
 
 from settings import get_app_conf, ConfigurationError
 import settings
+import caching
 import cli
 from finder import CATEGORIES
 import finder
@@ -163,4 +164,5 @@ if __name__ == '__main__':
     ])
     parser.add_commands(processing.commands, namespace='process')
     parser.add_commands(reports.commands, namespace='report')
+    parser.add_commands(caching.commands, namespace='cache')
     parser.dispatch()

@@ -36,3 +36,14 @@ def get_cached_yaml_file(path, model):
         cache[time_key] = mtime_file
     #cache.close()
     return data
+
+
+def reset():
+    try:
+        cache.close()
+    except:
+        pass
+    os.remove(cache_path)
+
+
+commands = [ reset ]
