@@ -90,6 +90,7 @@ class Concern(Model):
         closed = datetime.datetime,
         solved = False,
         frozen = datetime.datetime,  # if not None, it's someday/maybe
+        revive = datetime.date,      # if set, the concern is not considered frozen anymore since given date
         reqs = [unicode],            # list of items that block this one
         # TODO:
         # * проблема/потребность со временем: не меняется / усугубляется / ослабевает

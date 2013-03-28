@@ -13,6 +13,7 @@ def _crop(string, width=40):
         string = u'{0}…'.format(string[:width * 2 - 1])
     return formatting.textwrap.fill(string, width=width)
 
+
 def _get_plans_repr(concern):
     # FIXME based on a HACK in finder.collect_concerns
     plans_cnt = len(concern.plan)
@@ -29,6 +30,15 @@ def prepend(char, text):
 
 def indent(text):
     return prepend(text, ' ')
+
+
+def is_concern_frozen(concern):
+    if not concern.frozen:
+        return False
+    if concern.revive and (
+        utils.to_date(concern.revive) <= datetime.date.today()):
+        return False
+    return True
 
 
 def concerns(warm=False, acute=False, listing=False, fullnames=False):
@@ -50,7 +60,7 @@ def concerns(warm=False, acute=False, listing=False, fullnames=False):
     for item in items:
         if acute and not item.acute:
             continue
-        if warm and item.frozen:
+        if warm and is_concern_frozen(item):
             continue
         text = item.risk or item.need
 #        if item.acute:
@@ -119,7 +129,7 @@ def someday(fullnames=False):
 
     concerns = finder.get_concerns()
     for concern in concerns:
-        if concern.closed or not concern.frozen:
+        if concern.closed or not is_concern_frozen(concern):
             continue
 
         text = concern.risk or concern.need
@@ -160,7 +170,7 @@ def waiting(contact=None):
     items = finder.get_concerns()
     plans = []
     for item in items:
-        if item.closed or item.frozen:
+        if item.closed or is_concern_frozen(item):
             continue
         for plan in item.plan:
             if plan.delegated and not plan.closed:
