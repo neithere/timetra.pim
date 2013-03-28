@@ -122,7 +122,7 @@ def someday(fullnames=False):
     # NOTE: this is based on concerns() and probably awaits refactoring
 
     table = PrettyTable()
-    table.field_names = ['context', 'subject', 'plans']
+    table.field_names = ['context', 'subject', 'plans', 'revive']
     table.align = 'l'
 
     COLUMN_WIDTH_CONCERN = 80
@@ -140,7 +140,7 @@ def someday(fullnames=False):
         # based on HACK in finder
         context = concern.context_card.name if fullnames else concern.context
 
-        table.add_row([context or '-', text, plans_repr])
+        table.add_row([context or '-', text, plans_repr, concern.revive or '—'])
 
     return table
 
