@@ -6,9 +6,8 @@ import subprocess
 
 import argh
 import monk.validation
-from prettytable import PrettyTable
 
-from settings import get_app_conf, ConfigurationError
+from settings import get_app_conf
 import settings
 import caching
 import cli
@@ -17,42 +16,9 @@ import finder
 import formatting
 import processing
 import reports
+import stats
 
 
-@argh.wrap_errors([ConfigurationError], processor=formatting.format_error)
-def examine():
-    conf = get_app_conf()
-
-    yield 'examining {conf.index}...'.format(conf=conf)
-
-    files_by_ext = {}
-
-    vcs_dirs = '/.hg', '/.git', '/.svn'
-    vcs_files = '.hgignore', '.gitignore'
-
-    for root, dirs, files in os.walk(conf.index):
-        if any(x in root for x in vcs_dirs):
-            continue
-
-        if any(x in root for x in conf.x_ignore):
-            continue
-
-        for name in files:
-            if name in vcs_files:
-                continue
-
-#            yield root, files
-            _, ext = os.path.splitext(name)
-            files_by_ext.setdefault(ext, []).append(os.path.join(root, name))
-
-        #yaml_files = [f for f in files if f.endswith('.yaml')]
-
-#    yield files_by_ext
-    for ext, files in files_by_ext.iteritems():
-        yield '{ext}: {count}'.format(ext=(ext or 'no extension'), count=len(files))
-        if len(files) < 10:    # <- an arbitrary threshold for marginal formats
-            for f in files:
-                yield '    {0}'.format(f)
 
 
 nice_errors = argh.wrap_errors(
@@ -156,7 +122,6 @@ def edit(category, pattern):
 if __name__ == '__main__':
     parser = argh.ArghParser()
     parser.add_commands([
-        examine,
         show,
         edit,
         # these should be reorganized:
@@ -165,4 +130,5 @@ if __name__ == '__main__':
     parser.add_commands(processing.commands, namespace='process')
     parser.add_commands(reports.commands, namespace='report')
     parser.add_commands(caching.commands, namespace='cache')
+    parser.add_commands(stats.commands, namespace='stat')
     parser.dispatch()
