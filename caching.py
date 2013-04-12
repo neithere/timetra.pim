@@ -1,4 +1,5 @@
 # coding: utf-8
+import atexit
 import os
 import shelve
 
@@ -20,6 +21,10 @@ try:
 except:
     os.remove(cache_path)
     cache = shelve.open(cache_path)
+
+# http://stackoverflow.com/questions/2180946/really-weird-issue-with-shelve-python
+# (got this issue even on Python 2.7.4)
+atexit.register(lambda: cache.close())
 
 
 def get_cached_yaml_file(path, model):
