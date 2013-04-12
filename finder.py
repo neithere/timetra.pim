@@ -32,6 +32,7 @@ def guess_file_path(index_path, pattern):
     first_dir_startswith = None
     first_startswith = None
     first_endswith = None
+    first_contains = None
 
     # all tests below are case-insensitive
     pattern = pattern.lower()
@@ -59,7 +60,12 @@ def guess_file_path(index_path, pattern):
         if not first_endswith and slug.endswith(pattern):
             first_endswith = file_path
 
-    return first_dir_startswith or first_startswith or first_endswith or None
+        # `bar` matches `/foo/embargo.yaml`
+        if not first_contains and pattern in slug:
+            first_contains = file_path
+
+    return (first_dir_startswith or first_startswith or first_endswith
+            or first_contains or None)
 
 
 
