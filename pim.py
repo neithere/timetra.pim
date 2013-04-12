@@ -104,13 +104,15 @@ def edit(category, pattern):
         conf = get_app_conf()
         category_path = os.path.join(conf.index, category)
         path = os.path.join(category_path, pattern)
+
+        # prefer files to directories
+        if os.path.exists(path + '.yaml'):
+            path = path + '.yaml'
+
         if not os.path.exists(path):
-            if os.path.exists(path + '.yaml'):
-                path = path + '.yaml'
-            else:
-                guessed = finder.guess_file_path(category_path, pattern)
-                if guessed:
-                    path = guessed
+            guessed = finder.guess_file_path(category_path, pattern)
+            if guessed:
+                path = guessed
 
     if not os.path.exists(path):
         raise finder.PathDoesNotExist(path)
