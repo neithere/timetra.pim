@@ -10,7 +10,7 @@ import formatting
 import loading
 import settings
 from utils import getch
-from providers.base.models import Item as Concern
+from models import Concern
 
 
 

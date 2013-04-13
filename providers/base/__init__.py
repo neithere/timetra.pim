@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from .. import utils  # for providers.base.models
-
 
 class BaseDataProvider(object):
     """ All data providers should implement this interface.
