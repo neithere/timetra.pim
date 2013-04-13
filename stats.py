@@ -12,7 +12,7 @@ import formatting
 
 @argh.named('files')
 @argh.wrap_errors([ConfigurationError], processor=formatting.format_error)
-def stat_files():
+def stat_files(long=False):
     conf = get_app_conf()
 
     yield 'examining {conf.index}...'.format(conf=conf)
@@ -33,18 +33,14 @@ def stat_files():
             if name in vcs_files:
                 continue
 
-#            yield root, files
             _, ext = os.path.splitext(name)
             files_by_ext.setdefault(ext, []).append(os.path.join(root, name))
 
-        #yaml_files = [f for f in files if f.endswith('.yaml')]
-
-#    yield files_by_ext
     for ext, files in files_by_ext.iteritems():
         yield '{ext}: {count}'.format(ext=(ext or 'no extension'), count=len(files))
-        if len(files) < 10:    # <- an arbitrary threshold for marginal formats
+        if long or len(files) < 10:    # <- an arbitrary threshold for marginal formats
             for f in files:
-                yield '    {0}'.format(f)
+                yield u'    {0}'.format(f)
 
 
 @argh.named('concerns')
