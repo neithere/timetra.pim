@@ -137,6 +137,15 @@ class Concern(Model):
                 return True
         return self._check_has_plan(Plan.STATUS_WAITING)
 
+    def is_frozen(self):
+        "Returns `True` if concern is frozen and not (yet) revived."
+        if not self.frozen:
+            return False
+        if self.revive and (
+            utils.to_date(self.revive) <= datetime.date.today()):
+            return False
+        return True
+
     def sorted_plans(self):
         if not self.plan:
             return []

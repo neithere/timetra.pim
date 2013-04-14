@@ -32,15 +32,6 @@ def indent(text):
     return prepend(text, ' ')
 
 
-def is_concern_frozen(concern):
-    if not concern.frozen:
-        return False
-    if concern.revive and (
-        utils.to_date(concern.revive) <= datetime.date.today()):
-        return False
-    return True
-
-
 def concerns(warm=False, acute=False, listing=False, fullnames=False):
     """ Displays a list of active risks and needs.
     """
@@ -60,7 +51,7 @@ def concerns(warm=False, acute=False, listing=False, fullnames=False):
     for item in items:
         if acute and not item.acute:
             continue
-        if warm and is_concern_frozen(item):
+        if warm and item.is_frozen():
             continue
         text = item.risk or item.need
 #        if item.acute:
@@ -129,7 +120,7 @@ def someday(fullnames=False):
 
     concerns = finder.get_concerns()
     for concern in concerns:
-        if concern.closed or not is_concern_frozen(concern):
+        if concern.closed or not concern.is_frozen():
             continue
 
         text = concern.risk or concern.need
@@ -170,7 +161,7 @@ def waiting(contact=None):
     items = finder.get_concerns()
     plans = []
     for item in items:
-        if item.closed or is_concern_frozen(item):
+        if item.closed or item.is_frozen():
             continue
         for plan in item.plan:
             if plan.delegated and not plan.closed:

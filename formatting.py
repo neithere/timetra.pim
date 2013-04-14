@@ -114,7 +114,7 @@ def format_concern(concern):
 
     if concern.closed:
         state = STATE_SOLVED
-    elif concern.frozen:
+    elif concern.is_frozen():
         state = STATE_FROZEN
     elif concern.acute:
         state = STATE_ACUTE
