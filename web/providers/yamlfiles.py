@@ -6,7 +6,7 @@ import os
 import yaml
 
 from .base import BaseDataProvider
-from .base.models import Item, Document
+from models import Concern as Item, Document
 from . import utils
 
 from settings import get_app_conf

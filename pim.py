@@ -10,7 +10,6 @@ import monk.validation
 from settings import get_app_conf
 import settings
 import caching
-import cli
 from finder import CATEGORIES
 import finder
 import formatting
@@ -121,16 +120,22 @@ def edit(category, pattern):
     subprocess.Popen([editor, path]).wait()
 
 
+@argh.named('serve')
+def web_serve(port=6061):
+    import web
+    app = web.make_app()
+    app.run(port=port)
+
+
 if __name__ == '__main__':
     parser = argh.ArghParser()
     parser.add_commands([
         show,
         edit,
-        # these should be reorganized:
-        cli.serve,
     ])
     parser.add_commands(processing.commands, namespace='process')
     parser.add_commands(reports.commands, namespace='report')
     parser.add_commands(caching.commands, namespace='cache')
     parser.add_commands(stats.commands, namespace='stat')
+    parser.add_commands([web_serve], namespace='web')
     parser.dispatch()

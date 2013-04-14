@@ -3,7 +3,7 @@ import os
 from rdflib import Graph, Namespace, RDF, RDFS, URIRef
 
 from .base import BaseDataProvider
-from .base.models import Document
+from models import Document
 
 from settings import get_app_conf
 

@@ -8,7 +8,7 @@ import docutils.core
 import yaml
 
 from .base import BaseDataProvider
-from .base.models import Item, Plan, Document
+from models import Concern as Item, Plan, Document
 
 from settings import get_app_conf
 
