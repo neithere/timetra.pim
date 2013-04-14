@@ -3,18 +3,16 @@
 
 '''
 test
-Andy Mikhaylenko, 2012-07-01
+Andy Mikhaylenko, 2012-07-01 and 2013-04-14
 
 Based on a table navigator example by Ian Ward
 http://mail-archive.com/urwid@lists.excess.org/msg00897.html
 '''
+# 3rd-party
 import urwid
 
-from providers import DataProvidersManager
-from providers import yamlfiles
-from providers import rstfiles
-
-import conf
+# this app
+import finder
 
 
 def curses_app(col_names, elems):
@@ -54,12 +52,7 @@ def curses_app(col_names, elems):
 
 
 if __name__ == '__main__':
-    yaml_provider = yamlfiles.YAMLFilesProvider(conf.SOURCE_YAML_ROOT)
-    rst_provider = rstfiles.ReStructuredTextFilesProvider(conf.SOURCE_RST_ROOT)
-    data_providers = DataProvidersManager([yaml_provider, rst_provider])
-    items = data_providers.get_items()
-
-    items = (x for x in items if (x.risk or x.need) and not x.closed)
+    items = finder.get_concerns()
 
     #col_names = u'Type', u'Name', u'Opened'
     col_names = u'Name', u'Opened'
