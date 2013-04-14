@@ -124,7 +124,7 @@ def format_concern(concern):
     wrapper = colors[state]
     yield wrapper(u'    [{0}] {1}'.format(state, t.bold(name)))
 
-    if concern.closed:
+    if concern.closed or concern.is_frozen():
         return
 
     if concern.reqs:
