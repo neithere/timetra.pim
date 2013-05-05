@@ -8,6 +8,12 @@ import formatting
 import utils
 
 
+def _ucfirst(string):
+    if not string:
+        return string    # None or empty string
+    return string[0].upper() + string[1:]
+
+
 def _crop(string, width=40):
     if len(string) > width * 2:
         string = u'{0}…'.format(string[:width * 2 - 1])
@@ -53,7 +59,7 @@ def concerns(warm=False, acute=False, listing=False, fullnames=False):
             continue
         if warm and item.is_frozen():
             continue
-        text = item.risk or item.need
+        text = _ucfirst(item.risk or item.need)
 #        if item.acute:
 #            text = formatting.t.bold(text)
 #        if item.risk:
@@ -74,9 +80,9 @@ def concerns(warm=False, acute=False, listing=False, fullnames=False):
         for plan in item.plan:
             if not plan.closed:
                 if plan.delegated:
-                    _text = u'@{0}: {1}'.format(plan.delegated, plan.action)
+                    _text = u'@{0}: {1}'.format(plan.delegated, _ucfirst(plan.action))
                 else:
-                    _text = plan.action
+                    _text = _ucfirst(plan.action)
                 if listing:
                     next_action = _text
                 else:
