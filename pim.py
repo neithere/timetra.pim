@@ -5,7 +5,7 @@ import os
 import subprocess
 
 import argh
-import monk.validation
+import monk.errors
 
 from settings import get_app_conf
 import settings
@@ -21,7 +21,7 @@ import stats
 
 
 nice_errors = argh.wrap_errors(
-    [monk.validation.ValidationError, TypeError, finder.PathDoesNotExist],
+    [monk.errors.ValidationError, TypeError, finder.PathDoesNotExist],
     processor=formatting.format_error)
 
 

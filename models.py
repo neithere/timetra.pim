@@ -3,7 +3,7 @@
 import datetime
 
 from monk import manipulation, modeling
-from monk.validation import optional
+from monk.schema import optional
 
 import utils   # for Concern.sorted_plans
 

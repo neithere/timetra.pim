@@ -6,7 +6,7 @@ PIM application configuration
 import os
 import xdg.BaseDirectory
 from monk.modeling import DotExpandedDict
-from monk.validation import optional
+from monk.schema import optional
 
 import caching
 

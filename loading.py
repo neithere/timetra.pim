@@ -1,6 +1,7 @@
 # coding: utf-8
 
-from monk.validation import validate_structure, ValidationError
+from monk.validation import validate
+from monk.errors import ValidationError
 from monk.modeling import DotExpandedDict
 import yaml
 
@@ -41,8 +42,8 @@ def load_card(path, model):
         card.concerns = [models.Concern(**x) for x in card.concerns]
 
     try:
-        validate_structure(model, card)
+        validate(model, card)
     except (ValidationError, TypeError) as e:
-        raise type(e)('{path}: {e}'.format(path=path.decode('utf-8'), e=e))
+        raise type(e)('{path}: {e}'.format(path=path.encode('utf-8'), e=e))
 
     return card
