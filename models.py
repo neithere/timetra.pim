@@ -29,7 +29,7 @@ class Log(Model):
     """
     structure = dict(
         time = datetime.datetime,
-        note = unicode,
+        note = optional(unicode),
         data = dict,
     )
 
@@ -45,17 +45,17 @@ class Plan(Model):
     structure = dict(
         action = unicode,
         status = STATUS_TODO,
-        repeat = unicode,
-        effort = unicode,
-        context = [unicode],
-        srcmeta = dict,
-        delegated = unicode,
-        log = [Log.structure],
-        opened = datetime.datetime,
-        closed = datetime.datetime,
-        result = unicode,  # комментарий о результате выполнения действия: грабли, особенности, ...
-        reqs = [unicode],    # требования (напр., какие документы нужно принести и т.д.)
-        time = datetime.datetime,
+        repeat = optional(unicode),
+        effort = optional(unicode),
+        context = optional([unicode]),
+        srcmeta = optional(dict),
+        delegated = optional(unicode),
+        log = optional([Log.structure]),
+        opened = optional(datetime.datetime),
+        closed = optional(datetime.datetime),
+        result = optional(unicode),  # комментарий о результате выполнения действия: грабли, особенности, ...
+        reqs = optional([unicode]),    # требования (напр., какие документы нужно принести и т.д.)
+        time = optional(datetime.datetime),
     )
 
     def __init__(self, **kwargs):
@@ -76,28 +76,28 @@ class Concern(Model):
     """ An item containing observation, problem definition, goal and plan.
     """
     structure = dict(
-        note = unicode,
-        risk = unicode,
-        need = unicode,
-        haze = unicode,  # неясность; вопросы, требующие прояснения. mess, uncertainty
-        plan = [Plan.structure],
-        date = datetime.date,
-        cost = dict(
+        note = optional(unicode),
+        risk = optional(unicode),
+        need = optional(unicode),
+        haze = optional(unicode),  # неясность; вопросы, требующие прояснения. mess, uncertainty
+        plan = optional([Plan.structure]),
+        date = optional(datetime.date),
+        cost = optional(dict(
             amount = float,
             currency = unicode,
-        ),
-        stakeholders = [unicode],
-        project = unicode,
+        )),
+        stakeholders = optional([unicode]),
+        project = optional(unicode),
         acute = False,
-        opened = datetime.datetime,
-        closed = datetime.datetime,
+        opened = optional(datetime.datetime),
+        closed = optional(datetime.datetime),
         solved = False,
-        frozen = datetime.datetime,  # if not None, it's someday/maybe
-        revive = datetime.date,      # if set, the concern is not considered frozen anymore since given date
-        reqs = [unicode],            # list of items that block this one
+        frozen = optional(datetime.datetime),  # if not None, it's someday/maybe
+        revive = optional(datetime.date),      # if set, the concern is not considered frozen anymore since given date
+        reqs = optional([unicode]),            # list of items that block this one
         # TODO:
         # * проблема/потребность со временем: не меняется / усугубляется / ослабевает
-        log = [Log.structure]
+        log = optional([Log.structure])
     )
 
     def __init__(self, **kwargs):
