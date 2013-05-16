@@ -3,7 +3,7 @@
 import datetime
 
 from monk import manipulation, modeling
-from monk.schema import optional
+from monk.schema import optional, Rule
 
 import utils   # for Concern.sorted_plans
 
@@ -34,6 +34,15 @@ class Log(Model):
     )
 
 
+REFERENCED_ITEM = Rule(list, inner_spec=unicode)
+REFERENCED_ITEMS = {
+    'assets': optional(REFERENCED_ITEM),
+    'contacts': optional(REFERENCED_ITEM),
+    'projects': optional(REFERENCED_ITEM),
+    'reference': optional(REFERENCED_ITEM),
+}
+
+
 class Plan(Model):
     """ A planned activity.
     """
@@ -45,6 +54,7 @@ class Plan(Model):
     structure = dict(
         action = unicode,
         status = STATUS_TODO,
+        refers = optional(REFERENCED_ITEMS),
         repeat = optional(unicode),
         effort = optional(unicode),
         context = optional([unicode]),
@@ -94,6 +104,7 @@ class Concern(Model):
         solved = False,
         frozen = optional(datetime.datetime),  # if not None, it's someday/maybe
         revive = optional(datetime.date),      # if set, the concern is not considered frozen anymore since given date
+        refers = optional(REFERENCED_ITEMS),
         reqs = optional([unicode]),            # list of items that block this one
         # TODO:
         # * проблема/потребность со временем: не меняется / усугубляется / ослабевает
