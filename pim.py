@@ -28,7 +28,12 @@ nice_errors = argh.wrap_errors(
 @argh.arg('category', choices=list(CATEGORIES) + ['config'])
 @argh.arg('pattern', nargs='?', default='')
 @nice_errors
-def show(category, pattern, count=False, detailed=False):
+def show(category, pattern, count=False, detailed=False, full=False):
+    # NOTE: --detailed shows *everything* including nested fields like concerns
+    # (and they look horrible), while --full is passed down to the formatter to
+    # print a more complete version of a long field, however some fields may be
+    # hidden with --full.  Yes, this is confusing.  Yes, it needs refactoring.
+
     if category == 'config':
         for line in showconfig():
             yield line
@@ -40,12 +45,12 @@ def show(category, pattern, count=False, detailed=False):
     model = CATEGORIES[category]['model']
     sigil = CATEGORIES[category]['sigil']
     for line in _show_items(category, model, sigil, pattern,
-                            count=count, detailed=detailed):
+                            count=count, detailed=detailed, full=full):
         yield line
 
 
 
-def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
+def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False, full=False):
     assert '..' not in pattern, 'look at you, hacker!'
     assert not pattern.startswith('/'), 'look at you, hacker!'
 
@@ -65,7 +70,7 @@ def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False):
         file_path, card_loader = detail
         try:
             card = card_loader()
-            for line in formatting.format_card(file_path, card, model,
+            for line in formatting.format_card(file_path, card, model, full=full,
                                                hide_long_fields = not detailed):
                 yield line
         except Exception as e:

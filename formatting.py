@@ -79,7 +79,7 @@ def format_slug(root_dir, file_path, nocolour=False):
     return os.path.join(path_repr, colour(slug))
 
 
-def format_card(label, card, model, hide_long_fields=True):
+def format_card(label, card, model, hide_long_fields=True, full=False):
     skip = POSSIBLY_TOO_LONG_FIELDS if hide_long_fields else []
     for line in format_struct(card, skip=skip):
         yield line
@@ -90,7 +90,7 @@ def format_card(label, card, model, hide_long_fields=True):
     if concerns:
         yield ''
         for concern in concerns:
-            for line in format_concern(concern):
+            for line in format_concern(concern, full=full):
                 yield line
             yield ''
 
@@ -109,7 +109,7 @@ colors = {
     STATE_CANCELLED: t.blue,
 }
 
-def format_concern(concern):
+def format_concern(concern, full=False):
     name = concern.risk or concern.need or concern.note
 
     if concern.closed:
@@ -136,10 +136,10 @@ def format_concern(concern):
                 category = category,
                 items = ', '.join(concern.refers[category])))
     for plan in concern.plan:
-        yield format_plan(plan, indent=8*' ', concern_state=state)
+        yield format_plan(plan, indent=8*' ', concern_state=state, full=full)
 
 
-def format_plan(plan, concern_state=' ', indent=''):
+def format_plan(plan, concern_state=' ', indent='', full=False):
     # the logic here should be more complex, involving status field
     # concern itself also may not have "closed" but solved=True
     # here we just make sure 80% of cases work fine
@@ -154,7 +154,7 @@ def format_plan(plan, concern_state=' ', indent=''):
     wrapper = colors[STATE_SOLVED if concern_state == STATE_SOLVED else state]
     #pwrapper = formatting.t.green if pstate == 'x' else formatting.t.yellow
     name = plan.action or '?'
-    if '\n' in name:
+    if not full and '\n' in name:
         name = name.strip().partition('\n')[0] + u' [...]'
     name = '\n'.join(textwrap.wrap(
         name, initial_indent='', subsequent_indent=indent+'    '))
