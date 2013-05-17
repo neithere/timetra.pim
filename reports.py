@@ -142,7 +142,7 @@ def someday(fullnames=False):
     return table
 
 
-def plans(need_mask=None, plan_mask=None, context=None, fullnames=False):
+def plans(need_mask=None, plan_mask=None, context=None, fullnames=False, active_only=False):
     """ Displays plans for the need that matches given mask.
     """
     items = finder.get_concerns()
@@ -154,6 +154,9 @@ def plans(need_mask=None, plan_mask=None, context=None, fullnames=False):
             need_matches = item.need and need_mask in item.need.lower()
             if not risk_matches and not need_matches:
                 continue
+
+        if active_only and (item.closed or item.is_frozen()):
+            continue
 
         # FIXME problem: this should only show plans for given context but it
         # displays the whole concern with all plans because of the way
