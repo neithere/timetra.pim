@@ -130,7 +130,7 @@ def format_concern(concern, full=False):
     if concern.reqs:
         for req in concern.reqs:
             yield wrapper(u'    ---> сначала: {0}'.format(req))
-    if concern.refers:
+    if concern.get('refers'):
         for i, category in enumerate(concern.refers):
             yield wrapper(u'        re {category}: {items}'.format(
                 category = category,
