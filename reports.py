@@ -142,21 +142,32 @@ def someday(fullnames=False):
     return table
 
 
-def plans(need_mask=None, context=None, fullnames=False):  #, plan_mask=None):
+def plans(need_mask=None, plan_mask=None, context=None, fullnames=False):
     """ Displays plans for the need that matches given mask.
     """
     items = finder.get_concerns()
-    mask = need_mask.decode('utf-8').lower() if need_mask else u''
+    need_mask = need_mask.decode('utf-8').lower() if need_mask else u''
+    plan_mask = plan_mask.decode('utf-8').lower() if plan_mask else u''
     for item in items:
-        if mask:
-            risk_matches = item.risk and mask in item.risk.lower()
-            need_matches = item.need and mask in item.need.lower()
+        if need_mask:
+            risk_matches = item.risk and need_mask in item.risk.lower()
+            need_matches = item.need and need_mask in item.need.lower()
             if not risk_matches and not need_matches:
                 continue
 
         # FIXME problem: this should only show plans for given context but it
         # displays the whole concern with all plans because of the way
         # formatting is done below
+
+        if plan_mask:
+            matched = False
+            for plan in item.plan:
+                if plan_mask in plan.action:
+                    matched = True
+                    break
+            if not matched:
+                continue
+
         if context:
             matched = False
             for plan in item.plan:
