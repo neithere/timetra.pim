@@ -158,19 +158,25 @@ def format_plan(plan, concern_state=' ', indent='', full=False):
         name = name.strip().partition('\n')[0] + u' [...]'
     name = '\n'.join(textwrap.wrap(
         name, initial_indent='', subsequent_indent=indent+'    '))
+
     if plan.get('delegated'):
         waiting = utils.formatdelta.render_delta(
             plan['opened'],
             plan['closed'] or datetime.datetime.utcnow())
         name = u'@{0}: {1} (ожидание {2})'.format(plan['delegated'], name, waiting)
-    if plan.get('reqs'):
-        name = u'{0}\n{1}    ! иметь: {2}'.format(name, indent, ', '.join(plan['reqs']))
-    if plan.get('refers'):
-        refers = []
-        for i, category in enumerate(plan.refers):
-            refers.append(wrapper(u're {category}: {items}'.format(
-                category = category,
-                items = ', '.join(plan.refers[category]))))
-        lines = (u'{0}    {1}'.format(indent, x) for x in refers)
-        name = u'{0}\n{1}'.format(name, '\n'.join(lines))
+
+    if full:
+        if plan.get('reqs'):
+            name = u'{0}\n{1}    ! иметь: {2}'.format(name, indent, ', '.join(plan['reqs']))
+        if plan.get('context'):
+            name = u'{0}\n{1}    актуально: {2}'.format(name, indent, ', '.join(plan['context']))
+        if plan.get('refers'):
+            refers = []
+            for i, category in enumerate(plan.refers):
+                refers.append(wrapper(u're {category}: {items}'.format(
+                    category = category,
+                    items = ', '.join(plan.refers[category]))))
+            lines = (u'{0}    {1}'.format(indent, x) for x in refers)
+            name = u'{0}\n{1}'.format(name, '\n'.join(lines))
+
     return wrapper(u'{0}[{1}] {2}'.format(indent, state, name))
