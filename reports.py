@@ -142,7 +142,7 @@ def someday(fullnames=False):
     return table
 
 
-def plans(need_mask=None, plan_mask=None, context=None, fullnames=False, active_only=False):
+def plans(need_mask=None, plan_mask=None, context=None, fullnames=False, active_only=False, full=False):
     """ Displays plans for the need that matches given mask.
     """
     items = finder.get_concerns()
@@ -185,7 +185,7 @@ def plans(need_mask=None, plan_mask=None, context=None, fullnames=False, active_
         else:
             yield item.context
 
-        for line in formatting.format_concern(item):
+        for line in formatting.format_concern(item, full=full):
             yield line
         yield ''
 
