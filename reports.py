@@ -1,6 +1,7 @@
 # coding: utf-8
 import datetime
 
+import argh
 from prettytable import PrettyTable
 
 import finder
@@ -142,7 +143,9 @@ def someday(fullnames=False):
     return table
 
 
-def plans(need_mask=None, plan_mask=None, context=None, fullnames=False, active_only=False, full=False):
+@argh.arg('-C', '--exclude-context')
+def plans(need_mask=None, plan_mask=None, context=None, exclude_context=None,
+          fullnames=False, active_only=False, full=False):
     """ Displays plans for the need that matches given mask.
     """
     items = finder.get_concerns()
@@ -163,6 +166,7 @@ def plans(need_mask=None, plan_mask=None, context=None, fullnames=False, active_
         # formatting is done below
 
         if plan_mask:
+            # match → take
             matched = False
             for plan in item.plan:
                 if plan_mask in plan.action:
@@ -172,12 +176,23 @@ def plans(need_mask=None, plan_mask=None, context=None, fullnames=False, active_
                 continue
 
         if context:
+            # match → take
             matched = False
             for plan in item.plan:
                 if plan.context and context in plan.context:
                     matched = True
                     break
             if not matched:
+                continue
+
+        if exclude_context:
+            # match → skip
+            matched = False
+            for plan in item.plan:
+                if plan.context and exclude_context in plan.context:
+                    matched = True
+                    break
+            if matched:
                 continue
 
         if fullnames:
