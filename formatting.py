@@ -168,8 +168,10 @@ def format_plan(plan, concern_state=' ', indent='', full=False):
     if full:
         if plan.get('reqs'):
             name = u'{0}\n{1}    ! иметь: {2}'.format(name, indent, ', '.join(plan['reqs']))
+
         if plan.get('context'):
-            name = u'{0}\n{1}    актуально: {2}'.format(name, indent, ', '.join(plan['context']))
+            name = u'{0}\n{1}    when&where: {2}'.format(name, indent, ', '.join(plan['context']))
+
         if plan.get('refers'):
             refers = []
             for i, category in enumerate(plan.refers):
@@ -178,7 +180,17 @@ def format_plan(plan, concern_state=' ', indent='', full=False):
                     items = ', '.join(plan.refers[category]))))
             lines = (u'{0}    {1}'.format(indent, x) for x in refers)
             name = u'{0}\n{1}'.format(name, '\n'.join(lines))
+
         if plan.get('result'):
-            name = u'{0}\n{1}    результат: {2}'.format(name, indent, plan['result'])
+
+            result = plan['result']
+            if '\n' in result:
+                lines = (u'{0}      {1}'.format(indent, line)
+                        for line in result.split('\n') )#if line)
+                result = '\n' + '\n'.join(lines)
+            name = u'{0}\n{1}    result: {2}'.format(name, indent, result)
+
+    if not full and plan.get('result'):
+        name = u'{0} [→ …]'.format(name)
 
     return wrapper(u'{0}[{1}] {2}'.format(indent, state, name))
