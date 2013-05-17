@@ -178,5 +178,7 @@ def format_plan(plan, concern_state=' ', indent='', full=False):
                     items = ', '.join(plan.refers[category]))))
             lines = (u'{0}    {1}'.format(indent, x) for x in refers)
             name = u'{0}\n{1}'.format(name, '\n'.join(lines))
+        if plan.get('result'):
+            name = u'{0}\n{1}    результат: {2}'.format(name, indent, plan['result'])
 
     return wrapper(u'{0}[{1}] {2}'.format(indent, state, name))
