@@ -45,21 +45,27 @@ def stat_files(long=False):
 
 @argh.named('concerns')
 def stat_concerns():
-    concerns_open_cnt = 0
     concerns_total_cnt = 0
-    plans_open_cnt = 0
+    concerns_active_cnt = 0
+    concerns_frozen_cnt = 0
     plans_total_cnt = 0
+    plans_active_cnt = 0
+    plans_frozen_cnt = 0
     for concern in finder.get_concerns(include_closed=True):
         concerns_total_cnt += 1
         plans_total_cnt += len(concern.plan or [])
         if not concern.closed:
-            concerns_open_cnt += 1
-            plans_open_cnt += len(concern.plan or [])
+            if concern.is_frozen():
+                concerns_frozen_cnt += 1
+                plans_frozen_cnt += len(concern.plan or [])
+            else:
+                concerns_active_cnt += 1
+                plans_active_cnt += len(concern.plan or [])
 
     table = PrettyTable()
-    table.field_names = ['type', 'total', 'open']
-    table.add_row(['concerns', concerns_total_cnt, concerns_open_cnt])
-    table.add_row(['plans', plans_total_cnt, plans_open_cnt])
+    table.field_names = ['type', 'total', 'active', 'frozen']
+    table.add_row(['concerns', concerns_total_cnt, concerns_active_cnt, concerns_frozen_cnt])
+    table.add_row(['plans', plans_total_cnt, plans_active_cnt, plans_frozen_cnt])
     return table
 
 
