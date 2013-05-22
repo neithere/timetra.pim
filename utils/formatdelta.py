@@ -30,7 +30,12 @@ def format_delta_part(part):
     return u'{value} {label}'.format(label=label, value=part.value)
 
 
-def render_delta(dt1, dt2, stack_depth=2):
+def render_delta(dt1, dt2=None, stack_depth=2):
+    if not dt2:
+        dt2 = datetime.utcnow()
+        if dt2 < dt1:
+            dt1, dt2 = dt2, dt1
+
     dt1 = to_datetime(dt1)
     dt2 = to_datetime(dt2)
 

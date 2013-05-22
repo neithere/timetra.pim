@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-import datetime
 import os
 import textwrap
 
 from blessings import Terminal
 
 from settings import get_app_conf
-import utils.formatdelta
+from utils.formatdelta import render_delta
 
 
 POSSIBLY_TOO_LONG_FIELDS = ['concerns', 'note']
@@ -160,17 +159,19 @@ def format_plan(plan, concern_state=' ', indent='', full=False):
         name, initial_indent='', subsequent_indent=indent+'    '))
 
     if plan.get('delegated'):
-        waiting = utils.formatdelta.render_delta(
-            plan['opened'],
-            plan['closed'] or datetime.datetime.utcnow())
-        name = u'@{0}: {1} (ожидание {2})'.format(plan['delegated'], name, waiting)
+        waiting = render_delta(plan.opened, plan.closed)
+        name = u'@{0}: {1} (ожидание {2})'.format(plan.delegated, name, waiting)
 
     if full:
+        if plan.get('time'):
+            name = u'{0}\n{1}    {2} UTC ({3})'.format(name, indent, plan.time,
+                                                       render_delta(plan.time))
+
         if plan.get('reqs'):
-            name = u'{0}\n{1}    ! иметь: {2}'.format(name, indent, ', '.join(plan['reqs']))
+            name = u'{0}\n{1}    ! иметь: {2}'.format(name, indent, ', '.join(plan.reqs))
 
         if plan.get('context'):
-            name = u'{0}\n{1}    when&where: {2}'.format(name, indent, ', '.join(plan['context']))
+            name = u'{0}\n{1}    when&where: {2}'.format(name, indent, ', '.join(plan.context))
 
         if plan.get('refers'):
             refers = []
@@ -183,7 +184,7 @@ def format_plan(plan, concern_state=' ', indent='', full=False):
 
         if plan.get('result'):
 
-            result = plan['result']
+            result = plan.result
             if '\n' in result:
                 lines = (u'{0}      {1}'.format(indent, line)
                         for line in result.split('\n') )#if line)
