@@ -349,6 +349,46 @@ def done(days=7, fullnames=False):
     return table
 
 
+def events(no_upcoming=False, no_overdue=False, fullnames=False, full=False):
+    """ Displays plans with a fixed date/time.
+    """
+    now = datetime.datetime.utcnow()
+
+    table = PrettyTable()
+    table.field_names = ['type', 'delta', 'action', 'concern', 'context']
+    table.align = 'l'
+
+    concerns = finder.get_concerns()
+    for concern in concerns:
+        for plan in concern.plan:
+            if not plan.time:
+                continue
+
+            if no_overdue and plan.time < now:
+                continue
+
+            if no_upcoming and now < plan.time:
+                continue
+
+            kind = 'overdue' if plan.time < now else 'future'
+            table.add_row([kind, utils.formatdelta.render_delta(plan.time), plan.action,
+                           concern.risk or concern.need,
+                           concern.context])
+
+    if table._rows:
+        return table
+
+
+def upcoming():
+    "Displays plans with a fixed future date/time."
+    return events(no_overdue=True)
+
+
+def overdue():
+    "Displays plans with a fixed past date/time."
+    return events(no_upcoming=True)
+
+
 commands = [
     concerns,
     someday,
@@ -357,4 +397,8 @@ commands = [
     addressed,
     solved,
     done,
+
+    events,
+    upcoming,
+    overdue
 ]
