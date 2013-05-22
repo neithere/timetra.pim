@@ -37,11 +37,12 @@ def load_card(path, model):
         return
 
     card = DotExpandedDict(card)
-    # XXX HACK
-    if 'concerns' in card:
-        card.concerns = [models.Concern(**x) for x in card.concerns]
 
     try:
+        # XXX HACK
+        if 'concerns' in card:
+            card.concerns = [models.Concern(**x) for x in card.concerns]
+
         validate(model, card)
     except (ValidationError, TypeError) as e:
         raise type(e)('{path}: {e}'.format(path=path.encode('utf-8'), e=e))
