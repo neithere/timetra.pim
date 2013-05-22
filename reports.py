@@ -39,9 +39,13 @@ def indent(text):
     return prepend(text, ' ')
 
 
-def concerns(warm=False, acute=False, listing=False, fullnames=False):
+def concerns(frozen_only=False, warm_only=False, acute=False, listing=False,
+             fullnames=False):
     """ Displays a list of active risks and needs.
     """
+    if frozen_only and warm_only:
+        raise RuntimeError('cannot combine --frozen-only and --warm-only')
+
     table = PrettyTable()
 
     table.field_names = ['context', 'subject', 'plans', 'next action']
@@ -58,7 +62,9 @@ def concerns(warm=False, acute=False, listing=False, fullnames=False):
     for item in items:
         if acute and not item.acute:
             continue
-        if warm and item.is_frozen():
+        if frozen_only and not item.is_frozen():
+            continue
+        if warm_only and item.is_frozen():
             continue
         text = _ucfirst(item.risk or item.need)
 #        if item.acute:
