@@ -108,4 +108,34 @@ def stat_concerns():
     yield 'ttc = avg time to close (how long does it take to close an item)'
 
 
-commands = [ stat_files, stat_concerns ]
+@argh.named('assets')
+def stat_assets():
+    return get_state_aggregate('assets')
+
+
+@argh.named('projects')
+def stat_projects():
+    return get_state_aggregate('projects')
+
+
+def get_state_aggregate(category):
+    conf = get_app_conf()
+    root = '{0}/{1}'.format(conf.index, category)
+    detail, index, guessed_path = finder.find_items(root, finder.CATEGORIES[category], '')
+    states = {}
+    for path, loader in index:
+        item = loader()
+        states[item.state] = states.get(item.state, []) + [path]
+    state_table = PrettyTable()
+    state_table.field_names = ['state', 'count']
+    state_table.align = 'l'
+    for key, value in states.items():
+        # show number of multiple entries or path to a single entry with this value
+        if len(value) == 1:
+            state_table.add_row([key, value[0]])
+        else:
+            state_table.add_row([key, len(value)])
+    return state_table
+
+
+commands = [ stat_files, stat_concerns, stat_assets, stat_projects ]
