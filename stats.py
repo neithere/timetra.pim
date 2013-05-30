@@ -55,8 +55,10 @@ def stat_concerns():
 
     concerns_ttls = []
     concerns_ttls_closed = []
+    concerns_time_to_freeze = []
     plans_ttls = []
     plans_ttls_closed = []
+    plans_time_to_freeze = []
 
     for concern in finder.get_concerns(include_closed=True):
         concerns_total_cnt += 1
@@ -71,10 +73,9 @@ def stat_concerns():
         if not concern.closed:
             if concern.is_frozen():
                 concerns_frozen_cnt += 1
-                plans_frozen_cnt += len(concern.plan or [])
+                concerns_time_to_freeze.append(concern.frozen - concern.opened)
             else:
                 concerns_active_cnt += 1
-                plans_active_cnt += len(concern.plan or [])
 
         if concern.plan:
             for plan in concern.plan:
@@ -83,6 +84,12 @@ def stat_concerns():
                     plans_ttls.append(ttl)
                     if plan.closed:
                         plans_ttls_closed.append(ttl)
+                    else:
+                        if concern.frozen:
+                            plans_frozen_cnt += 1
+                            plans_time_to_freeze.append(concern.frozen - plan.opened)
+                        else:
+                            plans_active_cnt += 1
 
     def format_ttl(deltas):
         if not deltas:
@@ -91,21 +98,26 @@ def stat_concerns():
         return '{0} days'.format(avg)
 
     concerns_avg_ttl = format_ttl(concerns_ttls)
+    concerns_avg_time_to_freeze = format_ttl(concerns_time_to_freeze)
     plans_avg_ttl = format_ttl(plans_ttls)
     concerns_avg_ttl_closed = format_ttl(concerns_ttls_closed)
     plans_avg_ttl_closed = format_ttl(plans_ttls_closed)
+    plans_avg_time_to_freeze = format_ttl(plans_time_to_freeze)
 
     table = PrettyTable()
-    table.field_names = ['type', 'total', 'active', 'frozen', 'ttl', 'ttc']
+    table.field_names = ['type', 'total', 'active', 'frozen', 'ttl', 'ttc', 'ttf']
     table.add_row(['concerns', concerns_total_cnt, concerns_active_cnt,
-                   concerns_frozen_cnt, concerns_avg_ttl, concerns_avg_ttl_closed])
+                   concerns_frozen_cnt, concerns_avg_ttl, concerns_avg_ttl_closed,
+                   concerns_avg_time_to_freeze])
     table.add_row(['plans', plans_total_cnt, plans_active_cnt,
-                   plans_frozen_cnt, plans_avg_ttl, plans_avg_ttl_closed])
+                   plans_frozen_cnt, plans_avg_ttl, plans_avg_ttl_closed,
+                   plans_avg_time_to_freeze])
     yield table
     yield ''
     yield 'Legend:'
     yield 'ttl = avg time to live (item age, whether it is closed or not yet)'
     yield 'ttc = avg time to close (how long does it take to close an item)'
+    yield 'ttf = avg time to freeze (how long an item stays active until frozen)'
 
 
 @argh.named('assets')
