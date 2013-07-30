@@ -37,15 +37,14 @@ def load_card(path, model):
     if not card:
         return
 
+    # populate defaults
+    card = merge_defaults(model, card)
+
     card = DotExpandedDict(card)
 
     try:
         # XXX HACK
-        if 'concerns' in card:
-            card.concerns = [models.Concern(**x) for x in card.concerns]
-
-        # populate defaults
-        card = merge_defaults(model, card)
+        card.concerns = [models.Concern(**x) for x in card.get('concerns') or []]
 
         validate(model, card)
     except (ValidationError, TypeError) as e:

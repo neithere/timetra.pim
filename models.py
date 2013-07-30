@@ -43,10 +43,12 @@ plan_schema = dict(
     refers = optional(referenced_items_schema),
     repeat = optional(unicode),
     effort = optional(unicode),
-    context = optional([unicode]),
+    context = Rule(list, inner_spec=unicode, default=[u'anywhere']),
     srcmeta = optional(dict),
     delegated = optional(unicode),
-    log = optional([log_schema]),
+    log = optional([
+        optional(log_schema)
+    ]),
     opened = optional(datetime.datetime),
     closed = optional(datetime.datetime),
     result = optional(unicode),  # комментарий о результате выполнения действия: грабли, особенности, ...
@@ -60,7 +62,9 @@ concern_schema = dict(
     risk = optional(unicode),
     need = optional(unicode),
     haze = optional(unicode),  # неясность; вопросы, требующие прояснения. mess, uncertainty
-    plan = optional([plan_schema]),
+    plan = optional([
+        optional(plan_schema)
+    ]),
     date = optional(datetime.date),
     cost = optional(dict(
         amount = float,
@@ -78,7 +82,9 @@ concern_schema = dict(
     reqs = optional([unicode]),            # list of items that block this one
     # TODO:
     # * проблема/потребность со временем: не меняется / усугубляется / ослабевает
-    log = optional([log_schema])
+    log = optional([
+        optional(log_schema)
+    ]),
 )
 
 
@@ -96,7 +102,9 @@ contact_schema = {
     'first_contact': optional(datetime.date),
     'org': optional(unicode),
     'timetable': optional(unicode),
-    'concerns': optional([concern_schema]),
+    'concerns': optional([
+        optional(concern_schema)
+    ]),
 }
 
 
@@ -186,7 +194,9 @@ asset_schema = {
     'music': optional(dict),
     # Услуги
     'service': optional(dict),
-    'concerns': optional([concern_schema]),
+    'concerns': optional([
+        optional(concern_schema)
+    ]),
 }
 
 
@@ -196,7 +206,9 @@ project_schema = {
     'urls': optional([unicode]),
     'note': optional(unicode),
     'mail_label': optional([unicode]),
-    'concerns': optional([concern_schema]),
+    'concerns': optional([
+        optional(concern_schema)
+    ]),
     'stakeholders': optional(list),  # hashtags
     'categories': optional([unicode]),
 }
