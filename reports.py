@@ -40,7 +40,7 @@ def indent(text):
 
 
 def concerns(frozen_only=False, warm_only=False, acute=False, listing=False,
-             fullnames=False):
+             fullnames=False, calendar_included=False):
     """ Displays a list of active risks and needs.
     """
     if frozen_only and warm_only:
@@ -86,14 +86,27 @@ def concerns(frozen_only=False, warm_only=False, acute=False, listing=False,
         next_action = None
         for plan in item.plan:
             if not plan.closed:
+                _text = plan.action
+
                 if plan.delegated:
-                    _text = u'@{0}: {1}'.format(plan.delegated, _ucfirst(plan.action))
+                    _text = u'@{0}: {1}'.format(plan.delegated, _ucfirst(_text))
                 else:
-                    _text = _ucfirst(plan.action)
+                    _text = _ucfirst(_text)
+
+                if plan.time:
+                    if plan.time.date == datetime.date.today():
+                        _text = u'due TODAY: {0}'.format(_text)
+                    else:
+                        if calendar_included:
+                            _text = u'due {0}: {1}'.format(plan.time.strftime('%Y-%m-%d %H:%M UTC'), _text)
+                        else:
+                            continue
+
                 if listing:
                     next_action = _text
                 else:
                     next_action = _crop(_text, width=COLUMN_WIDTH_PLAN)
+
                 break
 
         if listing:
@@ -154,6 +167,8 @@ def plans(need_mask=None, plan_mask=None, context=None, exclude_context=None,
           fullnames=False, active_only=False, full=False):
     """ Displays plans for the need that matches given mask.
     """
+    contexts = context.split(',') if context else []
+    exclude_contexts = exclude_context.split(',') if exclude_context else []
     items = finder.get_concerns()
     need_mask = need_mask.decode('utf-8').lower() if need_mask else u''
     plan_mask = plan_mask.decode('utf-8').lower() if plan_mask else u''
@@ -181,21 +196,21 @@ def plans(need_mask=None, plan_mask=None, context=None, exclude_context=None,
             if not matched:
                 continue
 
-        if context:
+        if contexts:
             # match → take
             matched = False
             for plan in item.plan:
-                if plan.context and context in plan.context:
+                if plan.context and any(c in plan.context for c in contexts):
                     matched = True
                     break
             if not matched:
                 continue
 
-        if exclude_context:
+        if exclude_contexts:
             # match → skip
             matched = False
             for plan in item.plan:
-                if plan.context and exclude_context in plan.context:
+                if plan.context and any(c in plan.context for c in exclude_contexts):
                     matched = True
                     break
             if matched:
@@ -206,6 +221,7 @@ def plans(need_mask=None, plan_mask=None, context=None, exclude_context=None,
         else:
             yield item.context
 
+        # TODO: show only matching plans for concern
         for line in formatting.format_concern(item, full=full):
             yield line
         yield ''
@@ -361,6 +377,10 @@ def events(no_upcoming=False, no_overdue=False, fullnames=False, full=False):
     concerns = finder.get_concerns()
     for concern in concerns:
         for plan in concern.plan:
+
+            if plan.closed:
+                continue
+
             if not plan.time:
                 continue
 
@@ -371,7 +391,8 @@ def events(no_upcoming=False, no_overdue=False, fullnames=False, full=False):
                 continue
 
             kind = 'overdue' if plan.time < now else 'future'
-            table.add_row([kind, utils.formatdelta.render_delta(plan.time), plan.action,
+            table.add_row([kind, utils.formatdelta.render_delta(plan.time),
+                           _crop(plan.action),
                            concern.risk or concern.need,
                            concern.context])
 

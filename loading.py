@@ -3,6 +3,7 @@
 from monk.validation import validate
 from monk.errors import ValidationError
 from monk.modeling import DotExpandedDict
+from monk.manipulation import merged as merge_defaults
 import yaml
 
 import models
@@ -42,6 +43,9 @@ def load_card(path, model):
         # XXX HACK
         if 'concerns' in card:
             card.concerns = [models.Concern(**x) for x in card.concerns]
+
+        # populate defaults
+        card = merge_defaults(model, card)
 
         validate(model, card)
     except (ValidationError, TypeError) as e:

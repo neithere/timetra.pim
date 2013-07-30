@@ -32,6 +32,8 @@ def format_struct(data, skip=[]):
             for x in v[1:]:
                 yield _wrap_pair(' '*len(k), x, indent='')
         else:
+            if not v:
+                continue
             yield _wrap_pair(k, v)
 
 

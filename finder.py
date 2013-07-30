@@ -14,9 +14,9 @@ import loading
 
 
 CATEGORIES = {
-    'contacts': dict(model=models.CONTACT, sigil='@'),
-    'assets': dict(model=models.ASSET, sigil='$'),
-    'projects': dict(model=models.PROJECT, sigil='#'),
+    'contacts': dict(model=models.contact_schema, sigil='@'),
+    'assets': dict(model=models.asset_schema, sigil='$'),
+    'projects': dict(model=models.project_schema, sigil='#'),
     'reference': dict(model={}, sigil='?'),
 }
 
@@ -30,9 +30,11 @@ def guess_file_path(index_path, pattern):
     files = collect_files(index_path)
 
     first_dir_startswith = None
-    first_startswith = None
-    first_endswith = None
-    first_contains = None
+    first_slug_startswith = None
+    first_slug_endswith = None
+    first_slug_contains = None
+    first_path_endswith = None
+    first_path_contains = None
 
     # all tests below are case-insensitive
     pattern = pattern.lower()
@@ -41,6 +43,7 @@ def guess_file_path(index_path, pattern):
         directory, file_name = os.path.split(file_path)
         slug, _ = os.path.splitext(file_name)
         slug = loading.fix_str_to_unicode(slug).lower()
+        file_path_no_ext = os.path.splitext(file_path)[0]
 
         if slug == pattern:
             return file_path
@@ -53,19 +56,29 @@ def guess_file_path(index_path, pattern):
 
         # `bar` matches `/foo/bar-123.yaml`
         # (like above but prone to picking stuff from unexpected branches)
-        if not first_startswith and slug.startswith(pattern):
-            first_startswith = file_path
+        if not first_slug_startswith and slug.startswith(pattern):
+            first_slug_startswith = file_path
 
         # `quux` matches `/foo/bar-quux.yaml`
-        if not first_endswith and slug.endswith(pattern):
-            first_endswith = file_path
+        if not first_slug_endswith and slug.endswith(pattern):
+            first_slug_endswith = file_path
 
         # `bar` matches `/foo/embargo.yaml`
-        if not first_contains and pattern in slug:
-            first_contains = file_path
+        if not first_slug_contains and pattern in slug:
+            first_slug_contains = file_path
 
-    return (first_dir_startswith or first_startswith or first_endswith
-            or first_contains or None)
+        # `bar/quux` matches `/foo/bar/quux.yaml`
+        if not first_path_endswith and file_path_no_ext.endswith(pattern):
+            first_path_endswith = file_path
+
+        # `bar/quux` matches `/foo/bar/quux-123.yaml`
+        if not first_path_contains and not pattern.endswith('/') and pattern in file_path_no_ext:
+            first_path_contains = file_path
+
+
+    return (first_dir_startswith or first_slug_startswith or first_slug_endswith
+            or first_slug_contains or first_path_endswith or first_path_contains
+            or None)
 
 
 
@@ -95,10 +108,10 @@ def find_items(root_dir, model, pattern):
     file_exists = os.path.isfile(file_path)
 
     if not any([dir_exists, file_exists]):
-        file_path = guess_file_path(index_path, pattern)
-        if file_path:
+        guessed_path = guess_file_path(index_path, pattern)
+        if guessed_path:
             file_exists = True
-            guessed_path = file_path
+            file_path = guessed_path
         else:
             raise PathDoesNotExist(file_path)
 
@@ -135,10 +148,12 @@ def collect_concerns():
         combined = ([detail] if detail else []) + (index or [])
         for path, loader in combined:
             card = loader()
-            concerns = card.get('concerns', [])
+            assert card, path
+            concerns = card.get('concerns') or []
             for concern in concerns:
                 # HACK
                 concern.context_card = card
+
                 sigil = CATEGORIES[category]['sigil']
                 concern.context = sigil + formatting.format_slug(category, path,
                                                                  nocolour=True)

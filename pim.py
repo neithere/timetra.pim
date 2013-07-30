@@ -61,6 +61,10 @@ def _show_items(root_dir, model, sigil, pattern, count=False, detailed=False, fu
 
     detail, index, guessed_path = finder.find_items(root_dir, model, pattern)
 
+    if count:
+        yield 1 if detail else len(index)
+        return
+
     if guessed_path:
         # guessing may be confusing so we tell user what we've picked
         yield formatting.t.blue(u'guessed: {0}'.format(guessed_path))
