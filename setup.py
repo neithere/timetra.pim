@@ -25,6 +25,17 @@ import os
 
 from setuptools import setup, find_packages
 
+
+try:
+    from setuptools.command.easy_install import ScriptWriter
+except ImportError:
+    pass
+else:
+    # monkey-patch script writer template to enable bash completion
+    # in 'console_scripts' entries
+    ScriptWriter.template = '# PYTHON_ARGCOMPLETE_OK\n' + ScriptWriter.template
+
+
 with io.open(os.path.join(os.path.dirname(__file__), 'README'), encoding='ascii') as f:
     readme = f.read()
 
