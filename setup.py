@@ -54,6 +54,7 @@ setup(
     packages = find_packages(),
     #provides = ['timetra'],
     install_requires = [
+        'argh>=0.23.2',
         'blessings==1.5',
         'Flask==0.10.1',
         'monk==0.11.2',
