@@ -4,12 +4,12 @@ from __future__ import print_function
 import functools
 import os
 
-import models
-import settings
-import formatting
+from . import compat
+from . import models
+from . import settings
+from . import formatting
 #from flare import multikeysort
-import caching
-import loading
+from . import caching
 
 
 
@@ -42,7 +42,7 @@ def guess_file_path(index_path, pattern):
     for file_path in files:
         directory, file_name = os.path.split(file_path)
         slug, _ = os.path.splitext(file_name)
-        slug = loading.fix_str_to_unicode(slug).lower()
+        slug = compat.fix_strings_to_unicode(slug).lower()
         file_path_no_ext = os.path.splitext(file_path)[0]
 
         if slug == pattern:
@@ -95,7 +95,7 @@ def find_items(root_dir, model, pattern):
 
     conf = settings.get_app_conf()
 
-    pattern = loading.fix_str_to_unicode(pattern)
+    pattern = compat.fix_strings_to_unicode(pattern)
 
     index_path = os.path.join(conf.index, root_dir)
     if not os.path.exists(index_path):
@@ -137,7 +137,7 @@ def collect_files(path):
         for root, dirs, files in os.walk(path):
             for f in sorted(files):
                 if f.endswith('.yaml'):
-                    yield loading.fix_str_to_unicode(os.path.join(root, f))
+                    yield compat.fix_strings_to_unicode(os.path.join(root, f))
     return sorted(_walk())
 
 

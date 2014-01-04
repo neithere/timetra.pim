@@ -4,12 +4,17 @@ PIM application configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 import os
+import sys
 import xdg.BaseDirectory
 from monk.modeling import DotExpandedDict
 from monk.schema import optional
 
-import caching
+from . import caching
 
+
+PY3 = sys.version_info >= (3,)
+if PY3:
+    unicode = str
 
 APP_NAME = 'pim'
 

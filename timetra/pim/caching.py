@@ -5,7 +5,8 @@ import shelve
 
 import xdg.BaseDirectory
 
-import loading
+from . import compat
+from . import loading
 
 
 __all__ = ['get_cached_yaml_file']
@@ -29,8 +30,8 @@ atexit.register(lambda: cache.close())
 
 def get_cached_yaml_file(path, model):
     #results = tmpl_cache.get(key=search_param, createfunc=load_card)
-    time_key = u'changed:{0}'.format(path).encode('utf-8')
-    data_key = u'content:{0}'.format(path).encode('utf-8')
+    time_key = compat.encode(u'changed:{0}'.format(path))
+    data_key = compat.encode(u'content:{0}'.format(path))
     mtime_cache = cache.get(time_key)
     mtime_file = os.stat(path).st_mtime
     if mtime_cache == mtime_file:

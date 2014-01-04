@@ -5,7 +5,12 @@ import datetime
 from monk import manipulation, modeling, validators
 from monk.schema import Rule, one_of, optional
 
-import utils   # for Concern.sorted_plans
+from . import compat
+from . import utils   # for Concern.sorted_plans
+
+
+if compat.PY3:
+    unicode = str
 
 
 __all__ = ['Concern', 'contact_schema', 'asset_schema', 'project_schema']

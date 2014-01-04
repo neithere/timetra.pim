@@ -4,9 +4,9 @@ import datetime
 import argh
 from prettytable import PrettyTable
 
-import finder
-import formatting
-import utils
+from . import finder
+from . import formatting
+from . import utils
 
 
 def _ucfirst(string):

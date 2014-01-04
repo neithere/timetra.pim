@@ -7,17 +7,16 @@ import subprocess
 import argh
 import monk.errors
 
-from settings import get_app_conf
-import settings
-import caching
-from finder import CATEGORIES
-import finder
-import formatting
-import processing
-import reports
-import stats
-
-
+from .settings import get_app_conf
+from . import settings
+from . import caching
+from .finder import CATEGORIES
+from . import finder
+from . import formatting
+from . import processing
+from . import reports
+from . import stats
+from . import compat
 
 
 nice_errors = argh.wrap_errors(
@@ -104,7 +103,7 @@ def edit(category, pattern):
     editor = os.getenv('EDITOR')
     assert editor, 'env variable $EDITOR must be set'
 
-    pattern = pattern.decode('utf-8')
+    pattern = compat.decode(pattern)
 
     if category == 'config':
         path = settings.get_conf_path()

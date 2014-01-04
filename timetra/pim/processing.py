@@ -5,16 +5,12 @@ import os
 import xdg.BaseDirectory
 import yaml
 
-import finder
-import formatting
-import loading
-import settings
-from utils import getch
-from models import Concern
-
-
-
-import loading
+from . import finder
+from . import formatting
+from . import loading
+from . import settings
+from .utils import getch
+from .models import Concern
 
 
 data_dir = xdg.BaseDirectory.save_data_path(settings.APP_NAME)

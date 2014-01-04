@@ -4,8 +4,13 @@ import textwrap
 
 from blessings import Terminal
 
-from settings import get_app_conf
-from utils.formatdelta import render_delta
+from . import compat
+from .settings import get_app_conf
+from .utils.formatdelta import render_delta
+
+
+if compat.PY3:
+    unicode = str
 
 
 POSSIBLY_TOO_LONG_FIELDS = ['concerns', 'note']

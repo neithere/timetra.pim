@@ -6,9 +6,9 @@ import os
 import argh
 from prettytable import PrettyTable
 
-from settings import get_app_conf, ConfigurationError
-import finder
-import formatting
+from .settings import get_app_conf, ConfigurationError
+from . import finder
+from . import formatting
 
 
 @argh.named('files')
