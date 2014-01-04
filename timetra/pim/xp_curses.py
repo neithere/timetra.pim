@@ -30,7 +30,12 @@ http://mail-archive.com/urwid@lists.excess.org/msg00897.html
 import urwid
 
 # this app
-import finder
+from . import compat
+from . import finder
+
+
+if compat.PY3:
+    unicode = str
 
 
 def curses_app(col_names, elems):

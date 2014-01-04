@@ -78,7 +78,8 @@ setup(
     zip_safe = False,
     entry_points = {
         'console_scripts': [
-            'timetra-pim=timetra.pim.app:main'
+            'timetra-pim=timetra.pim.app:main',
+            'timetra-pim-tui=timetra.pim.xp_curses:main [curses]',
         ],
     },
 
