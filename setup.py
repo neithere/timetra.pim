@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# coding: utf-8
 #
 #    Timetra is a time tracking application and library.
 #    Copyright © 2010-2014  Andrey Mikhaylenko

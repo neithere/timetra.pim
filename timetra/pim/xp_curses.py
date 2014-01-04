@@ -1,6 +1,24 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
-
+#!/usr/bin/env python
+# coding: utf-8
+#
+#    Timetra is a time tracking application and library.
+#    Copyright © 2010-2014  Andrey Mikhaylenko
+#
+#    This file is part of Timetra.
+#
+#    Timetra is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Lesser General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Timetra is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Lesser General Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser General Public License
+#    along with Timetra.  If not, see <http://gnu.org/licenses/>.
+#
 '''
 test
 Andy Mikhaylenko, 2012-07-01 and 2013-04-14
@@ -51,7 +69,7 @@ def curses_app(col_names, elems):
     urwid.MainLoop(top, palette).run()
 
 
-if __name__ == '__main__':
+def main():
     items = finder.get_concerns()
 
     #col_names = u'Type', u'Name', u'Opened'
@@ -60,3 +78,7 @@ if __name__ == '__main__':
              (x.risk or x.need,
               x.opened) for x in items]
     curses_app(col_names, elems)
+
+
+if __name__ == '__main__':
+    main()
