@@ -1,0 +1,25 @@
+# python crap
+
+*$
+*.pyc
+*.pyo
+__pycache__/
+
+# editor crap
+
+*.swo
+*.swp
+.ropeproject/
+
+# testing crap
+
+.coverage
+*.egg-info/
+.tox/
+htmlcov/
+
+# packaging crap
+
+*.egg-info/
+build/
+dist/

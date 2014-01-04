@@ -1,0 +1,46 @@
+~~~~~~~~~~~
+Timetra PIM
+~~~~~~~~~~~
+
+A Personal Information Tracker with YAML backend + CLI frontend.
+
+Shares ideology with `Timetra Diary`_.
+
+"Timetra" is an umbrella project for a set of PIM-related tools.
+
+.. _Timetra Diary:: http://github.com/neithere/timetra-diary
+
+Installation
+------------
+
+.. note:: TODO
+
+Documentation
+-------------
+
+.. note:: TODO
+
+Author
+------
+
+Originally written by Andrey Mikhaylenko since 2012.
+
+Please feel free to submit patches, report bugs or request features:
+
+    https://github.com/neithere/timetra/issues/
+
+Licensing
+---------
+
+Timetra is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Timetra is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Timetra.  If not, see <http://gnu.org/licenses/>.

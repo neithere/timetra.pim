@@ -136,7 +136,7 @@ def web_serve(port=6061):
     app.run(port=port)
 
 
-if __name__ == '__main__':
+def main():
     parser = argh.ArghParser()
     parser.add_commands([
         show,
@@ -148,3 +148,7 @@ if __name__ == '__main__':
     parser.add_commands(stats.commands, namespace='stat')
     parser.add_commands([web_serve], namespace='web')
     parser.dispatch()
+
+
+if __name__ == '__main__':
+    main()
