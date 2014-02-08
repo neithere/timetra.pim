@@ -59,8 +59,84 @@ def indent(text):
     return prepend(text, ' ')
 
 
-def concerns(frozen_only=False, warm_only=False, acute=False, listing=False,
-             fullnames=False, calendar_included=False):
+def concerns(frozen_only=False, warm_only=False, acute=False,
+             calendar_included=False):
+    """ Displays a list of active risks and needs.
+    """
+    if frozen_only and warm_only:
+        raise RuntimeError('cannot combine --frozen-only and --warm-only')
+
+    concerns = finder.get_concerns()
+    node_concerns = {}
+    node_names = {}
+    for concern in concerns:
+        if acute and not concern.acute:
+            continue
+        if frozen_only and not concern.is_frozen():
+            continue
+        if warm_only and concern.is_frozen():
+            continue
+        text = _ucfirst(concern.risk or concern.need)
+
+        # based on HACK in finder
+        node_names[concern.context] = _ucfirst(concern.context_card.name)
+
+        # XXX the code below mostly groups items by context and formats them.
+        # Formatting can be slowly refactored but grouping definitely belongs
+        # to the backend.
+
+        node_plans = node_concerns.setdefault(concern.context, {}).setdefault(text, [])
+
+        for plan in concern.plan:
+            if not plan.closed:
+                _text = plan.action
+                try:
+                    head, _, tail = _text.partition(' ')
+                    head = _ucfirst(head)
+                    head = formatting.t.bold(head)
+                    _text = ' '.join([head, tail])
+                except:
+                    pass
+
+                _text = _crop(_text).replace('\n', ' ')
+
+                if plan.delegated:
+                    _text = u'@{0}: {1}'.format(plan.delegated, _ucfirst(_text))
+                else:
+                    _text = _ucfirst(_text)
+
+                if plan.time:
+                    if plan.time.date == datetime.date.today():
+                        _text = formatting.t.red(u'due TODAY: {0}'.format(_text))
+                    else:
+                        if calendar_included:
+                            _text = u'due {0}: {1}'.format(plan.time.strftime('%Y-%m-%d %H:%M UTC'), _text)
+                        else:
+                            continue
+
+                MARK_PLAN_OPEN   = u'▫'
+                MARK_PLAN_CLOSED = u'▪'
+                mark = MARK_PLAN_CLOSED if plan.closed else MARK_PLAN_OPEN
+                _text = '{} {}'.format(mark, _text)
+
+                node_plans.append(_text)
+
+    # yield the three levels of grouped data (node=context, concern, plan)
+
+    for node in sorted(node_concerns):
+        yield '{}  {}'.format(formatting.t.bold(node_names[node]), node)
+        for concern, plans in node_concerns[node].items():
+            # as closed items are already excluded, an item without plans
+            # is worse than an item with plans
+            colour = formatting.t.yellow if plans else formatting.t.red
+            yield '  {}'.format(colour(concern))
+            for plan in plans:
+                yield '    {}'.format(plan)
+        yield ''
+
+
+def concerns_tabular(frozen_only=False, warm_only=False, acute=False,
+                     listing=False, fullnames=False, calendar_included=False):
     """ Displays a list of active risks and needs.
     """
     if frozen_only and warm_only:
@@ -432,6 +508,7 @@ def overdue():
 
 commands = [
     concerns,
+    concerns_tabular,
     someday,
     plans,
     waiting,
