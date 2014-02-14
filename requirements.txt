@@ -12,3 +12,9 @@ urwid==1.1.1
 
 # for pim.web.providers.ttlbooks
 rdflib==3.2.1
+
+# for testing
+freezegun==0.1.11
+pytest==2.5.2
+pytest-cov==1.6
+pytest-xdist==1.9
