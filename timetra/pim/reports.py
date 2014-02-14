@@ -41,6 +41,12 @@ def _crop(string, width=40):
     return formatting.textwrap.fill(string, width=width)
 
 
+def _tz(dt):
+    import time
+    offset = time.timezone if (time.localtime().tm_isdst == 0) else time.altzone
+    return dt - datetime.timedelta(seconds=offset)
+
+
 def _get_plans_repr(concern):
     # FIXME based on a HACK in finder.collect_concerns
     plans_cnt = len(concern.plan)
@@ -60,7 +66,7 @@ def indent(text):
 
 
 def concerns(frozen_only=False, warm_only=False, acute=False,
-             calendar_included=False):
+             nocalendar=False):
     """ Displays a list of active risks and needs.
     """
     if frozen_only and warm_only:
@@ -105,14 +111,13 @@ def concerns(frozen_only=False, warm_only=False, acute=False,
                 else:
                     _text = _ucfirst(_text)
 
-                if plan.time:
-                    if plan.time.date == datetime.date.today():
-                        _text = formatting.t.red(u'due TODAY: {0}'.format(_text))
+                if plan.time and not nocalendar:
+                    tz_time = _tz(plan.time)
+                    if plan.time.date() == datetime.date.today():
+                        fmt_time = formatting.t.red(tz_time.strftime('today %H:%M'))
                     else:
-                        if calendar_included:
-                            _text = u'due {0}: {1}'.format(plan.time.strftime('%Y-%m-%d %H:%M UTC'), _text)
-                        else:
-                            continue
+                        fmt_time = tz_time.strftime('%Y-%m-%d %H:%M')
+                    _text = 'due {}: {}'.format(fmt_time, _text)
 
                 MARK_PLAN_OPEN   = u'▫'
                 MARK_PLAN_CLOSED = u'▪'
@@ -136,7 +141,7 @@ def concerns(frozen_only=False, warm_only=False, acute=False,
 
 
 def concerns_tabular(frozen_only=False, warm_only=False, acute=False,
-                     listing=False, fullnames=False, calendar_included=False):
+                     listing=False, fullnames=False, nocalendar=False):
     """ Displays a list of active risks and needs.
     """
     if frozen_only and warm_only:
@@ -189,14 +194,13 @@ def concerns_tabular(frozen_only=False, warm_only=False, acute=False,
                 else:
                     _text = _ucfirst(_text)
 
-                if plan.time:
-                    if plan.time.date == datetime.date.today():
-                        _text = u'due TODAY: {0}'.format(_text)
+                if plan.time and not nocalendar:
+                    tz_time = _tz(plan.time)
+                    if plan.time.date() == datetime.date.today():
+                        fmt_time = formatting.t.red(tz_time.strftime('today %H:%M'))
                     else:
-                        if calendar_included:
-                            _text = u'due {0}: {1}'.format(plan.time.strftime('%Y-%m-%d %H:%M UTC'), _text)
-                        else:
-                            continue
+                        fmt_time = tz_time.strftime('%Y-%m-%d %H:%M')
+                    _text = 'due {}: {}'.format(fmt_time, _text)
 
                 if listing:
                     next_action = _text
