@@ -60,7 +60,7 @@ setup(
         'monk==0.11.2',
         'prettytable==0.7.2',
         'python-dateutil==2.2',
-        'PyYAML==3.10',
+        'PyYAML>=3.10',
         'pyxdg==0.25',
     ],
     # usage example: http://stackoverflow.com/a/18879288/68097
