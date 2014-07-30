@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import utils  # XXX для yamlfiles; надо бы переместить
+from ... import utils  # XXX для yamlfiles; надо бы переместить
 
 
 class DataProvidersManager(object):

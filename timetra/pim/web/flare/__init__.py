@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 import datetime
+import functools
 import itertools
 from dateutil import rrule
 from operator import itemgetter
@@ -34,7 +35,7 @@ def multikeysort(items, columns):
                     return mult * result
         else:
             return 0
-    return sorted(items, cmp=comparer)
+    return sorted(items, key=functools.cmp_to_key(comparer))
 
 
 def day_view(year=None, month=None, day=None, template=None, query=None,

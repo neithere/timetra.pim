@@ -150,7 +150,7 @@ def edit(category, pattern):
 
 @argh.named('serve')
 def web_serve(port=6061):
-    import web
+    from . import web
     app = web.make_app()
     app.run(port=port)
 

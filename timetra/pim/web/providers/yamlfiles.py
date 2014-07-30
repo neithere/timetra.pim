@@ -6,10 +6,10 @@ import os
 import yaml
 
 from .base import BaseDataProvider
-from models import Concern as Item, Document
+from ...models import Concern as Item, Document
 from . import utils
 
-from settings import get_app_conf
+from ...settings import get_app_conf
 
 
 ARCHIVE_FILENAMES = ('archive.yaml',)
@@ -59,7 +59,7 @@ class YAMLFilesProvider(BaseDataProvider):
 
     @staticmethod
     def _transform_item(item):
-        item = {'note': item} if isinstance(item, unicode) else item
+        item = {'note': item} if isinstance(item, str) else item
         return Item(**item)
 
     def get_items(self, date=None, skip_archived=False):

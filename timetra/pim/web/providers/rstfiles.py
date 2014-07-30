@@ -8,9 +8,9 @@ import docutils.core
 import yaml
 
 from .base import BaseDataProvider
-from models import Concern as Item, Plan, Document
+from ...models import Concern as Item, Plan, Document
 
-from settings import get_app_conf
+from ...settings import get_app_conf
 
 
 __all__ = ['get_day_plans']
@@ -36,11 +36,11 @@ def parse_task(line, src_ver, context=None, from_yesterday=False, fixed_time=Fal
 
     meta_pattern = re.compile(r'(^|\s)(?P<data>\{.+?\})(\s|$)')
     if meta_pattern.search(item['text']):
-        print 'META'
+        print('META')
         raw_meta = meta_pattern.search(item['text']).group('data')
-        print '  raw:', repr(raw_meta)
+        print('  raw:', repr(raw_meta))
         meta = yaml.load(raw_meta)
-        print '  parsed:', meta
+        print('  parsed:', meta)
         item.update(meta)
         item['text'] = meta_pattern.sub('', item['text'])
 
@@ -138,7 +138,7 @@ def extract_items(path, src_ver=2, day=None):
             elif line == u'нет':
                 continue
             elif line in sections[src_ver]:
-                print 'OK SECT', line
+                print('OK SECT', line)
                 # possible remainder from another section
                 if prev:
                     yield prepare_task()
@@ -148,16 +148,16 @@ def extract_items(path, src_ver=2, day=None):
                 context = line
             elif line.startswith(' ') and not line.strip().startswith('['):
                 # prev item continued
-                print 'OK CONT', line
+                print('OK CONT', line)
                 assert prev
                 prev= ' '.join([prev, line.strip()])
             elif section:
-                print 'OK TASK', line
+                print('OK TASK', line)
                 if prev:
                     yield prepare_task()
                 prev = line
             else:
-                print "FAIL Don't know how to treat line", repr(line)
+                print("FAIL Don't know how to treat line", repr(line))
         # possible remainder
         if prev:
             yield prepare_task()
@@ -171,9 +171,9 @@ def get_day_plans(root_dir, date=None):
     except OSError:
         return []
     docs = [f for f in files if f.endswith('.rst')]
-    print docs
+    print(docs)
     today_fn = '{date.day:0>2}.rst'.format(date=date)
-    print today_fn
+    print(today_fn)
     if today_fn not in docs:
         return []
     today_path = os.path.join(day_dir, today_fn)
@@ -187,7 +187,7 @@ def get_day_plans(root_dir, date=None):
 def get_rst_files_list(root_dir, subdir):
     directory = os.path.join(root_dir, subdir)
     files = (f for f in os.listdir(directory) if f.endswith('.rst'))
-    files = (f if isinstance(f, unicode) else f.decode('utf-8') for f in files)
+    files = (f if isinstance(f, str) else f.decode('utf-8') for f in files)
     return sorted(name for name, ext in (os.path.splitext(f) for f in files))
 
 
@@ -236,7 +236,7 @@ def read_rst_file(root_dir, subdir, slug):
     directory = os.path.join(root_dir, subdir)
     path = u'{root}/{slug}.rst'.format(root=directory, slug=slug)
     if not os.path.exists(path):
-        print 'NO FILE', path
+        print('NO FILE', path)
         return None
     with codecs.open(path, encoding='utf-8') as f:
         return f.read()
@@ -245,7 +245,7 @@ def read_rst_file(root_dir, subdir, slug):
 def render_rst_file(root_dir, subdir, slug):
     meta, raw_document = get_rst_file_parts(root_dir, subdir, slug)
     if raw_document is None:
-        print 'NO FILE, NO RAW DOC'
+        print('NO FILE, NO RAW DOC')
         return None  #meta
     conf = dict(
         initial_header_level=2,
@@ -318,7 +318,7 @@ class ReStructuredTextFilesProvider(BaseDataProvider):
         return get_rst_files_list_annotated(self.root_dir, category)
 
     def get_document(self, category, slug):
-        slug = slug if isinstance(slug, unicode) else slug.decode('utf-8')
+        slug = slug if isinstance(slug, str) else slug.decode('utf-8')
         return render_rst_file(self.root_dir, category, slug)
 
 
