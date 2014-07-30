@@ -56,7 +56,7 @@ def stat_files(long=False):
             _, ext = os.path.splitext(name)
             files_by_ext.setdefault(ext, []).append(os.path.join(root, name))
 
-    for ext, files in files_by_ext.iteritems():
+    for ext, files in files_by_ext.items():
         yield '{ext}: {count}'.format(ext=(ext or 'no extension'), count=len(files))
         if long or len(files) < 10:    # <- an arbitrary threshold for marginal formats
             for f in files:
