@@ -57,7 +57,7 @@ setup(
         'argh>=0.23.2',
         'blessings==1.5',
         'Flask==0.10.1',
-        'monk==0.11.2',
+        'monk>=0.13.1',
         'prettytable==0.7.2',
         'python-dateutil==2.2',
         'PyYAML>=3.10',

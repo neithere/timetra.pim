@@ -19,10 +19,8 @@
 #    along with Timetra.  If not, see <http://gnu.org/licenses/>.
 #
 
-from monk.validation import validate
-from monk.errors import ValidationError
+from monk import validate, ValidationError, merge_defaults
 from monk.modeling import DotExpandedDict
-from monk.manipulation import merged as merge_defaults
 import yaml
 
 from . import compat

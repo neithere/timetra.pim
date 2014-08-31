@@ -153,7 +153,7 @@ def format_concern(concern, full=False):
     if concern.closed or concern.is_frozen():
         return
 
-    if concern.reqs:
+    if concern.get('reqs'):
         for req in concern.reqs:
             yield wrapper(u'    ---> сначала: {0}'.format(req))
     if concern.get('refers'):
@@ -161,7 +161,7 @@ def format_concern(concern, full=False):
             yield wrapper(u'        re {category}: {items}'.format(
                 category = category,
                 items = ', '.join(concern.refers[category])))
-    for plan in concern.plan:
+    for plan in concern.get('plan', []):
         yield format_plan(plan, indent=8*' ', concern_state=state, full=full)
 
 

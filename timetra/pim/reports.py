@@ -49,8 +49,9 @@ def _tz(dt):
 
 def _get_plans_repr(concern):
     # FIXME based on a HACK in finder.collect_concerns
-    plans_cnt = len(concern.plan)
-    plans_open_cnt = len([1 for p in concern.plan if not p.closed])
+    plans_cnt = len(concern.get('plan', []))
+    plans_open_cnt = len([1 for p in concern.get('plan', [])
+                          if not p.get('closed')])
     MARK_PLAN_OPEN   = u'▫'
     MARK_PLAN_CLOSED = u'▪'
     return u'{0}{1}'.format(MARK_PLAN_CLOSED * (plans_cnt - plans_open_cnt),
@@ -93,8 +94,8 @@ def concerns(frozen_only=False, warm_only=False, acute=False,
 
         node_plans = node_concerns.setdefault(concern.context, {}).setdefault(text, [])
 
-        for plan in concern.plan:
-            if not plan.closed:
+        for plan in concern.get('plan', []):
+            if not plan.get('closed'):
                 _text = plan.action
                 try:
                     head, _, tail = _text.partition(' ')
@@ -106,12 +107,12 @@ def concerns(frozen_only=False, warm_only=False, acute=False,
 
                 _text = _crop(_text).replace('\n', ' ')
 
-                if plan.delegated:
+                if plan.get('delegated'):
                     _text = u'@{0}: {1}'.format(plan.delegated, _ucfirst(_text))
                 else:
                     _text = _ucfirst(_text)
 
-                if plan.time and not nocalendar:
+                if plan.get('time') and not nocalendar:
                     tz_time = _tz(plan.time)
                     if plan.time.date() == datetime.date.today():
                         fmt_time = formatting.t.red(tz_time.strftime('today %H:%M'))
@@ -121,7 +122,7 @@ def concerns(frozen_only=False, warm_only=False, acute=False,
 
                 MARK_PLAN_OPEN   = u'▫'
                 MARK_PLAN_CLOSED = u'▪'
-                mark = MARK_PLAN_CLOSED if plan.closed else MARK_PLAN_OPEN
+                mark = MARK_PLAN_CLOSED if plan.get('closed') else MARK_PLAN_OPEN
                 _text = '{} {}'.format(mark, _text)
 
                 node_plans.append(_text)

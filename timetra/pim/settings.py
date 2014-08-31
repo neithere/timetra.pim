@@ -26,7 +26,7 @@ import os
 import sys
 import xdg.BaseDirectory
 from monk.modeling import DotExpandedDict
-from monk.schema import optional
+from monk import optional
 
 from . import caching
 

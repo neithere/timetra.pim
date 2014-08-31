@@ -21,8 +21,10 @@
 
 import datetime
 
-from monk import manipulation, modeling, validators
-from monk.schema import Rule, one_of, optional
+from monk import (
+    manipulation, modeling, one_of, IsA, Length, Equals, translate, nullable,
+    optional, opt_key,
+)
 
 from . import compat
 from . import utils   # for Concern.sorted_plans
@@ -38,20 +40,20 @@ __all__ = ['Concern', 'contact_schema', 'asset_schema', 'project_schema']
 #--- Pure Schemata
 
 
-log_schema = dict(
-    time = datetime.datetime,
-    note = optional(unicode),
-    data = dict,
-)
+log_schema = {
+    'time': datetime.datetime,
+    opt_key('note'): nullable(unicode),
+    'data': dict,
+}
 
 
 referenced_item_schema = [unicode]    # Rule(list, inner_spec=unicode)
-referenced_items_schema = {
-    'assets': optional(referenced_item_schema),
-    'contacts': optional(referenced_item_schema),
-    'projects': optional(referenced_item_schema),
-    'reference': optional(referenced_item_schema),
-}
+referenced_items_schema = translate({
+    opt_key('assets'): referenced_item_schema,
+    opt_key('contacts'): referenced_item_schema,
+    opt_key('projects'): referenced_item_schema,
+    opt_key('reference'): referenced_item_schema,
+}) & Length(min=1)
 
 
 STATUS_TODO = u'todo'
@@ -61,78 +63,74 @@ STATUS_CANCELLED = u'cancelled'
 
 plan_status_choices = STATUS_TODO, STATUS_WAITING, STATUS_DONE, STATUS_CANCELLED
 
-plan_schema = dict(
-    action = unicode,
-    status = one_of(plan_status_choices, first_is_default=True),
-    refers = optional(referenced_items_schema),
-    repeat = optional(unicode),
-    effort = optional(unicode),
-    context = Rule(list, inner_spec=unicode, default=[u'anywhere']),
-    srcmeta = optional(dict),
-    delegated = optional(unicode),
-    log = optional([
-        optional(log_schema)
-    ]),
-    opened = optional(datetime.datetime),
-    closed = optional(datetime.datetime),
-    result = optional(unicode),  # комментарий о результате выполнения действия: грабли, особенности, ...
-    reqs = optional([unicode]),    # требования (напр., какие документы нужно принести и т.д.)
-    time = optional(datetime.datetime),
-)
+plan_schema = {
+    'action': unicode,
+    'status': one_of(plan_status_choices, first_is_default=True),
+    opt_key('refers'): referenced_items_schema,
+    opt_key('repeat'): unicode,
+    opt_key('effort'): unicode,
+    opt_key('context'): [u'anywhere'],
+    opt_key('srcmeta'): dict,
+    opt_key('delegated'): unicode,
+    opt_key('log'): [ log_schema ],
+    opt_key('opened'): nullable(datetime.datetime),
+    opt_key('closed'): nullable(datetime.datetime),
+    opt_key('result'): nullable(unicode),  # комментарий о результате выполнения действия: грабли, особенности, ...
+    opt_key('reqs'): [unicode],    # требования (напр., какие документы нужно принести и т.д.)
+    opt_key('time'): datetime.datetime,
+}
 
 
-concern_schema = dict(
-    note = optional(unicode),
-    risk = optional(unicode),
-    need = optional(unicode),
-    haze = optional(unicode),  # неясность; вопросы, требующие прояснения. mess, uncertainty
-    plan = optional([
-        optional(plan_schema)
-    ]),
-    date = optional(datetime.date),
-    cost = optional(dict(
+concern_schema = {
+    opt_key('note'): unicode,
+    'risk': nullable(unicode),
+    'need': nullable(unicode),
+    opt_key('haze'): unicode,  # неясность; вопросы, требующие прояснения. mess, uncertainty
+    opt_key('plan'): [
+        plan_schema
+    ],
+    opt_key('date'): datetime.date,
+    opt_key('cost'): dict(
         amount = float,
         currency = unicode,
-    )),
-    stakeholders = optional([unicode]),
-    project = optional(unicode),
-    acute = False,
-    opened = optional(datetime.datetime),
-    closed = optional(datetime.datetime),
-    solved = False,
-    frozen = optional(datetime.datetime),  # if not None, it's someday/maybe
-    revive = optional(datetime.date),      # if set, the concern is not considered frozen anymore since given date
-    refers = optional(referenced_items_schema),
-    reqs = optional([unicode]),            # list of items that block this one
+    ),
+    opt_key('stakeholders'): [unicode],
+    opt_key('project'): unicode,
+    'acute': False,
+    'opened': nullable(datetime.datetime),
+    'closed': nullable(datetime.datetime),
+    opt_key('solved'): nullable(False),
+    opt_key('frozen'): datetime.datetime,  # if not None, it's someday/maybe
+    opt_key('revive'): datetime.date,      # if set, the concern is not considered frozen anymore since given date
+    opt_key('refers'): referenced_items_schema,
+    opt_key('reqs'): [unicode],            # list of items that block this one
     # TODO:
     # * проблема/потребность со временем: не меняется / усугубляется / ослабевает
-    log = optional([
-        optional(log_schema)
-    ]),
-)
+    opt_key('log'): [ log_schema ],
+}
 
 
 contact_schema = {
     'name': unicode,
-    'full_name': optional(unicode),
-    'urls': optional([unicode]),
-    'addr': optional(unicode),
-    'tels': optional([unicode]),
-    'mail': optional([unicode]),
-    'note': optional(unicode),
-    'nick': optional(unicode),
-    'born': optional(datetime.date),
-    'related': optional([unicode]),    # hashtags
-    'first_contact': optional(datetime.date),
-    'org': optional(unicode),
-    'timetable': optional(unicode),
-    'concerns': optional([
-        optional(concern_schema)
-    ]),
+    opt_key('full_name'): unicode,
+    opt_key('urls'): [unicode],
+    opt_key('addr'): unicode,
+    opt_key('tels'): [unicode],
+    opt_key('mail'): [unicode],
+    opt_key('note'): unicode,
+    opt_key('nick'): unicode,
+    opt_key('born'): datetime.date,
+    opt_key('related'): [unicode],    # hashtags
+    opt_key('first_contact'): datetime.date,
+    opt_key('org'): unicode,
+    opt_key('timetable'): unicode,
+    opt_key('concerns'): [
+        concern_schema
+    ],
 }
 
 
-imei_schema = Rule(unicode, validators=[validators.validate_length(15)])
+imei_schema = IsA(unicode) & Length(max=15)
 
 
 ASSET_CONDITION_CHOICES = u'new', u'good', u'fair', u'poor', u'unusable'
@@ -142,99 +140,99 @@ ASSET_OWNING_STATE_CHOICES = u'in effect', u'ordered', u'discarded', u'sold', u'
 asset_schema = {
     'name': unicode,
     'usable': True,
-    'urls': optional([unicode]),
-    'note': optional(unicode),
-    'type': optional(unicode),
-    'physical': optional({
-        #'condition': Rule(unicode, validators=[validators.validate_choice(['new'])]),
+    opt_key('urls'): [unicode],
+    opt_key('note'): unicode,
+    opt_key('type'): unicode,
+    opt_key('physical'): {
+        #'condition'): Rule(unicode, validators=[validators.validate_choice(['new'])],
         'condition': one_of(ASSET_CONDITION_CHOICES),
-        'maker': optional(unicode),
-        'model': optional(unicode),
-        'size': optional(unicode),
-        'weight': optional(unicode),
-        'colour': optional(unicode),
-        'location': optional(unicode),  # maybe hashtag
-        'quantity': optional(int),
-        'manufactured': optional(unicode),  # free-form date
-        'volume': optional(unicode),    # storage volume, be it litres or bytes
-        'connectivity': optional(unicode),
-        'material': optional(unicode),
-    }),
-    'owning': optional({
-        'state': optional(one_of(ASSET_OWNING_STATE_CHOICES, first_is_default=True)),
-        'owner': optional(unicode),
-        'price': optional(unicode),  # may include currency
-        'vendor': optional(unicode),
-        'bought': optional(datetime.date),
-        'delivered': optional(datetime.date), # free-form date
-    }),
-    'stakeholders': optional(list),  # hashtags
+        opt_key('maker'): unicode,
+        opt_key('model'): unicode,
+        opt_key('size'): unicode,
+        opt_key('weight'): unicode,
+        opt_key('colour'): unicode,
+        opt_key('location'): unicode,  # maybe hashtag
+        opt_key('quantity'): int,
+        opt_key('manufactured'): unicode,  # free-form date
+        opt_key('volume'): unicode,    # storage volume, be it litres or bytes
+        opt_key('connectivity'): unicode,
+        opt_key('material'): unicode,
+    },
+    opt_key('owning'): {
+        opt_key('state'): one_of(ASSET_OWNING_STATE_CHOICES, first_is_default=True),
+        opt_key('owner'): unicode,
+        opt_key('price'): unicode,  # may include currency
+        opt_key('vendor'): unicode,
+        opt_key('bought'): datetime.date,
+        opt_key('delivered'): datetime.date, # free-form date
+    },
+    opt_key('stakeholders'): list,  # hashtags
     # meta
-    'mail_label': optional(unicode),    # gmail integration
-    'categories': optional([unicode]),
+    opt_key('mail_label'): unicode,    # gmail integration
+    opt_key('categories'): [unicode],
     # Недвижимость
-    'flat': optional({
+    opt_key('flat'): {
         'addr': unicode,
-        'cadastre_zone': optional(unicode),
-        'title_deed': optional(int),
-        'unit': optional(unicode),
-        'overall_area': optional(unicode),         # общая площадь
-        'living_space': optional(unicode),         # жилая площадь
-        'residents_num': optional(int),            # количество проживающих
-        'ownership_form': optional(unicode),       # форма собственности
-    }),
+        opt_key('cadastre_zone'): unicode,
+        opt_key('title_deed'): int,
+        opt_key('unit'): unicode,
+        opt_key('overall_area'): unicode,         # общая площадь
+        opt_key('living_space'): unicode,         # жилая площадь
+        opt_key('residents_num'): int,            # количество проживающих
+        opt_key('ownership_form'): unicode,       # форма собственности
+    },
     # Устройства/техника
-    'device': optional({
+    opt_key('device'): {
         # device model
-        'model_number': optional(unicode),
-        'model_code': optional(unicode),
-        'product_code': optional(unicode),
-        'product_name': optional(unicode),
-        'product_number': optional(unicode),
-        'article': optional(unicode),           # артикул
-        'standard': optional(unicode),          # IEEE, ГОСТ, ...
+        opt_key('model_number'): unicode,
+        opt_key('model_code'): unicode,
+        opt_key('product_code'): unicode,
+        opt_key('product_name'): unicode,
+        opt_key('product_number'): unicode,
+        opt_key('article'): unicode,           # артикул
+        opt_key('standard'): unicode,          # IEEE, ГОСТ, ...
         # this device
-        'serial_number': optional(unicode),
-        'mac_address_eth': optional(unicode),
-        'mac_address_wlan': optional(unicode),
-        'mac_address_bluetooth': optional(unicode),
-        #'imei': optional(int),  # XXX вот тут бы проверить кол-во знаков!
-        'imei': optional(imei_schema),
-        'hardware_version': optional(unicode),
-        'software_version': optional(unicode),
-    }),
+        opt_key('serial_number'): unicode,
+        opt_key('mac_address_eth'): unicode,
+        opt_key('mac_address_wlan'): unicode,
+        opt_key('mac_address_bluetooth'): unicode,
+        #'imei'): optional(int),  # XXX вот тут бы проверить кол-во знаков!
+        opt_key('imei'): imei_schema,
+        opt_key('hardware_version'): unicode,
+        opt_key('software_version'): unicode,
+    },
     # Доменные имена
-    'domain_name': optional({
+    opt_key('domain_name'): {
         'registrar': unicode,
-        'username': optional(unicode),
-    }),
+        opt_key('username'): unicode,
+    },
     # Счета
-    'account': optional(dict),
+    opt_key('account'): dict,
     # Мебель
-    'furniture': optional(dict),
+    opt_key('furniture'): dict,
     # Одежда, обувь
-    'clothes': optional(dict),
+    opt_key('clothes'): dict,
     # Музыкальные инструменты
-    'music': optional(dict),
+    opt_key('music'): dict,
     # Услуги
-    'service': optional(dict),
-    'concerns': optional([
+    opt_key('service'): dict,
+    opt_key('concerns'): [
         optional(concern_schema)
-    ]),
+    ],
 }
 
 
 project_schema = {
     'name': unicode,
     'state': unicode,
-    'urls': optional([unicode]),
-    'note': optional(unicode),
-    'mail_label': optional([unicode]),
-    'concerns': optional([
+    opt_key('urls'): [unicode],
+    opt_key('note'): unicode,
+    opt_key('mail_label'): [unicode],
+    'concerns': [
         optional(concern_schema)
-    ]),
-    'stakeholders': optional(list),  # hashtags
-    'categories': optional([unicode]),
+    ],
+    opt_key('stakeholders'): list,  # hashtags
+    opt_key('categories'): [unicode],
 }
 
 #CONTACT = contact_schema
@@ -277,7 +275,7 @@ class Plan(Model):
         data = kwargs.copy()
 
         if 'context' in data:
-            data['context'] = manipulation.unfold_to_list(data['context'])
+            data['context'] = manipulation.normalize_to_list(data['context'])
 
         # convert date to datetime
         for key in ('opened', 'closed'):
@@ -300,17 +298,18 @@ class Concern(Model):
             if key in data and isinstance(data[key], datetime.date):
                 data[key] = utils.to_datetime(data[key])
 
-        # разворачиваем строку или словарь в список словарей
-        data['plan'] = manipulation.unfold_list_of_dicts(data.get('plan'), 'action')
+        if 'plan' in data:
+            # разворачиваем строку или словарь в список словарей
+            data['plan'] = manipulation.normalize_list_of_dicts(data.get('plan'), 'action')
 
-        # заворачиваем строку в список
-        data['plan'] = [Plan(**x) for x in data['plan']]
+            # заворачиваем строку в список
+            data['plan'] = [Plan(**x) for x in data['plan']]
 
         super(Concern, self).__init__(**data)
 
     def _check_has_plan(self, status):
         status_list = (status,) if isinstance(status, unicode) else status
-        if not self.plan:
+        if not self.get('plan'):
             return False
         for plan in self.plan:
             if plan.status in status_list:
@@ -324,22 +323,22 @@ class Concern(Model):
         return self._check_has_plan(Plan.STATUS_DONE)
 
     def is_waiting(self):
-        if self.plan:
-            if any(x.delegated for x in self.plan if not x.closed):
+        if self.get('plan'):
+            if any(x.get('delegated') for x in self.plan if not x.get('closed')):
                 return True
         return self._check_has_plan(Plan.STATUS_WAITING)
 
     def is_frozen(self):
         "Returns `True` if concern is frozen and not (yet) revived."
-        if not self.frozen:
+        if not self.get('frozen'):
             return False
-        if self.revive and (
+        if self.get('revive') and (
             utils.to_date(self.revive) <= datetime.date.today()):
             return False
         return True
 
     def sorted_plans(self):
-        if not self.plan:
+        if not self.get('plan'):
             return []
         return sorted(self.plan, key=lambda x: utils.to_datetime(x.closed or
                                                datetime.datetime.now()))
